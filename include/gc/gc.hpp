@@ -1,9 +1,11 @@
 
 
+#ifndef GC_HPP
+#define GC_HPP
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
-
 
 class GC {
 
@@ -220,4 +222,6 @@ private:
     Cell *alloc_end_ = nullptr;
     
 };
+
+#endif //GC_HPP
 
