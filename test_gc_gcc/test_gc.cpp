@@ -1,6 +1,6 @@
 
 
-#include "gc.hpp"
+#include "gc/gc.hpp"
 
 typedef GC::Cell Cell;
 
