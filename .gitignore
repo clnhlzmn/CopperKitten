@@ -1,0 +1,7 @@
+*.exe
+*.o
+*.elf
+*.hex
+*.eep
+**/Debug/**
+**/Release/**
