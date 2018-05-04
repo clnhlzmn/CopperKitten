@@ -17,7 +17,7 @@ template<typename Fetch>
 class VM {
     
     //instruction pointer
-    uint8_t *ip_;
+    int8_t *ip_;
     
     //function to fetch instruction
     Fetch fetch_;
@@ -38,7 +38,7 @@ public:
         stack_(stack), 
         size_(size) {}
     
-    enum OpCode : uint8_t {
+    enum OpCode : int8_t {
         ADD,
         SUB,
         MUL,
@@ -49,6 +49,8 @@ public:
         RETURN,     //jump to the return address on the stack
         JUMP,       //unconditional jump to the address on the top of the stack
         JUMPZ,      //jump to the address second on the stack if the first value is zero
+        JUMPO,      //jump to an offset stored in the next byte
+        JUMPOZ,     //jump to an offset stored in the next byte if the top of stack is zero
         PUSH,       //push the next byte in the instruction stream onto the stack
         PUSHW,      //push the next word (Cell) in the instruction stream onto the stack
         POP,        //pop the top value from the stack
@@ -57,10 +59,9 @@ public:
         UNFRAME     //remove a frame from the stack
     };
     
-    void Execute(uint8_t *code) {
+    void Execute(int8_t *code) {
         for (ip_ = code; ip_; ++ip_) {
-            uint8_t instruction = fetch_(ip_);
-            Dispatch(instruction);
+            Dispatch(fetch_(ip_));
         }
     }
     
@@ -102,17 +103,41 @@ public:
                 *stack_ = lhs < rhs ? -1 : lhs > rhs ? 1 : 0;
                 break;
             }
-            case CALL:
+            case CALL: {
+                auto temp = ip_;
+                ip_ = (uint8_t*)*stack_;
+                *stack_ = temp;
                 break;
+            }
             case RETURN:
-                break;
             case JUMP:
+                ip_ = (uint8_t*)*stack_--;
+                break;
+            case JUMPZ:
+                if (*stack_-- == 0) {
+                    ip_ = (uint8_t*)*stack_--;
+                } else {
+                    stack_--;
+                }
+                break;
+            case JUMPO:
+                ip_ += fetch_(ip_ + 1);
+                break;
+            case JUMPOZ:
+                if (*stack_-- == 0) {
+                    ip_ += fetch_(ip_ + 1);
+                } else {
+                    ip_++;
+                }
                 break;
             case PUSH:
+                *++stack_ = fetch_(++ip_);
                 break;
             case PUSHW:
+                //TODO: make a Cell from bytes in the instruction stream
                 break;
             case POP:
+                stack_--;
                 break;
             case HALT: 
                 ip_ = nullptr;

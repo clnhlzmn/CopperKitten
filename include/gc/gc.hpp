@@ -51,9 +51,9 @@ private:
     //the remaining cells are non references
    
     //allocation indices
-    static constexpr Cell SIZE = 0;
-    static constexpr Cell META = 1;
-    static constexpr Cell USER = 2;
+    static constexpr Cell SIZE = 0;     //meta
+    static constexpr Cell META = 1;     //meta
+    static constexpr Cell USER = 2;     //user data
     
     //size of allocation meta
     static constexpr Cell META_SIZE = 2;
@@ -72,10 +72,12 @@ private:
         cp[SIZE] = size;
     }
     
+    //get the value of the flag bit
     static Cell GetFlag(Cell *cp) {
         return cp[META] & FLAG_MASK;
     }
     
+    //set flag bit
     static void SetFlag(Cell *cp, Cell flag) {
         //clear existing type code
         cp[META] &= ~FLAG_MASK;
@@ -83,32 +85,36 @@ private:
         cp[META] |= (flag & FLAG_MASK);
     }
     
+    //get ref count value (flag == REFS)
     static Cell GetRefCount(Cell *cp) {
         return cp[META] >> FLAG_BITS;
     }
     
+    //set ref count (flas == REFS)
     static void SetRefCount(Cell *cp, Cell ref_count) {
         cp[META] &= FLAG_MASK;
         cp[META] |= (ref_count << FLAG_BITS);
     }
     
+    //get forwarding pointer (flag == FORWARD)
     static Cell *GetForward(Cell *cp) {
         return (Cell*)(cp[META] & ~FLAG_MASK);
     }
     
+    //set forwarding pointer (flag == FORWARD)
     static void SetForward(Cell *cp, Cell *fp) {
         cp[META] &= FLAG_MASK;
         cp[META] |= ((Cell)fp & ~FLAG_MASK);
     }
     
     //convert an allocation pointer to a user pointer
-    static Cell *GetUser(Cell *gc) {
-        return &gc[USER];
+    static Cell *GetUserPtr(Cell *gc) {
+        return gc + USER;
     }
     
     //convert a user pointer to an allocation pointer
-    static Cell *GetGC(Cell *user) {
-        return &user[-USER];
+    static Cell *GetGCPtr(Cell *user) {
+        return user - USER;
     }
     
 public:
@@ -129,15 +135,15 @@ public:
         SetFlag(ret, REFS);
         SetRefCount(ret, ref_count);
         for (Cell i = 0; i < ref_count; ++i) {
-            GetUser(ret)[i] = 0;
+            GetUserPtr(ret)[i] = 0;
         }
-        return GetUser(ret);
+        return GetUserPtr(ret);
     }
     
     //get the size of user data from a pointer
     //returned by Alloc
     static Cell GetSize(Cell *cp) {
-        return GetGC(cp)[SIZE] - META_SIZE;
+        return GetGCPtr(cp)[SIZE] - META_SIZE;
     }
     
 private:
@@ -164,6 +170,7 @@ private:
     //pointers must be converted when forwarding
     Cell *Forward(Cell *cp) {
         if (cp == nullptr) {
+            //nothing to do
             return cp;
         } else if (GetFlag(cp) == FORWARD) {
             //cp points to an allocation that is already forwarded
@@ -181,8 +188,9 @@ private:
             SetFlag(cp, FORWARD);
             //set forward pointer to new space
             SetForward(cp, alloc_ptr_);
+            //save the location
             auto ret = alloc_ptr_;
-            //bump pointer in new space
+            //bump pointer for next call
             alloc_ptr_ += size;
             //return new location
             return ret;
@@ -201,15 +209,19 @@ private:
         //forward roots
         for (auto it = begin; it != end; ++it) {
             //*it is a user pointer, Forward takes GC pointers
-            //so we must convert
-            *it = GetUser(Forward(GetGC(*it)));
+            *it = GetUserPtr(Forward(GetGCPtr(*it)));
         }
         //forward references between scan_ptr_ and alloc_ptr_
         while (scan_ptr_ < alloc_ptr_) {
+            //for each ref in user data
             for (Cell i = 0; i < GetRefCount(scan_ptr_); ++i) {
-                auto user = (Cell*)GetUser(scan_ptr_)[i];
-                GetUser(scan_ptr_)[i] = (Cell)GetUser(Forward(GetGC(user)));
+                //get the user pointer from the ref area at scan_ptr_
+                auto user = (Cell*)GetUserPtr(scan_ptr_)[i];
+                //then get the gc pointer for it, forward it and return the forwarded
+                //value to its place in the scan_ptr_allocation
+                GetUserPtr(scan_ptr_)[i] = (Cell)GetUserPtr(Forward(GetGCPtr(user)));
             }
+            //done with refs so bump scan_ptr_ to next allocation
             scan_ptr_ += GetAllocSize(scan_ptr_);
         }
         //check if collection freed enough space
