@@ -1,5 +1,23 @@
 
 
+//GC is meant to provide a generic interface for
+//allocating managed memory.
+
+//Memory is allocated in units of intptr_t.
+//Allocated memory can be declared reference or not.
+//A reference in this case refers to a pointer
+//to another GC allocation. GC uses two intptr_t
+//to maintain allocation state. One is for the 
+//size (in intptr_t) and the other contains a single
+//bit flag to indicate if the cell contains a 
+//count of references, or a forwarding pointer.
+//All references must be in the lower memory address 
+//area of the allocation like below
+//ptr->|                ptr+6->|
+//     [ref|ref|ref|bytes|bytes|bytes]
+//in the case above the ref count would be 3 and
+//the allocation size is 6 (not including metadata)
+
 #ifndef GC_HPP
 #define GC_HPP
 
@@ -45,7 +63,7 @@ private:
     static constexpr Cell FLAG_MASK = 0x01;
 
     //get the size from an allocation pointer
-    static Cell GetSize(Cell *cp) {
+    static Cell GetAllocSize(Cell *cp) {
         return cp[SIZE];
     }
     
@@ -95,12 +113,6 @@ private:
     
 public:
     
-    //get the size of user data from a pointer
-    //returned by Alloc
-    static Cell GetUserSize(Cell *cp) {
-        return GetGC(cp)[SIZE] - META_SIZE;
-    }
-    
     //create a GC instance with the given memory of the given size
     GC(Cell *mem, size_t size) {
         size_ = size / 2;
@@ -122,10 +134,16 @@ public:
         return GetUser(ret);
     }
     
+    //get the size of user data from a pointer
+    //returned by Alloc
+    static Cell GetSize(Cell *cp) {
+        return GetGC(cp)[SIZE] - META_SIZE;
+    }
+    
 private:
 
     //simple allocation of size cells with no checking
-    Cell *JustAlloc(Cell size) {
+    Cell *Alloc(Cell size) {
         auto ret = alloc_ptr_;
         alloc_ptr_ += size;
         return ret;
@@ -138,7 +156,7 @@ private:
         if ((alloc_end_ - alloc_ptr_) < size) {
             Collect(begin, end, size);
         }
-        return JustAlloc(size);
+        return Alloc(size);
     }
     
     //forward the allocation pointed to by cp
@@ -154,7 +172,7 @@ private:
         } else {
             //cp needs to be forwarded
             //get size
-            auto size = GetSize(cp);
+            auto size = GetAllocSize(cp);
             //copy size Cells from old to new space
             for (Cell i = 0; i < size; ++i) {
                 alloc_ptr_[i] = cp[i];
@@ -192,7 +210,7 @@ private:
                 auto user = (Cell*)GetUser(scan_ptr_)[i];
                 GetUser(scan_ptr_)[i] = (Cell)GetUser(Forward(GetGC(user)));
             }
-            scan_ptr_ += GetSize(scan_ptr_);
+            scan_ptr_ += GetAllocSize(scan_ptr_);
         }
         //check if collection freed enough space
         if ((alloc_end_ - alloc_ptr_) < required_size) {
