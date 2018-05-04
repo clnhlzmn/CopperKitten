@@ -29,6 +29,27 @@ class VM {
     //stack size
     GC::Cell size_;
     
+    //pointer to the current stack frame
+    GC::Cell frame_;
+    
+    //registers
+    GC::Cell r0_;
+    GC::Cell r1_;
+    GC::Cell r2_;
+    GC::Cell r3_;
+    GC::Cell r4_;
+    GC::Cell r5_;
+    GC::Cell r6_;
+    GC::Cell r7_;
+    GC::Cell r8_;
+    GC::Cell r9_;
+    GC::Cell r10_;
+    GC::Cell r11_;
+    GC::Cell r12_;
+    GC::Cell r13_;
+    GC::Cell r14_;
+    GC::Cell r15_;
+    
 public:
     
     VM(Fetch fetch, GC::Cell *stack, GC::Cell size)
@@ -39,11 +60,11 @@ public:
         size_(size) {}
     
     enum OpCode : int8_t {
-        ADD,
-        SUB,
-        MUL,
-        DIV,
-        MOD,
+        ADD,        //rl=rl+rr
+        SUB,        //rl=rl-rr
+        MUL,        //rl=rl*rr
+        DIV,        //rl=rl/rr
+        MOD,        //rl=rl%rr
         CMP,        //compare top items on stack -1 if s-2<s-1 0 if s-2==s-1 and 1 if s-2>s-1
         CALL,       //jump to the instruction pointer on the stack and leave the current instruction pointer there
         RETURN,     //jump to the return address on the stack
