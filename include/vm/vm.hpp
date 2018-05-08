@@ -56,15 +56,13 @@ public:
         MUL,        //rd=rl*rr
         DIV,        //rd=rl/rr
         MOD,        //rd=rl%rr
-        CMP,        //compare top items on stack -1 if s-2<s-1 0 if s-2==s-1 and 1 if s-2>s-1
-        CALL,       //jump to the instruction pointer on the stack and leave the current instruction pointer there
+        CMP,        //compare two registers, rd=-1 if rl<rr, rd=0 if rl==rr, rd=1 if rl>rr
+        CALL,       //jump to the instruction pointer in the given register and leave the current instruction pointer on the stack
         RETURN,     //jump to the return address on the stack
-        JUMP,       //unconditional jump to the address on the top of the stack
-        JUMPZ,      //jump to the address second on the stack if the first value is zero
-        JUMPO,      //jump to an offset stored in the next byte
-        JUMPOZ,     //jump to an offset stored in the next byte if the top of stack is zero
-        PUSH,       //push the next byte in the instruction stream onto the stack
-        PUSHW,      //push the next word (Cell) in the instruction stream onto the stack
+        JUMP,       //jump to the address in the given register
+        JUMPZ,      //jump to the address in the first register if the value in the second register is zero
+        
+        PUSH,       //push the value in the given register onto the stack
         POP,        //pop the top value from the stack
         HALT,       //stop execution
         PUSHREFS,   //push the current refs pointer and make a new one pointing there
