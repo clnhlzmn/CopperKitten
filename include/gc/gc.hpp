@@ -68,7 +68,7 @@ private:
     }
     
     //set the size of an allocation
-    static void SetSize(Cell *cp, Cell size) {
+    static void SetAllocSize(Cell *cp, Cell size) {
         cp[SIZE] = size;
     }
     
@@ -131,7 +131,7 @@ public:
     template<typename RootIterator>
     Cell *Alloc(RootIterator begin, RootIterator end, Cell size, Cell ref_count) {
         auto ret = Alloc(begin, end, size + META_SIZE);
-        SetSize(ret, size + META_SIZE);
+        SetAllocSize(ret, size + META_SIZE);
         SetFlag(ret, REFS);
         SetRefCount(ret, ref_count);
         for (Cell i = 0; i < ref_count; ++i) {

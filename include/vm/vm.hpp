@@ -29,7 +29,7 @@ class VM {
     //stack size
     GC::Cell size_;
     
-    //pointer to the current register frame
+    //pointer to the current frame
     GC::Cell frame_;
     
     //registers, first half are for references
@@ -69,11 +69,13 @@ public:
         HALT,       //stop execution
         PUSHREFS,   //push the current refs pointer and make a new one pointing there
         POPREFS     //pop the refs pointer
+        ENTER,      //enter a stack frame
+        LEAVE,      //leave a stack frame
     };
     
     void Execute(int8_t *code) {
-        for (ip_ = code; ip_; ++ip_) {
-            Dispatch(deref_(ip_));
+        for (ip_ = code; ip_; ) {
+            Dispatch(deref_(ip_++));
         }
     }
     
