@@ -8,19 +8,19 @@
 #include "gc/gc.hpp"
 
 //takes a parameter for the function
-//to fetch a uint8_t from a uint8_t*
+//to Deref a uint8_t from a uint8_t*
 //this is so, e.g., on avr the program
 //can be stored in program memory,
 //and different instructions need to be
 //used to acces that memory
-template<typename Fetch>
+template<typename Deref>
 class VM {
     
     //instruction pointer
     int8_t *ip_;
     
-    //function to fetch instruction
-    Fetch fetch_;
+    //function to dereference instruction pointer
+    Deref deref_;
     
     //stack pointer(s)
     GC::Cell *stack_base_;
@@ -29,42 +29,33 @@ class VM {
     //stack size
     GC::Cell size_;
     
-    //pointer to the current stack frame
+    //pointer to the current register frame
     GC::Cell frame_;
     
-    //registers
-    GC::Cell r0_;
-    GC::Cell r1_;
-    GC::Cell r2_;
-    GC::Cell r3_;
-    GC::Cell r4_;
-    GC::Cell r5_;
-    GC::Cell r6_;
-    GC::Cell r7_;
-    GC::Cell r8_;
-    GC::Cell r9_;
-    GC::Cell r10_;
-    GC::Cell r11_;
-    GC::Cell r12_;
-    GC::Cell r13_;
-    GC::Cell r14_;
-    GC::Cell r15_;
+    //registers, first half are for references
+    static constexpr GC::Cell NREFS = 16;
+    static constexpr GC::Cell NREGISTERS = 32;
+    GC::Cell r_[NREGISTERS];
     
 public:
     
-    VM(Fetch fetch, GC::Cell *stack, GC::Cell size)
-        : fetch_(fetch),
+    VM(Deref Deref, GC::Cell *stack, GC::Cell size)
+        : deref_(Deref),
         ip_(nullptr), 
         stack_base_(stack), 
         stack_(stack), 
-        size_(size) {}
+        size_(size) {
+            for (auto &r : r_) {
+                r = 0;
+            }
+        }
     
     enum OpCode : int8_t {
-        ADD,        //rl=rl+rr
-        SUB,        //rl=rl-rr
-        MUL,        //rl=rl*rr
-        DIV,        //rl=rl/rr
-        MOD,        //rl=rl%rr
+        ADD,        //rd=rl+rr
+        SUB,        //rd=rl-rr
+        MUL,        //rd=rl*rr
+        DIV,        //rd=rl/rr
+        MOD,        //rd=rl%rr
         CMP,        //compare top items on stack -1 if s-2<s-1 0 if s-2==s-1 and 1 if s-2>s-1
         CALL,       //jump to the instruction pointer on the stack and leave the current instruction pointer there
         RETURN,     //jump to the return address on the stack
@@ -76,46 +67,58 @@ public:
         PUSHW,      //push the next word (Cell) in the instruction stream onto the stack
         POP,        //pop the top value from the stack
         HALT,       //stop execution
-        FRAME,      //frame must be used in order to store references on the stack
-        UNFRAME     //remove a frame from the stack
+        PUSHREFS,   //push the current refs pointer and make a new one pointing there
+        POPREFS     //pop the refs pointer
     };
     
     void Execute(int8_t *code) {
         for (ip_ = code; ip_; ++ip_) {
-            Dispatch(fetch_(ip_));
+            Dispatch(deref_(ip_));
         }
     }
+    
+private:
+    
+    
+    //Instruction encoding
+    //first byte, opcode
+    //opcode specific arguments are in the next bytes
     
     void Dispatch(uint8_t instruction) {
         switch (instruction) {
             case ADD: {
-                auto rhs = *stack_--;
-                auto lhs = *stack_;
-                *stack_ = lhs + rhs;
+                auto dest = deref_(++ip_);
+                auto lhs = deref_(++ip_);
+                auto rhs = deref_(++ip_);
+                r_[dest] = r_[lhs] + r_[rhs];
                 break;
             }
             case SUB: {
-                auto rhs = *stack_--;
-                auto lhs = *stack_;
-                *stack_ = lhs - rhs;
+                auto dest = deref_(++ip_);
+                auto lhs = deref_(++ip_);
+                auto rhs = deref_(++ip_);
+                r_[dest] = r_[lhs] - r_[rhs];
                 break;
             }
             case MUL: {
-                auto rhs = *stack_--;
-                auto lhs = *stack_;
-                *stack_ = lhs * rhs;
+                auto dest = deref_(++ip_);
+                auto lhs = deref_(++ip_);
+                auto rhs = deref_(++ip_);
+                r_[dest] = r_[lhs] * r_[rhs];
                 break;
             }
             case DIV: {
-                auto rhs = *stack_--;
-                auto lhs = *stack_;
-                *stack_ = lhs / rhs;
+                auto dest = deref_(++ip_);
+                auto lhs = deref_(++ip_);
+                auto rhs = deref_(++ip_);
+                r_[dest] = r_[lhs] / r_[rhs];
                 break;
             }
             case MOD: {
-                auto rhs = *stack_--;
-                auto lhs = *stack_;
-                *stack_ = lhs % rhs;
+                auto dest = deref_(++ip_);
+                auto lhs = deref_(++ip_);
+                auto rhs = deref_(++ip_);
+                r_[dest] = r_[lhs] % r_[rhs];
                 break;
             }
             case CMP: {
@@ -142,17 +145,17 @@ public:
                 }
                 break;
             case JUMPO:
-                ip_ += fetch_(ip_ + 1);
+                ip_ += deref_(ip_ + 1);
                 break;
             case JUMPOZ:
                 if (*stack_-- == 0) {
-                    ip_ += fetch_(ip_ + 1);
+                    ip_ += deref_(ip_ + 1);
                 } else {
                     ip_++;
                 }
                 break;
             case PUSH:
-                *++stack_ = fetch_(++ip_);
+                *++stack_ = deref_(++ip_);
                 break;
             case PUSHW:
                 //TODO: make a Cell from bytes in the instruction stream
