@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "gc/gc.hpp"
+#include "gc.hpp"
 
 //takes a parameter for the function
 //to Deref a uint8_t from a uint8_t*
@@ -38,7 +38,7 @@ class VM {
     //reference for finding locals, 
     //arguments, and captures in 
     //function activations
-    GC::Cell *frame_;
+    GC::Cell frame_;
     
     //pointer to the ref chain
     //the ref chain is a singly linked list
@@ -46,19 +46,23 @@ class VM {
     //node is the cell below a reference cell
     //to be used to implement the root iterator
     //required by GC
-    GC::Cell *refs_;
+    GC::Cell refs_;
     
 public:
     
-    VM(Deref deref, GC &gc, GC::Cell *stack, GC::Cell size)
-        : gc_(gc),
+    VM(Deref Deref, GC &gc, GC::Cell *stack, GC::Cell size)
+        : deref_(Deref),
+        gc_(gc),
         ip_(nullptr), 
-        deref_(deref),
         sb_(stack), 
         sp_(stack), 
         size_(size),
-        frame_(0),
-        refs_(0) {}
+        frame_(nullptr),
+        refs_(nullptr) {
+            for (auto &r : r_) {
+                r = 0;
+            }
+        }
     
     enum OpCode : int8_t {
         ADD,        //
@@ -131,18 +135,18 @@ private:
             }
             case CALL: {
                 auto temp = ip_;
-                ip_ = (int8_t*)*(sp_ - 1);
-                *(sp_ - 1) = (GC::Cell)temp;
+                ip_ = (uint8_t*)*(sp_ - 1);
+                *(sp_ - 1) = temp;
                 break;
             }
             case RETURN:
             case JUMP:
-                ip_ = (int8_t*)*(sp_ - 1);
+                ip_ = (uint8_t*)*(sp_ - 1);
                 sp_--;
                 break;
             case JUMPZ:
                 if (*(sp_ - 1) == 0) {
-                    ip_ = (int8_t*)*(sp_ - 2);
+                    ip_ = (uint8_t*)*(sp_ - 2);
                 }
                 sp_ -= 2;
                 break;
@@ -180,21 +184,21 @@ private:
                 ip_ = nullptr;
                 break;
             case PUSHREF:
-                *sp_ = (GC::Cell)refs_;
+                *sp_ = refs_;
                 refs_ = sp_;
                 sp_++;
                 break;
             case POPREF:
-                refs_ = (GC::Cell*)*(sp_ - 1);
+                refs_ = *(sp_ - 1);
                 sp_--;
                 break;
             case ENTER:
-                *sp_ = (GC::Cell)frame_;
+                *sp_ = frame_;
                 frame_ = sp_;
                 sp_++;
                 break;
             case LEAVE:
-                frame_ = (GC::Cell*)*(sp_ - 1);
+                frame_ = *(sp_ - 1);
                 sp_--;
                 break;
             case IN: {
