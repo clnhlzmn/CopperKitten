@@ -75,6 +75,7 @@ public:
         JUMPOZ,     //JUMPO if tos is zero
         PUSH,       //push the next byte in the instruction stream
         PUSHW,      //push the next word in the instruction stream
+        DUP,        //duplicate the top value 
         POP,        //pop the top value from the stack
         SWAP,       //swap the top two items on the stack
         HALT,       //stop execution
@@ -84,6 +85,9 @@ public:
         LEAVE,      //leave a stack frame
         IN,         //read a byte from the console
         OUT,        //print a byte to the console
+        ALLOC,      //[...|n|nrefs]->[...|ref], allocate n cells with nrefs references
+        REFGET,     //[...|ref|index]->[...|value], get the cell at ref+index
+        REFSET,     //[...|ref|index|value]->[...], set the cell at ref+index
     };
     
     void Execute(int8_t *code) {
@@ -95,10 +99,40 @@ public:
     
 private:
     
+    //Rooterator implements the root iterator required for GC::Alloc
+    class Rooterator {
+        
+        //head of the root list
+        GC::Cell *ref_;
+        
+    public:
     
-    //Instruction encoding
-    //first byte, opcode
-    //opcode specific arguments are in the next bytes
+        //create a Rooterator given the root list head
+        Rooterator(GC::Cell *ref)
+            : ref_(ref) {}
+        
+        //return a reference to the cell above ref_ cast as a GC::Cell*&
+        GC::Cell *&operator*() {
+            return (GC::Cell*&)*(ref_ + 1);
+        }
+        
+        //equality
+        bool operator== (const Rooterator &other) const {
+            return ref_ == other.ref_;
+        }
+        
+        //not equality
+        bool operator!= (const Rooterator &other) const {
+            return !(*this == other);
+        }
+        
+        //next root (singly linked list traversal)
+        Rooterator &operator++ () {
+            ref_ = (GC::Cell*)*ref_;
+            return *this;
+        }
+        
+    };
     
     void Dispatch(uint8_t instruction) {
         switch (instruction) {
@@ -170,6 +204,10 @@ private:
                 sp_++;
                 break;
             }
+            case DUP:
+                *sp_ = *(sp_ - 1);
+                sp_++;
+                break;
             case POP:
                 sp_--;
                 break;
@@ -208,7 +246,21 @@ private:
                 printf("%c", *(sp_ - 1));
                 sp_--;
                 break;
-            
+            case ALLOC: {
+                auto begin = Rooterator(refs_);
+                auto end = Rooterator(nullptr);
+                *(sp_ - 2) = (GC::Cell)gc_.Alloc(begin, end, *(sp_ - 2), *(sp_ - 1));
+                sp_--;
+                break;
+            }
+            case REFGET:
+                *(sp_ - 2) = ((GC::Cell*)*(sp_ - 2))[*(sp_ - 1)];
+                sp_--;
+                break;
+            case REFSET:
+                ((GC::Cell*)*(sp_ - 3))[*(sp_ - 2)] = *(sp_ - 1);
+                sp_ -= 3;
+                break;
         }
     }
     

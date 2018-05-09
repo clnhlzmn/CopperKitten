@@ -5,3 +5,4 @@
 *.eep
 **/Debug/**
 **/Release/**
+CKAssembler/out/**

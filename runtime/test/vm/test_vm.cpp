@@ -24,7 +24,7 @@ RamVM vm(deref, gc, stack, STACKSIZE);
 int main() {
     int8_t program0[] = {RamVM::HALT};
     vm.Execute(program0);
-    int8_t program1[] = {RamVM::IN, RamVM::PUSH, 3, RamVM::SUB, RamVM::OUT, RamVM::HALT};
+    int8_t program1[] = {RamVM::IN, RamVM::PUSH, 3, RamVM::SUB, RamVM::OUT, RamVM::PUSH, '\n', RamVM::OUT, RamVM::HALT};
     vm.Execute(program1);
     std::cout<<"success"<<std::endl;
 }
