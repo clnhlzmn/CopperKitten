@@ -1,9 +1,9 @@
 package com.cph;
 
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Context {
-    public Map<String, AbstractInstruction> labels = new HashMap<String, AbstractInstruction>();
+    public int currentIndex = 0;
+    public Map<String, Integer> labels = new HashMap<String, Integer>();
 }

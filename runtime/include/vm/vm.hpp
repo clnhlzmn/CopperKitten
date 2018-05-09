@@ -88,6 +88,7 @@ public:
         ALLOC,      //[...|n|nrefs]->[...|ref], allocate n cells with nrefs references
         REFGET,     //[...|ref|index]->[...|value], get the cell at ref+index
         REFSET,     //[...|ref|index|value]->[...], set the cell at ref+index
+        NOP,        //
     };
     
     void Execute(int8_t *code) {
@@ -260,6 +261,8 @@ private:
             case REFSET:
                 ((GC::Cell*)*(sp_ - 3))[*(sp_ - 2)] = *(sp_ - 1);
                 sp_ -= 3;
+                break;
+            case NOP:
                 break;
         }
     }

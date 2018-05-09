@@ -36,5 +36,6 @@ public final class OpCode {
     public static final OpCode ALLOC = new OpCode(24);
     public static final OpCode REFGET = new OpCode(25);
     public static final OpCode REFSET = new OpCode(26);
+    public static final OpCode NOP = new OpCode(27);
 
 }

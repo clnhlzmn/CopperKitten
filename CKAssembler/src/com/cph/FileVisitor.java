@@ -1,14 +1,17 @@
 package com.cph;
 
-public class FileVisitor extends ckasmBaseVisitor<InstructionStream> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class FileVisitor extends ckasmBaseVisitor<List<PseudoInstruction>> {
 
     private Context context = new Context();
 
     @Override
-    public InstructionStream visitFile(ckasmParser.FileContext ctx) {
-        InstructionStream stream = new InstructionStream();
+    public List<PseudoInstruction> visitFile(ckasmParser.FileContext ctx) {
+        List<PseudoInstruction> stream = new ArrayList<>();
         for (int i = 0; i < ctx.instruction().size(); ++i) {
-            stream.append(new InstructionVisitor(context).visit(ctx.instruction(i)));
+            stream.add(new InstructionVisitor(context).visit(ctx.instruction(i)));
         }
         return stream;
     }
