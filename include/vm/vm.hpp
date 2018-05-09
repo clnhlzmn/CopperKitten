@@ -16,6 +16,9 @@
 template<typename Deref>
 class VM {
     
+    //reference to a GC instance
+    GC &gc_;
+    
     //instruction pointer
     int8_t *ip_;
     
@@ -24,7 +27,7 @@ class VM {
     
     //stack pointer(s)
     GC::Cell *stack_base_;
-    GC::Cell *stack_;
+    GC::Cell *sp_;
     
     //stack size
     GC::Cell size_;
@@ -32,48 +35,51 @@ class VM {
     //pointer to the current frame
     GC::Cell frame_;
     
-    //registers, first half are for references
-    static constexpr GC::Cell NREFS = 16;
-    static constexpr GC::Cell NREGISTERS = 32;
-    GC::Cell r_[NREGISTERS];
+    //pointer to the ref chain
+    GC::Cell refs_;
     
 public:
     
-    VM(Deref Deref, GC::Cell *stack, GC::Cell size)
+    VM(Deref Deref, GC &gc, GC::Cell *stack, GC::Cell size)
         : deref_(Deref),
+        gc_(gc),
         ip_(nullptr), 
         stack_base_(stack), 
-        stack_(stack), 
-        size_(size) {
+        sp_(stack), 
+        size_(size),
+        frame_(nullptr),
+        refs_(nullptr) {
             for (auto &r : r_) {
                 r = 0;
             }
         }
     
     enum OpCode : int8_t {
-        ADD,        //rd=rl+rr
+        ADD,        //
         SUB,        //rd=rl-rr
         MUL,        //rd=rl*rr
         DIV,        //rd=rl/rr
         MOD,        //rd=rl%rr
-        CMP,        //compare two registers, rd=-1 if rl<rr, rd=0 if rl==rr, rd=1 if rl>rr
-        CALL,       //jump to the instruction pointer in the given register and leave the current instruction pointer on the stack
-        RETURN,     //jump to the return address on the stack
-        JUMP,       //jump to the address in the given register
-        JUMPZ,      //jump to the address in the first register if the value in the second register is zero
-        
-        PUSH,       //push the value in the given register onto the stack
+        CMP,        //compare top two items on the stack [...|lhs|rhs]->[...|int] where int=-1 if lhs<rhs, 0 if lhs==rhs, 1 if lhs>rhs
+        CALL,       //jump to the instruction pointer on the stack and leave the current instruction pointer on the stack
+        RETURN,     //jump to the address on the stack
+        JUMP,       //jump to the address on the stack
+        JUMPZ,      //[...|a|t]->[...] if t==0 ip=a
+        PUSH,       //push the next byte in the instruction stream
+        PUSHW,      //push the next word in the instruction stream
         POP,        //pop the top value from the stack
         HALT,       //stop execution
-        PUSHREFS,   //push the current refs pointer and make a new one pointing there
-        POPREFS     //pop the refs pointer
+        REF,        //to indicate the next higher word on the stack is a reference
         ENTER,      //enter a stack frame
         LEAVE,      //leave a stack frame
+        IN,         //read a byte from the console
+        OUT,        //print a byte to the console
     };
     
     void Execute(int8_t *code) {
         for (ip_ = code; ip_; ) {
-            Dispatch(deref_(ip_++));
+            //increment ip_ here so its before Dispatch gets it (where it might be modified)
+            Dispatch(deref_(ip_++)); 
         }
     }
     
@@ -86,86 +92,75 @@ private:
     
     void Dispatch(uint8_t instruction) {
         switch (instruction) {
-            case ADD: {
-                auto dest = deref_(++ip_);
-                auto lhs = deref_(++ip_);
-                auto rhs = deref_(++ip_);
-                r_[dest] = r_[lhs] + r_[rhs];
+            case ADD:
+                *(sp_ - 2) = *(sp_ - 2) + *(sp_ - 1);
+                sp_--;
                 break;
-            }
-            case SUB: {
-                auto dest = deref_(++ip_);
-                auto lhs = deref_(++ip_);
-                auto rhs = deref_(++ip_);
-                r_[dest] = r_[lhs] - r_[rhs];
+            case SUB:
+                *(sp_ - 2) = *(sp_ - 2) - *(sp_ - 1);
+                sp_--;
                 break;
-            }
-            case MUL: {
-                auto dest = deref_(++ip_);
-                auto lhs = deref_(++ip_);
-                auto rhs = deref_(++ip_);
-                r_[dest] = r_[lhs] * r_[rhs];
+            case MUL: 
+                *(sp_ - 2) = *(sp_ - 2) * *(sp_ - 1);
+                sp_--;
                 break;
-            }
-            case DIV: {
-                auto dest = deref_(++ip_);
-                auto lhs = deref_(++ip_);
-                auto rhs = deref_(++ip_);
-                r_[dest] = r_[lhs] / r_[rhs];
+            case DIV:
+                *(sp_ - 2) = *(sp_ - 2) / *(sp_ - 1);
+                sp_--;
                 break;
-            }
-            case MOD: {
-                auto dest = deref_(++ip_);
-                auto lhs = deref_(++ip_);
-                auto rhs = deref_(++ip_);
-                r_[dest] = r_[lhs] % r_[rhs];
+            case MOD:
+                *(sp_ - 2) = *(sp_ - 2) % *(sp_ - 1);
+                sp_--;
                 break;
-            }
             case CMP: {
-                auto rhs = *stack_--;
-                auto lhs = *stack_;
-                *stack_ = lhs < rhs ? -1 : lhs > rhs ? 1 : 0;
+                auto lhs = *(sp_ - 2);
+                auto rhs = *(sp_ - 1);
+                *(sp_ - 2) = lhs < rhs ? -1 : lhs > rhs ? 1 : 0;
+                sp_--;
                 break;
             }
             case CALL: {
                 auto temp = ip_;
-                ip_ = (uint8_t*)*stack_;
-                *stack_ = temp;
+                ip_ = (uint8_t*)*(sp_ - 1);
+                *(sp_ - 1) = temp;
                 break;
             }
             case RETURN:
             case JUMP:
-                ip_ = (uint8_t*)*stack_--;
+                ip_ = (uint8_t*)*(sp_ - 1);
+                sp_--;
                 break;
             case JUMPZ:
-                if (*stack_-- == 0) {
-                    ip_ = (uint8_t*)*stack_--;
-                } else {
-                    stack_--;
+                if (*(sp_ - 1) == 0) {
+                    ip_ = (uint8_t*)*(sp_ - 2);
                 }
-                break;
-            case JUMPO:
-                ip_ += deref_(ip_ + 1);
-                break;
-            case JUMPOZ:
-                if (*stack_-- == 0) {
-                    ip_ += deref_(ip_ + 1);
-                } else {
-                    ip_++;
-                }
+                sp_ -= 2;
                 break;
             case PUSH:
-                *++stack_ = deref_(++ip_);
+                *sp_ = deref_(ip_++);
+                sp_++;
                 break;
-            case PUSHW:
-                //TODO: make a Cell from bytes in the instruction stream
+            case PUSHW: {
+                GC::Cell word;
+                for (int i = 0; i < sizeof(GC::Cell); ++i) {
+                    word <<= 8;
+                    word |= deref_(ip_++);
+                }
+                *sp_ = word;
+                sp_++;
                 break;
+            }
             case POP:
-                stack_--;
+                sp_--;
                 break;
             case HALT: 
                 ip_ = nullptr;
                 break;
+            case ENTER:
+                break;
+            case LEAVE:
+                break;
+            
         }
     }
     

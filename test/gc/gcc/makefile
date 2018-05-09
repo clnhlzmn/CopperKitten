@@ -2,7 +2,7 @@
 test: test_gc.o
 	g++ -g -o test test_gc.o
 
-test_gc.o: test_gc.cpp ../gc/gc.hpp
+test_gc.o: test_gc.cpp gc.hpp
 	g++ -Wall -Wextra -g -I ../ -std=c++11 -c test_gc.cpp -o test_gc.o
 
 clean:

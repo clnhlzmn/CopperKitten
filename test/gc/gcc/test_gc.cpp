@@ -1,6 +1,6 @@
 
 
-#include "gc/gc.hpp"
+#include "gc.hpp"
 
 typedef GC::Cell Cell;
 
@@ -10,12 +10,12 @@ int main() {
     Cell mem[1000];
     //gc instance
     GC gc(mem, 1000);
-    //alloc one ref cell (no roots here)
+    //alloc one ref cell (no roots yet)
     auto root = gc.Alloc((Cell**)0, (Cell**)0, 1, 1);
-    assert(GC::GetUserSize(root) == 1);
+    assert(GC::GetSize(root) == 1);
     //alloc one non ref cell (passing iterator to roots)
-    auto a = gc.Alloc(&root, (&root)+1, 1, 0);
-    assert(GC::GetUserSize(a) == 1);
+    auto a = gc.Alloc(&root, &root + 1, 1, 0);
+    assert(GC::GetSize(a) == 1);
     //store a value in non ref cell
     a[0] = 42;
     //store a in root
