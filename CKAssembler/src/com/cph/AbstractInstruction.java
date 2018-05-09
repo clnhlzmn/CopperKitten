@@ -1,11 +1,8 @@
 package com.cph;
 
-public class AbstractInstruction {
+import java.util.List;
 
-    public AbstractInstruction() {}
-
-    //return the size of this instruction in bytes
-    int size() {
-        return 0;
-    }
+public interface AbstractInstruction {
+    //return the list of concrete instructions that make up this instruction
+    List<ConcreteInstruction> getConcreteInstructions();
 }
