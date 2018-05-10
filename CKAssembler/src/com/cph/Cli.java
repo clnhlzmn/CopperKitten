@@ -47,8 +47,8 @@ public class Cli {
 //            }
 
             if (cmd.getArgs().length == 1) {
-                List<PseudoInstruction> file = Parse.file(new File(cmd.getArgs()[0]));
-                for (PseudoInstruction pi : file) {
+                ParseContext pc = Parse.file(new File(cmd.getArgs()[0]));
+                for (PseudoInstruction pi : pc.instructions) {
                     System.out.println(pi);
                 }
             } else {

@@ -36,12 +36,12 @@ public final class Parse {
         return parser;
     }
 
-    public static List<PseudoInstruction> file(File inputFile) {
+    public static ParseContext file(File inputFile) {
         ParseTree tree = getParser(getInputStream(inputFile)).file();
         return new FileVisitor().visit(tree);
     }
 
-    public static List<PseudoInstruction> file(String inputString) {
+    public static ParseContext file(String inputString) {
         ParseTree tree = getParser(getInputStream(inputString)).file();
         return new FileVisitor().visit(tree);
     }

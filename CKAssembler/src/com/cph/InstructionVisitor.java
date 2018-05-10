@@ -3,23 +3,26 @@ package com.cph;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
-    private Context context;
+    private int currentIndex;
+    private Map<String, Integer> labels;
 
-    public InstructionVisitor(Context context) {
-        this.context = context;
+    public InstructionVisitor(int currentIndex, Map<String, Integer> labels) {
+        this.currentIndex = currentIndex;
+        this.labels = labels;
     }
 
     @Override
     public PseudoInstruction visitLabel(ckasmParser.LabelContext ctx) {
         String name = ctx.LABEL().getText();
-        if (context.labels.containsKey(name)) {
+        if (labels.containsKey(name)) {
             throw new RuntimeException("duplicate label " + name);
         }
         Label ret = new Label();
-        context.labels.put(name, context.currentIndex);
+        labels.put(name, currentIndex);
         return ret;
     }
 

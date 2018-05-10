@@ -1,19 +1,20 @@
 package com.cph;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class FileVisitor extends ckasmBaseVisitor<List<PseudoInstruction>> {
-
-    private Context context = new Context();
+public class FileVisitor extends ckasmBaseVisitor<ParseContext> {
 
     @Override
-    public List<PseudoInstruction> visitFile(ckasmParser.FileContext ctx) {
-        List<PseudoInstruction> stream = new ArrayList<>();
+    public ParseContext visitFile(ckasmParser.FileContext ctx) {
+        List<PseudoInstruction> instructions = new ArrayList<>();
+        Map<String, Integer> labels = new HashMap<>();
         for (int i = 0; i < ctx.instruction().size(); ++i) {
-            stream.add(new InstructionVisitor(context).visit(ctx.instruction(i)));
+            instructions.add(new InstructionVisitor(i, labels).visit(ctx.instruction(i)));
         }
-        return stream;
+        return new ParseContext(labels, instructions);
     }
 
 }
