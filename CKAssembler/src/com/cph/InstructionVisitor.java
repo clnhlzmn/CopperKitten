@@ -1,6 +1,5 @@
 package com.cph;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +44,7 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
         if (!pushInstructions.contains(mnemonic)) {
             throw new RuntimeException("unknown instruction " + mnemonic + " " + arg);
         }
-        return new PushInstruction();
+        return new PushIntInstruction(Integer.valueOf(arg));
     }
 
     @Override

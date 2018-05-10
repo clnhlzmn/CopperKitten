@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 //
-public class PushInstruction implements PseudoInstruction {
+public class PushIntInstruction implements PseudoInstruction {
 
     int arg;
 
-    public PushInstruction(int arg) {
+    public PushIntInstruction(int arg) {
         this.arg = arg;
     }
 
