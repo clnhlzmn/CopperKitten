@@ -1,15 +1,15 @@
 package com.cph;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class SimpleInstruction implements Instruction {
+//a class that represents literal values (bytes) in the instruction stream
+public class LiteralValueInstruction implements Instruction {
 
-    String mnemonic;
+    byte value;
 
-    public SimpleInstruction(String mnemonic) {
-        this.mnemonic = mnemonic;
+    public LiteralValueInstruction(byte value) {
+        this.value = value;
     }
 
     @Override
@@ -22,8 +22,9 @@ public class SimpleInstruction implements Instruction {
         return Collections.singletonList(this);
     }
 
+
     @Override
     public List<Byte> getBytes(int targetCellSize) {
-        return Collections.singletonList((byte)OpCode.getOpCode(mnemonic).VALUE);
+        return Collections.singletonList(this.value);
     }
 }

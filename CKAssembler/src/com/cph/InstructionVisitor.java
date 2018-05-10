@@ -2,6 +2,7 @@ package com.cph;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
@@ -38,13 +39,13 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
     @Override
     public PseudoInstruction visitIntArgInstruction(ckasmParser.IntArgInstructionContext ctx) {
-        List<String> intArgInstructions = Arrays.asList("jump", "jumpz", "push", "pushw");
+        List<String> pushInstructions = Collections.singletonList("push");
         String mnemonic = ctx.MNEMONIC().getText();
         String arg = ctx.INTEGER().getText();
-        if (!intArgInstructions.contains(mnemonic)) {
+        if (!pushInstructions.contains(mnemonic)) {
             throw new RuntimeException("unknown instruction " + mnemonic + " " + arg);
         }
-        return super.visitIntArgInstruction(ctx);
+        return new PushInstruction();
     }
 
     @Override
