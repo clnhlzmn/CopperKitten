@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/CKAssembler/src\ckasm.g4 by ANTLR 4.7
+// Generated from /Users/colinholzman/Documents/CopperKitten/CKAssembler/src/ckasm.g4 by ANTLR 4.7
 package com.cph;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

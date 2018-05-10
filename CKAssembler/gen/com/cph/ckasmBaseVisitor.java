@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/CKAssembler/src\ckasm.g4 by ANTLR 4.7
+// Generated from /Users/colinholzman/Documents/CopperKitten/CKAssembler/src/ckasm.g4 by ANTLR 4.7
 package com.cph;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -31,19 +31,19 @@ public class ckasmBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMnemonic(ckasmParser.MnemonicContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMnemonicInstruction(ckasmParser.MnemonicInstructionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMnemonicInteger(ckasmParser.MnemonicIntegerContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIntArgInstruction(ckasmParser.IntArgInstructionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMnemonicLabel(ckasmParser.MnemonicLabelContext ctx) { return visitChildren(ctx); }
+	@Override public T visitLabelArgInstruction(ckasmParser.LabelArgInstructionContext ctx) { return visitChildren(ctx); }
 }

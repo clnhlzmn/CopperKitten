@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/CKAssembler/src\ckasm.g4 by ANTLR 4.7
+// Generated from /Users/colinholzman/Documents/CopperKitten/CKAssembler/src/ckasm.g4 by ANTLR 4.7
 package com.cph;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -145,32 +145,12 @@ public class ckasmParser extends Parser {
 			super.copyFrom(ctx);
 		}
 	}
-	public static class MnemonicLabelContext extends InstructionContext {
+	public static class MnemonicInstructionContext extends InstructionContext {
 		public TerminalNode MNEMONIC() { return getToken(ckasmParser.MNEMONIC, 0); }
-		public TerminalNode LABEL() { return getToken(ckasmParser.LABEL, 0); }
-		public MnemonicLabelContext(InstructionContext ctx) { copyFrom(ctx); }
+		public MnemonicInstructionContext(InstructionContext ctx) { copyFrom(ctx); }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ckasmVisitor ) return ((ckasmVisitor<? extends T>)visitor).visitMnemonicLabel(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class MnemonicIntegerContext extends InstructionContext {
-		public TerminalNode MNEMONIC() { return getToken(ckasmParser.MNEMONIC, 0); }
-		public TerminalNode INTEGER() { return getToken(ckasmParser.INTEGER, 0); }
-		public MnemonicIntegerContext(InstructionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ckasmVisitor ) return ((ckasmVisitor<? extends T>)visitor).visitMnemonicInteger(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class MnemonicContext extends InstructionContext {
-		public TerminalNode MNEMONIC() { return getToken(ckasmParser.MNEMONIC, 0); }
-		public MnemonicContext(InstructionContext ctx) { copyFrom(ctx); }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ckasmVisitor ) return ((ckasmVisitor<? extends T>)visitor).visitMnemonic(this);
+			if ( visitor instanceof ckasmVisitor ) return ((ckasmVisitor<? extends T>)visitor).visitMnemonicInstruction(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -180,6 +160,26 @@ public class ckasmParser extends Parser {
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof ckasmVisitor ) return ((ckasmVisitor<? extends T>)visitor).visitLabel(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class IntArgInstructionContext extends InstructionContext {
+		public TerminalNode MNEMONIC() { return getToken(ckasmParser.MNEMONIC, 0); }
+		public TerminalNode INTEGER() { return getToken(ckasmParser.INTEGER, 0); }
+		public IntArgInstructionContext(InstructionContext ctx) { copyFrom(ctx); }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ckasmVisitor ) return ((ckasmVisitor<? extends T>)visitor).visitIntArgInstruction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class LabelArgInstructionContext extends InstructionContext {
+		public TerminalNode MNEMONIC() { return getToken(ckasmParser.MNEMONIC, 0); }
+		public TerminalNode LABEL() { return getToken(ckasmParser.LABEL, 0); }
+		public LabelArgInstructionContext(InstructionContext ctx) { copyFrom(ctx); }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ckasmVisitor ) return ((ckasmVisitor<? extends T>)visitor).visitLabelArgInstruction(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -202,7 +202,7 @@ public class ckasmParser extends Parser {
 				}
 				break;
 			case 2:
-				_localctx = new MnemonicContext(_localctx);
+				_localctx = new MnemonicInstructionContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(14);
@@ -210,7 +210,7 @@ public class ckasmParser extends Parser {
 				}
 				break;
 			case 3:
-				_localctx = new MnemonicIntegerContext(_localctx);
+				_localctx = new IntArgInstructionContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(15);
@@ -220,7 +220,7 @@ public class ckasmParser extends Parser {
 				}
 				break;
 			case 4:
-				_localctx = new MnemonicLabelContext(_localctx);
+				_localctx = new LabelArgInstructionContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
 				setState(17);

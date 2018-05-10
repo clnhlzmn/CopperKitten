@@ -1,5 +1,9 @@
 package com.cph;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
     private Context context;
@@ -20,17 +24,31 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
     }
 
     @Override
-    public PseudoInstruction visitMnemonic(ckasmParser.MnemonicContext ctx) {
-        return super.visitMnemonic(ctx);
+    public PseudoInstruction visitMnemonicInstruction(ckasmParser.MnemonicInstructionContext ctx) {
+        List<String> mnemonicInstructions = Arrays.asList("add", "sub", "mul", "div", "cmp", "call", "return",
+                                                          "jump", "jumpz", "dup", "pop", "swap", "halt", "pushref",
+                                                          "popref", "enter", "leave", "in", "out", "alloc", "refget",
+                                                          "refset", "nop");
+        String mnemonic = ctx.MNEMONIC().getText();
+        if (!mnemonicInstructions.contains(mnemonic)) {
+            throw new RuntimeException("unknown instruction " + mnemonic);
+        }
+        return new SimpleInstruction(mnemonic);
     }
 
     @Override
-    public PseudoInstruction visitMnemonicInteger(ckasmParser.MnemonicIntegerContext ctx) {
-        return super.visitMnemonicInteger(ctx);
+    public PseudoInstruction visitIntArgInstruction(ckasmParser.IntArgInstructionContext ctx) {
+        List<String> intArgInstructions = Arrays.asList("jump", "jumpz", "push", "pushw");
+        String mnemonic = ctx.MNEMONIC().getText();
+        String arg = ctx.INTEGER().getText();
+        if (!intArgInstructions.contains(mnemonic)) {
+            throw new RuntimeException("unknown instruction " + mnemonic + " " + arg);
+        }
+        return super.visitIntArgInstruction(ctx);
     }
 
     @Override
-    public PseudoInstruction visitMnemonicLabel(ckasmParser.MnemonicLabelContext ctx) {
-        return super.visitMnemonicLabel(ctx);
+    public PseudoInstruction visitLabelArgInstruction(ckasmParser.LabelArgInstructionContext ctx) {
+        return super.visitLabelArgInstruction(ctx);
     }
 }

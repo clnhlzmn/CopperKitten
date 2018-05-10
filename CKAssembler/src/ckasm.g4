@@ -8,9 +8,9 @@ file
 
 instruction
     : LABEL ':'                         #label
-    | MNEMONIC                          #mnemonic
-    | MNEMONIC INTEGER                  #mnemonicInteger
-    | MNEMONIC LABEL                    #mnemonicLabel
+    | MNEMONIC                          #mnemonicInstruction
+    | MNEMONIC INTEGER                  #intArgInstruction
+    | MNEMONIC LABEL                    #labelArgInstruction
     ;
 
 MNEMONIC

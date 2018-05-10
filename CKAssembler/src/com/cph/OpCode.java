@@ -1,5 +1,8 @@
 package com.cph;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public final class OpCode {
 
     private OpCode(int value) {
@@ -37,5 +40,40 @@ public final class OpCode {
     public static final OpCode REFGET = new OpCode(25);
     public static final OpCode REFSET = new OpCode(26);
     public static final OpCode NOP = new OpCode(27);
+
+    public static final Map<String, OpCode> nameToOpcode = new HashMap<String, OpCode>() {{
+        put("add", new OpCode(0));
+        put("sub", new OpCode(1));
+        put("mul", new OpCode(2));
+        put("div", new OpCode(3));
+        put("mod", new OpCode(4));
+        put("cmp", new OpCode(5));
+        put("call", new OpCode(6));
+        put("return", new OpCode(7));
+        put("jump", new OpCode(8));
+        put("jumpz", new OpCode(9));
+        put("jumpz", new OpCode(10));
+        put("jumpoz", new OpCode(11));
+        put("push", new OpCode(12));
+        put("pushw", new OpCode(13));
+        put("dup", new OpCode(14));
+        put("pop", new OpCode(15));
+        put("swap", new OpCode(16));
+        put("halt", new OpCode(17));
+        put("pushref", new OpCode(18));
+        put("popref", new OpCode(19));
+        put("enter", new OpCode(20));
+        put("leave", new OpCode(21));
+        put("in", new OpCode(22));
+        put("out", new OpCode(23));
+        put("alloc", new OpCode(24));
+        put("refget", new OpCode(25));
+        put("refset", new OpCode(26));
+        put("nop", new OpCode(27));
+    }};
+
+    static public OpCode getOpCode(String mnemonic) {
+        return nameToOpcode.get(mnemonic);
+    }
 
 }

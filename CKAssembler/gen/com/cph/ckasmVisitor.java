@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/CKAssembler/src\ckasm.g4 by ANTLR 4.7
+// Generated from /Users/colinholzman/Documents/CopperKitten/CKAssembler/src/ckasm.g4 by ANTLR 4.7
 package com.cph;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -24,24 +24,24 @@ public interface ckasmVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLabel(ckasmParser.LabelContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code mnemonic}
+	 * Visit a parse tree produced by the {@code mnemonicInstruction}
 	 * labeled alternative in {@link ckasmParser#instruction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMnemonic(ckasmParser.MnemonicContext ctx);
+	T visitMnemonicInstruction(ckasmParser.MnemonicInstructionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code mnemonicInteger}
+	 * Visit a parse tree produced by the {@code intArgInstruction}
 	 * labeled alternative in {@link ckasmParser#instruction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMnemonicInteger(ckasmParser.MnemonicIntegerContext ctx);
+	T visitIntArgInstruction(ckasmParser.IntArgInstructionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code mnemonicLabel}
+	 * Visit a parse tree produced by the {@code labelArgInstruction}
 	 * labeled alternative in {@link ckasmParser#instruction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMnemonicLabel(ckasmParser.MnemonicLabelContext ctx);
+	T visitLabelArgInstruction(ckasmParser.LabelArgInstructionContext ctx);
 }
