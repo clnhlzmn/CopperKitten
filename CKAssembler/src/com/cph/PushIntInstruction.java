@@ -3,7 +3,7 @@ package com.cph;
 import java.util.ArrayList;
 import java.util.List;
 
-//
+//an instruction of the form push <int>
 public class PushIntInstruction implements PseudoInstruction {
 
     int arg;

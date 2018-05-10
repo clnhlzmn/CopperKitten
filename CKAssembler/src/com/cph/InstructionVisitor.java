@@ -49,6 +49,18 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
     @Override
     public PseudoInstruction visitLabelArgInstruction(ckasmParser.LabelArgInstructionContext ctx) {
-        return super.visitLabelArgInstruction(ctx);
+        List<String> pushInstructions = Arrays.asList("jump", "call");
+        String mnemonic = ctx.MNEMONIC().getText();
+        String arg = ctx.LABEL().getText();
+        if (!pushInstructions.contains(mnemonic)) {
+            throw new RuntimeException("unknown instruction " + mnemonic + " " + arg);
+        }
+        if (mnemonic.equals("jump")) {
+            return new JumpLabelInstruction(mnemonic, arg);
+        } else if (mnemonic.equals("call")) {
+            return new CallLabelInstruction(mnemonic, arg);
+        } else {
+            return null;
+        }
     }
 }
