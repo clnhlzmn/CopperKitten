@@ -58,12 +58,13 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
         if (!pushInstructions.contains(mnemonic)) {
             throw new RuntimeException("unknown instruction " + mnemonic + " " + arg);
         }
-        if (mnemonic.equals("jump")) {
-            return new JumpLabelInstruction(mnemonic, arg);
-        } else if (mnemonic.equals("call")) {
-            return new CallLabelInstruction(mnemonic, arg);
-        } else {
-            return null;
+        switch (mnemonic) {
+            case "jump":
+                return new JumpLabelInstruction(mnemonic, arg);
+            case "call":
+                return new CallLabelInstruction(mnemonic, arg);
+            default:
+                return null;
         }
     }
 }
