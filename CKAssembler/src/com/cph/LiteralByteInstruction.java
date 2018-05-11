@@ -3,12 +3,13 @@ package com.cph;
 import java.util.Collections;
 import java.util.List;
 
-public class SimpleInstruction implements Instruction {
+//a class that represents literal values (bytes) in the instruction stream
+public class LiteralByteInstruction implements Instruction {
 
-    String mnemonic;
+    byte value;
 
-    public SimpleInstruction(String mnemonic) {
-        this.mnemonic = mnemonic;
+    public LiteralByteInstruction(byte value) {
+        this.value = value;
     }
 
     @Override
@@ -31,8 +32,9 @@ public class SimpleInstruction implements Instruction {
         return Collections.singletonList(this);
     }
 
+
     @Override
     public String emit(TargetContext targetContext) {
-        return targetContext.mnemonicConverter.apply(mnemonic) + ", ";
+        return String.valueOf(value) + ", ";
     }
 }

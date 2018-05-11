@@ -3,6 +3,7 @@ package com.cph;
 import org.apache.commons.cli.*;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 //borrowed and adapted from http://www.thinkplexx.com/blog/simple-apache-commons-cli-example-java-command-line-arguments-parsing
@@ -46,11 +47,26 @@ public class Cli {
 //                help();
 //            }
 
+            //create based on options passed
+            TargetContext tc = new TargetContext(4, "program", (m)-> "TargetVM::" + m.toUpperCase());
+
             if (cmd.getArgs().length == 1) {
                 ParseContext pc = Parse.file(new File(cmd.getArgs()[0]));
-                for (PseudoInstruction pi : pc.instructions) {
-                    System.out.println(pi);
+                for (int i = 0; i < pc.instructions.size(); ++i) {
+                    pc.instructions.get(i).determineInstructions(pc, tc, i);
                 }
+                for (int i = 0; i < pc.instructions.size(); ++i) {
+                    pc.instructions.get(i).calculateJumps(pc, tc, i);
+                }
+                List<Instruction> instructions = new ArrayList<>();
+                for (int i = 0; i < pc.instructions.size(); ++i) {
+                    instructions.addAll(pc.instructions.get(i).getInstructions(tc.cellSize));
+                }
+                StringBuilder sb = new StringBuilder();
+                for (Instruction inst: instructions) {
+                    sb.append(inst.emit(tc));
+                }
+                System.out.println(sb.toString());
             } else {
                 help();
             }

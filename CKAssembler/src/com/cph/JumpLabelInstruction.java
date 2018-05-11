@@ -13,6 +13,11 @@ public class JumpLabelInstruction implements PseudoInstruction {
     //label of jump target
     String targetLabel;
 
+    //does it use offset or address
+    boolean smallJump = false;
+    //address or offset
+    int address = 0;
+
     //create instruction with the given mnemonic and target label
     public JumpLabelInstruction(String mnemonic, String targetLabel) {
         this.mnemonic = mnemonic;
@@ -22,13 +27,69 @@ public class JumpLabelInstruction implements PseudoInstruction {
     //returns the worst case size
     @Override
     public int size(int targetCellSize) {
-        //worst case: pushw offset jump(z)
-        return 2 + targetCellSize;
+        if (smallJump) {
+            //best case jumpo(z) offset
+            return 2;
+        } else {
+            //worst case: pushw address jump(z)
+            return 2 + targetCellSize;
+        }
+    }
+
+    @Override
+    public void determineInstructions(ParseContext context, TargetContext targetContext, int thisIndex) {
+        int begin = Math.min(thisIndex, context.labels.get(targetLabel));
+        int end = Math.max(thisIndex, context.labels.get(targetLabel));
+        address = 0;
+        for (int i = begin; i < end; ++i) {
+            address += context.instructions.get(i).size(targetContext.cellSize);
+        }
+        if (thisIndex < context.labels.get(targetLabel)) {
+            //forward jump, have to subtract 1 + targetCellSize from dist
+            address -= (1 + targetContext.cellSize);
+        }
+        smallJump = address <= 127;
+    }
+
+    @Override
+    public void calculateJumps(ParseContext context, TargetContext targetContext, int thisIndex) {
+        if (smallJump) {
+            //have to calculate offset
+            int begin = Math.min(thisIndex, context.labels.get(targetLabel));
+            int end = Math.max(thisIndex, context.labels.get(targetLabel));
+            address = 0;
+            for (int i = begin; i < end; ++i) {
+                address += context.instructions.get(i).size(targetContext.cellSize);
+            }
+            //add one because of when ip_ gets incremented
+            address += 1;
+            if (thisIndex < context.labels.get(targetLabel)) {
+                //forward jump, have to subtract 2 from dist
+                address -= (2);
+            } else {
+                address = -(address);
+            }
+        } else {
+            //have to calculate address
+            address = 0;
+            for (int i = 0; i < context.labels.get(targetLabel); ++i) {
+                address += context.instructions.get(i).size(targetContext.cellSize);
+            }
+        }
     }
 
     @Override
     public List<Instruction> getInstructions(int targetCellSize) {
-        return null;
+        List<Instruction> ret = new ArrayList<>();
+        if (smallJump) {
+            ret.add(new SimpleInstruction(mnemonic.equals("jump") ? "jumpo" : "jumpoz"));
+            ret.add(new LiteralByteInstruction((byte)address));
+        } else {
+            ret.add(new SimpleInstruction("pushw"));
+            ret.add(new LiteralIntInstruction(address));
+            ret.add(new SimpleInstruction(mnemonic));
+        }
+        return ret;
     }
 
 }

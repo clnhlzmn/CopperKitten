@@ -1,0 +1,7 @@
+Main:
+push 10
+pop
+jump Mani
+push 1122
+pop
+Mani:

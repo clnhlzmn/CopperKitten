@@ -1,0 +1,10 @@
+Main:
+call Foo
+jump Main
+
+Foo:
+push 2
+push 97
+add
+out
+return

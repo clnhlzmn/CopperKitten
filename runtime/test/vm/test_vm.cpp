@@ -3,13 +3,11 @@
 #include <iostream>
 #include "vm/vm.hpp"
 
-typedef GC::Cell Cell;
+constexpr intptr_t HEAPSIZE = 1000;
+constexpr intptr_t STACKSIZE = 100;
 
-constexpr Cell HEAPSIZE = 1000;
-constexpr Cell STACKSIZE = 100;
-
-Cell heap[HEAPSIZE];
-Cell stack[STACKSIZE];
+intptr_t heap[HEAPSIZE];
+intptr_t stack[STACKSIZE];
 
 GC gc(heap, HEAPSIZE);
 
@@ -17,15 +15,13 @@ auto deref = [](int8_t*ip){return *ip;};
 
 typedef decltype(deref) Deref;
 
-typedef VM<Deref> RamVM;
+typedef VM<Deref> TargetVM;
 
-RamVM vm(deref, gc, stack, STACKSIZE);
+TargetVM vm(deref, gc, stack, STACKSIZE);
 
 int main() {
-    int8_t program0[] = {RamVM::HALT};
-    vm.Execute(program0);
-    int8_t program1[] = {RamVM::IN, RamVM::PUSH, 3, RamVM::SUB, RamVM::OUT, RamVM::PUSH, '\n', RamVM::OUT, RamVM::HALT};
-    vm.Execute(program1);
+    int8_t program[] = {TargetVM::PUSHW, (int8_t)((intptr_t)(program+8) >> 0), (int8_t)((intptr_t)(program+8) >> 8), (int8_t)((intptr_t)(program+8) >> 16), (int8_t)((intptr_t)(program+8) >> 24), TargetVM::CALL, TargetVM::JUMPO, -7, TargetVM::PUSH, 2, TargetVM::PUSH, 97, TargetVM::ADD, TargetVM::OUT, TargetVM::RETURN,};
+    vm.Execute(program);
     std::cout<<"success"<<std::endl;
 }
 

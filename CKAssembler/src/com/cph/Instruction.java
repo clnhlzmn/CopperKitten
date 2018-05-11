@@ -1,10 +1,9 @@
 package com.cph;
 
-import java.util.List;
-
 //represents a concrete instruction
 public interface Instruction extends PseudoInstruction {
 
-    List<Byte> getBytes(int targetCellSize);
+    //emit the instructions in a form determined in part by TargetContext
+    String emit(TargetContext targetContext);
 
 }

@@ -12,10 +12,10 @@ public interface PseudoInstruction {
     int size(int targetCellSize);
 
     //call for the pseudo instruction to determine which instructions it will emit
-    void determineInstructions(ParseContext context);
+    void determineInstructions(ParseContext context, TargetContext targetContext, int thisIndex);
 
     //call for the pseudo instruction to calculate jump offsets
-    void calculateJumps(ParseContext context);
+    void calculateJumps(ParseContext context, TargetContext targetContext, int thisIndex);
 
     //get the list of actual instructions that this pseudo instruction represents
     List<Instruction> getInstructions(int targetCellSize);

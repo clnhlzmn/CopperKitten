@@ -27,18 +27,18 @@ class VM {
     Deref deref_;
     
     //stack pointer(s)
-    GC::Cell *sb_;
-    GC::Cell *sp_;
+    intptr_t *sb_;
+    intptr_t *sp_;
     
     //stack size
-    GC::Cell size_;
+    intptr_t size_;
     
     //pointer to the current frame
     //to be used to create a stable
     //reference for finding locals, 
     //arguments, and captures in 
     //function activations
-    GC::Cell *frame_;
+    intptr_t *frame_;
     
     //pointer to the ref chain
     //the ref chain is a singly linked list
@@ -46,11 +46,11 @@ class VM {
     //node is the cell below a reference cell
     //to be used to implement the root iterator
     //required by GC
-    GC::Cell *refs_;
+    intptr_t *refs_;
     
 public:
     
-    VM(Deref deref, GC &gc, GC::Cell *stack, GC::Cell size)
+    VM(Deref deref, GC &gc, intptr_t *stack, intptr_t size)
         : gc_(gc),
         ip_(nullptr), 
         deref_(deref),
@@ -104,17 +104,17 @@ private:
     class Rooterator {
         
         //head of the root list
-        GC::Cell *ref_;
+        intptr_t *ref_;
         
     public:
     
         //create a Rooterator given the root list head
-        Rooterator(GC::Cell *ref)
+        Rooterator(intptr_t *ref)
             : ref_(ref) {}
         
-        //return a reference to the cell above ref_ cast as a GC::Cell*&
-        GC::Cell *&operator*() {
-            return (GC::Cell*&)*(ref_ + 1);
+        //return a reference to the cell above ref_ cast as a intptr_t*&
+        intptr_t *&operator*() {
+            return (intptr_t*&)*(ref_ + 1);
         }
         
         //equality
@@ -129,7 +129,7 @@ private:
         
         //next root (singly linked list traversal)
         Rooterator &operator++ () {
-            ref_ = (GC::Cell*)*ref_;
+            ref_ = (intptr_t*)*ref_;
             return *this;
         }
         
@@ -167,7 +167,7 @@ private:
             case CALL: {
                 auto temp = ip_;
                 ip_ = (int8_t*)*(sp_ - 1);
-                *(sp_ - 1) = (GC::Cell)temp;
+                *(sp_ - 1) = (intptr_t)temp;
                 break;
             }
             case RETURN:
@@ -182,13 +182,14 @@ private:
                 sp_ -= 2;
                 break;
             case JUMPO:
-                ip_ += deref_(ip_++);
+                ip_ += deref_(ip_);
                 break;
             case JUMPOZ:
                 if (*(sp_ - 1) == 0) {
                     ip_ += deref_(ip_);
+                } else {
+                    ip_++;
                 }
-                ip_++;
                 sp_--;
                 break;
             case PUSH:
@@ -196,10 +197,10 @@ private:
                 sp_++;
                 break;
             case PUSHW: {
-                GC::Cell word;
-                for (int i = 0; i < sizeof(GC::Cell); ++i) {
-                    word <<= 8;
-                    word |= deref_(ip_++);
+                intptr_t word = 0;
+                for (int i = 0; i < sizeof(intptr_t); ++i) {
+                    auto byte = (uint8_t)deref_(ip_++);
+                    word |= byte << i * 8;
                 }
                 *sp_ = word;
                 sp_++;
@@ -219,21 +220,21 @@ private:
                 ip_ = nullptr;
                 break;
             case PUSHREF:
-                *sp_ = (GC::Cell)refs_;
+                *sp_ = (intptr_t)refs_;
                 refs_ = sp_;
                 sp_++;
                 break;
             case POPREF:
-                refs_ = (GC::Cell*)*(sp_ - 1);
+                refs_ = (intptr_t*)*(sp_ - 1);
                 sp_--;
                 break;
             case ENTER:
-                *sp_ = (GC::Cell)frame_;
+                *sp_ = (intptr_t)frame_;
                 frame_ = sp_;
                 sp_++;
                 break;
             case LEAVE:
-                frame_ = (GC::Cell*)*(sp_ - 1);
+                frame_ = (intptr_t*)*(sp_ - 1);
                 sp_--;
                 break;
             case IN: {
@@ -250,16 +251,16 @@ private:
             case ALLOC: {
                 auto begin = Rooterator(refs_);
                 auto end = Rooterator(nullptr);
-                *(sp_ - 2) = (GC::Cell)gc_.Alloc(begin, end, *(sp_ - 2), *(sp_ - 1));
+                *(sp_ - 2) = (intptr_t)gc_.Alloc(begin, end, *(sp_ - 2), *(sp_ - 1));
                 sp_--;
                 break;
             }
             case REFGET:
-                *(sp_ - 2) = ((GC::Cell*)*(sp_ - 2))[*(sp_ - 1)];
+                *(sp_ - 2) = ((intptr_t*)*(sp_ - 2))[*(sp_ - 1)];
                 sp_--;
                 break;
             case REFSET:
-                ((GC::Cell*)*(sp_ - 3))[*(sp_ - 2)] = *(sp_ - 1);
+                ((intptr_t*)*(sp_ - 3))[*(sp_ - 2)] = *(sp_ - 1);
                 sp_ -= 3;
                 break;
             case NOP:
