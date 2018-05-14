@@ -7,6 +7,15 @@ import java.util.Map;
 
 public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
+    List<String> mnemonicInstructions = Arrays.asList("add", "sub", "mul", "div", "cmp", "call", "return",
+        "jump", "jumpz", "dup", "pop", "swap", "halt", "pushref",
+        "popref", "enter", "leave", "in", "out", "alloc", "refget",
+        "refset", "nop");
+
+    List<String> intArgInstructions = Collections.singletonList("push");
+
+    List<String> labelArgInstructions = Arrays.asList("jump", "call");
+
     private int currentIndex;
     private Map<String, Integer> labels;
 
@@ -28,10 +37,7 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
     @Override
     public PseudoInstruction visitMnemonicInstruction(ckasmParser.MnemonicInstructionContext ctx) {
-        List<String> mnemonicInstructions = Arrays.asList("add", "sub", "mul", "div", "cmp", "call", "return",
-                                                          "jump", "jumpz", "dup", "pop", "swap", "halt", "pushref",
-                                                          "popref", "enter", "leave", "in", "out", "alloc", "refget",
-                                                          "refset", "nop");
+
         String mnemonic = ctx.MNEMONIC().getText();
         if (!mnemonicInstructions.contains(mnemonic)) {
             throw new RuntimeException("unknown instruction " + mnemonic);
@@ -41,10 +47,9 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
     @Override
     public PseudoInstruction visitIntArgInstruction(ckasmParser.IntArgInstructionContext ctx) {
-        List<String> pushInstructions = Collections.singletonList("push");
         String mnemonic = ctx.MNEMONIC().getText();
         String arg = ctx.INTEGER().getText();
-        if (!pushInstructions.contains(mnemonic)) {
+        if (!intArgInstructions.contains(mnemonic)) {
             throw new RuntimeException("unknown instruction " + mnemonic + " " + arg);
         }
         return new PushIntInstruction(Integer.valueOf(arg));
@@ -52,10 +57,9 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
     @Override
     public PseudoInstruction visitLabelArgInstruction(ckasmParser.LabelArgInstructionContext ctx) {
-        List<String> pushInstructions = Arrays.asList("jump", "call");
         String mnemonic = ctx.MNEMONIC().getText();
         String arg = ctx.LABEL().getText();
-        if (!pushInstructions.contains(mnemonic)) {
+        if (!labelArgInstructions.contains(mnemonic)) {
             throw new RuntimeException("unknown instruction " + mnemonic + " " + arg);
         }
         switch (mnemonic) {
