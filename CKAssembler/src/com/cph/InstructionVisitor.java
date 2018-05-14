@@ -52,7 +52,7 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
     @Override
     public PseudoInstruction visitLabelArgInstruction(ckasmParser.LabelArgInstructionContext ctx) {
-        List<String> pushInstructions = Arrays.asList("jump", "call");
+        List<String> pushInstructions = Arrays.asList("jump", "jumpz", "call");
         String mnemonic = ctx.MNEMONIC().getText();
         String arg = ctx.LABEL().getText();
         if (!pushInstructions.contains(mnemonic)) {
@@ -60,6 +60,7 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
         }
         switch (mnemonic) {
             case "jump":
+            case "jumpz":
                 return new JumpLabelInstruction(mnemonic, arg);
             case "call":
                 return new CallLabelInstruction(mnemonic, arg);
