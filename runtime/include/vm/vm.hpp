@@ -69,10 +69,10 @@ public:
         CMP,        //compare top two items on the stack [...|lhs|rhs]->[...|int] where int=-1 if lhs<rhs, 0 if lhs==rhs, 1 if lhs>rhs
         CALL,       //jump to the instruction pointer on the stack and leave the current instruction pointer on the stack
         RETURN,     //jump to the address on the stack
-        JUMP,       //jump to the address on the stack
-        JUMPZ,      //[...|a|t]->[...] if t==0 ip=a
-        JUMPO,      //adjust ip_ by amount in next byte in instructions
-        JUMPOZ,     //JUMPO if tos is zero
+        IJUMP,      //jump to the address on the top of the stack
+        IJUMPZ,     //[...|a|t]->[...] if t==0 ip=a
+        RJUMP,      //adjust ip_ by amount in next byte in instruction stream
+        RJUMPZ,     //RJUMP if tos is zero
         PUSH,       //push the next byte in the instruction stream
         PUSHW,      //push the next word in the instruction stream
         DUP,        //duplicate the top value 
@@ -171,20 +171,20 @@ private:
                 break;
             }
             case RETURN:
-            case JUMP:
+            case IJUMP:
                 ip_ = (int8_t*)*(sp_ - 1);
                 sp_--;
                 break;
-            case JUMPZ:
+            case IJUMPZ:
                 if (*(sp_ - 1) == 0) {
                     ip_ = (int8_t*)*(sp_ - 2);
                 }
                 sp_ -= 2;
                 break;
-            case JUMPO:
+            case RJUMP:
                 ip_ += deref_(ip_);
                 break;
-            case JUMPOZ:
+            case RJUMPZ:
                 if (*(sp_ - 1) == 0) {
                     ip_ += deref_(ip_);
                 } else {
