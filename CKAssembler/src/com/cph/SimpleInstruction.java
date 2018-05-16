@@ -33,6 +33,12 @@ public class SimpleInstruction implements Instruction {
 
     @Override
     public String emit(TargetContext targetContext) {
+        //convert simple jump mnemonics to ijump
+        if (mnemonic.equals("jump")) {
+            mnemonic = "ijump";
+        } else if (mnemonic.equals("jumpz")) {
+            mnemonic = "ijumpz";
+        }
         return targetContext.mnemonicConverter.apply(mnemonic) + ", ";
     }
 }

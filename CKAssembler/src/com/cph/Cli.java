@@ -52,12 +52,15 @@ public class Cli {
 
             if (cmd.getArgs().length == 1) {
                 ParseContext pc = Parse.file(new File(cmd.getArgs()[0]));
+                //determine conservative size estimate of instructions
                 for (int i = 0; i < pc.instructions.size(); ++i) {
                     pc.instructions.get(i).determineInstructions(pc, tc, i);
                 }
+                //using estimated sizes determine actual instructions
                 for (int i = 0; i < pc.instructions.size(); ++i) {
                     pc.instructions.get(i).calculateJumps(pc, tc, i);
                 }
+                //
                 List<Instruction> instructions = new ArrayList<>();
                 for (int i = 0; i < pc.instructions.size(); ++i) {
                     instructions.addAll(pc.instructions.get(i).getInstructions(tc.cellSize));

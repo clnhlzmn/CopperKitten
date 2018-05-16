@@ -82,12 +82,20 @@ public class JumpLabelInstruction implements PseudoInstruction {
     public List<Instruction> getInstructions(int targetCellSize) {
         List<Instruction> ret = new ArrayList<>();
         if (smallJump) {
-            ret.add(new SimpleInstruction(mnemonic.equals("jump") ? "jumpo" : "jumpoz"));
+            if (mnemonic.equals("jump")) {
+                ret.add(new SimpleInstruction("rjump"));
+            } else if (mnemonic.equals("jumpz")) {
+                ret.add(new SimpleInstruction("rjumpz"));
+            }
             ret.add(new LiteralByteInstruction((byte)address));
         } else {
             ret.add(new SimpleInstruction("pushw"));
             ret.add(new LiteralIntInstruction(address));
-            ret.add(new SimpleInstruction(mnemonic));
+            if (mnemonic.equals("jump")) {
+                ret.add(new SimpleInstruction("ijump"));
+            } else if (mnemonic.equals("jumpz")) {
+                ret.add(new SimpleInstruction("ijumpz"));
+            }
         }
         return ret;
     }
