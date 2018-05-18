@@ -86,8 +86,9 @@ public:
         IN,         //read a byte from the console
         OUT,        //print a byte to the console
         ALLOC,      //[...|n|nrefs]->[...|ref], allocate n cells with nrefs references
-        REFGET,     //[...|ref|index]->[...|value], get the cell at ref+index
-        REFSET,     //[...|ref|index|value]->[...], set the cell at ref+index
+        LOAD,       //[...|ref|index]->[...|value], get the cell at ref+index
+        STORE,      //[...|ref|index|value]->[...], set the cell at ref+index
+        NCALL,      //[...|N]->[...], call the native function N
         NOP,        //
     };
     
@@ -255,14 +256,20 @@ private:
                 sp_--;
                 break;
             }
-            case REFGET:
+            case LOAD:
                 *(sp_ - 2) = ((intptr_t*)*(sp_ - 2))[*(sp_ - 1)];
                 sp_--;
                 break;
-            case REFSET:
+            case STORE:
                 ((intptr_t*)*(sp_ - 3))[*(sp_ - 2)] = *(sp_ - 1);
                 sp_ -= 3;
                 break;
+            case NCALL: {
+                auto fun = (void(*)(VM&))*(sp_-1);
+                sp_--;
+                fun(*this);
+                break;
+            }
             case NOP:
                 break;
         }

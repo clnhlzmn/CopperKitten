@@ -3,11 +3,12 @@ package com.cph;
 import java.util.Collections;
 import java.util.List;
 
-public class LiteralAddressInstruction implements Instruction {
+public class ProgramAddressInstruction implements Instruction {
 
     int address;
 
-    public LiteralAddressInstruction(int address) {
+    //create a literal address instruction where given address is index into program stream
+    public ProgramAddressInstruction(int address) {
         this.address = address;
     }
 

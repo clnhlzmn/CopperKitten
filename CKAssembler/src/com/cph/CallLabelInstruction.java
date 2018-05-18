@@ -49,7 +49,7 @@ public class CallLabelInstruction implements PseudoInstruction {
     public List<Instruction> getInstructions(int targetCellSize) {
         List<Instruction> ret = new ArrayList<>();
         ret.add(new SimpleInstruction("pushw"));
-        ret.add(new LiteralAddressInstruction(address));
+        ret.add(new ProgramAddressInstruction(address));
         ret.add(new SimpleInstruction("call"));
         return ret;
     }

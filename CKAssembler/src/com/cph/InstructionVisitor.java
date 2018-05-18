@@ -9,8 +9,8 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
 
     List<String> mnemonicInstructions = Arrays.asList("add", "sub", "mul", "div", "cmp", "call", "return",
         "jump", "jumpz", "dup", "pop", "swap", "halt", "pushref",
-        "popref", "enter", "leave", "in", "out", "alloc", "refget",
-        "refset", "nop");
+        "popref", "enter", "leave", "in", "out", "alloc", "load",
+        "store", "ncall", "nop");
 
     List<String> intArgInstructions = Collections.singletonList("push");
 
@@ -68,6 +68,8 @@ public class InstructionVisitor extends ckasmBaseVisitor<PseudoInstruction> {
                 return new JumpLabelInstruction(mnemonic, arg);
             case "call":
                 return new CallLabelInstruction(mnemonic, arg);
+            case "ncall":
+                return new NativeCallInstruction(mnemonic, arg);
             default:
                 return null;
         }
