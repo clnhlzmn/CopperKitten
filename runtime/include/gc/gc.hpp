@@ -30,10 +30,10 @@ class GC {
     static constexpr intptr_t LAYOUT_REF_ARRAY = 0; //object is a ref array
     static intptr_t layout_ref_array[];
     
-    static constexpr intptr_t LAYOUT_INT_ARRAY = 0; //object is an int array
+    static constexpr intptr_t LAYOUT_INT_ARRAY = 1; //object is an int array
     static intptr_t layout_int_array[];
     
-    static constexpr intptr_t LAYOUT_BITMAP = 0; //refs are found using a bitmap
+    static constexpr intptr_t LAYOUT_BITMAP = 2; //refs are found using a bitmap
     static intptr_t layout_bitmap_example[];
     
     //low order bit flag
@@ -123,6 +123,7 @@ public:
     
     //create a GC instance with the given memory of the given size
     GC(intptr_t *mem, size_t size) {
+        assert(mem);
         size_ = size / 2;
         a_space_ = mem;
         b_space_ = mem + size_;
@@ -141,7 +142,9 @@ public:
             for (intptr_t i = 0; i < size; ++i) {
                 GetUserPtr(ret)[i] = 0;
             }
-        } //TODO: clear refs using other layout types
+        } else if (layout[0] == LAYOUT_BITMAP) {
+            assert(0);
+        }//TODO: clear refs using other layout types
         return GetUserPtr(ret);
     }
     
@@ -242,6 +245,7 @@ private:
                         GetUserPtr(scan_ptr_)[i] = (intptr_t)GetUserPtr(Forward(GetGCPtr(user)));
                     }
                 } else if (GetMetaPtr(scan_ptr_)[0] == LAYOUT_BITMAP) {
+                    assert(0);
                     //TODO: forward refs found using bitmap
                 } //TODO: other layout options
                 //else there are no refs to forward because scan_ptr_ points to something with no refs
