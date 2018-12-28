@@ -1,6 +1,7 @@
 
 #include <stdio.h>
-#include "gc/gc.c"
+#include <assert.h>
+#include "gc.h"
 
 //forwards yields one root pointed to by root
 void roots_foreach(void (*cb)(intptr_t **, void *data), void *cb_data, void *root) {
