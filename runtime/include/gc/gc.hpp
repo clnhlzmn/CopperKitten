@@ -26,10 +26,19 @@
 #include <stdint.h>
 
 class GC {
-
+    
+    static constexpr intptr_t LAYOUT_REF_ARRAY = 0; //object is a ref array
+    static intptr_t layout_ref_array[];
+    
+    static constexpr intptr_t LAYOUT_INT_ARRAY = 0; //object is an int array
+    static intptr_t layout_int_array[];
+    
+    static constexpr intptr_t LAYOUT_BITMAP = 0; //refs are found using a bitmap
+    static intptr_t layout_bitmap_example[];
+    
     //low order bit flag
-    //refs means the high order bits are a count of refs
-    static constexpr intptr_t REFS = 0;
+    //refs means the high order bits are a layout pointer
+    static constexpr intptr_t LAYOUT = 0;
     //forward means that a forwarding pointer is held in the high order bits
     static constexpr intptr_t FORWARD = 1;
     
@@ -39,10 +48,10 @@ class GC {
     //the type field is layed out as follows
     //[data|flag]
     //where flag is one bit to indicate the meaning of data
-    //if flag is REFS then data == (ref_count << 1)
+    //if flag is LAYOUT then data == (ref_count << 1)
     //where ref_count is the number of references following the type intptr_t
     //the remaining intptr_ts are non references
-   
+    
     //allocation indices
     static constexpr intptr_t SIZE = 0;     //meta
     static constexpr intptr_t META = 1;     //meta
@@ -66,36 +75,36 @@ class GC {
     }
     
     //get the value of the flag bit
-    static intptr_t GetFlag(intptr_t *cp) {
+    static intptr_t GetMetaFlag(intptr_t *cp) {
         return cp[META] & FLAG_MASK;
     }
     
     //set flag bit
-    static void SetFlag(intptr_t *cp, intptr_t flag) {
+    static void SetMetaFlag(intptr_t *cp, intptr_t flag) {
         //clear existing type code
         cp[META] &= ~FLAG_MASK;
         //set new one
         cp[META] |= (flag & FLAG_MASK);
     }
     
-    //get ref count value (flag == REFS)
-    static intptr_t GetRefCount(intptr_t *cp) {
+    //an int from the meta field
+    static intptr_t GetMetaInt(intptr_t *cp) {
         return cp[META] >> FLAG_BITS;
     }
     
-    //set ref count (flas == REFS)
-    static void SetRefCount(intptr_t *cp, intptr_t ref_count) {
+    //set an int in the meta field
+    static void SetMetaInt(intptr_t *cp, intptr_t ref_count) {
         cp[META] &= FLAG_MASK;
         cp[META] |= (ref_count << FLAG_BITS);
     }
     
-    //get forwarding pointer (flag == FORWARD)
-    static intptr_t *GetForward(intptr_t *cp) {
+    //get pointer from the meta field
+    static intptr_t *GetMetaPtr(intptr_t *cp) {
         return (intptr_t*)(cp[META] & ~FLAG_MASK);
     }
     
-    //set forwarding pointer (flag == FORWARD)
-    static void SetForward(intptr_t *cp, intptr_t *fp) {
+    //set a pointer in the meta field
+    static void SetMetaPtr(intptr_t *cp, intptr_t *fp) {
         cp[META] &= FLAG_MASK;
         cp[META] |= ((intptr_t)fp & ~FLAG_MASK);
     }
@@ -120,16 +129,37 @@ public:
         InitPointers(a_space_, a_space_ + size_);
     }
     
-    //allocate GC managed memory with the given size of user data and number of references
+    //allocate GC managed array of refs
     template<typename RootIterator>
-    intptr_t *Alloc(RootIterator begin, RootIterator end, intptr_t size, intptr_t ref_count) {
+    intptr_t *AllocRefArray(RootIterator begin, RootIterator end, intptr_t size) {
         auto ret = Alloc(begin, end, size + META_SIZE);
         SetAllocSize(ret, size + META_SIZE);
-        SetFlag(ret, REFS);
-        SetRefCount(ret, ref_count);
-        for (intptr_t i = 0; i < ref_count; ++i) {
+        SetMetaFlag(ret, LAYOUT);
+        SetMetaPtr(ret, layout_ref_array);
+        for (intptr_t i = 0; i < size; ++i) {
             GetUserPtr(ret)[i] = 0;
         }
+        return GetUserPtr(ret);
+    }
+    
+    //allocate GC managed array of ints (not set to zero)
+    template<typename RootIterator>
+    intptr_t *AllocIntArray(RootIterator begin, RootIterator end, intptr_t size) {
+        auto ret = Alloc(begin, end, size + META_SIZE);
+        SetAllocSize(ret, size + META_SIZE);
+        SetMetaFlag(ret, LAYOUT);
+        SetMetaPtr(ret, layout_int_array);
+        return GetUserPtr(ret);
+    }
+    
+    //allocate GC managed memory with custom layout
+    template<typename RootIterator>
+    intptr_t *AllocWithLayout(RootIterator begin, RootIterator end, intptr_t size, intptr_t *layout) {
+        auto ret = Alloc(begin, end, size + META_SIZE);
+        SetAllocSize(ret, size + META_SIZE);
+        SetMetaFlag(ret, LAYOUT);
+        SetMetaPtr(ret, layout);
+        //TODO: clear refs using locations in layouts
         return GetUserPtr(ret);
     }
     
@@ -165,10 +195,10 @@ private:
         if (cp == nullptr) {
             //nothing to do
             return cp;
-        } else if (GetFlag(cp) == FORWARD) {
+        } else if (GetMetaFlag(cp) == FORWARD) {
             //cp points to an allocation that is already forwarded
             //return the forwarding address
-            return GetForward(cp);
+            return GetMetaPtr(cp);
         } else {
             //cp needs to be forwarded
             //get size
@@ -178,9 +208,9 @@ private:
                 alloc_ptr_[i] = cp[i];
             }
             //set the forward flag at cp
-            SetFlag(cp, FORWARD);
+            SetMetaFlag(cp, FORWARD);
             //set forward pointer to new space
-            SetForward(cp, alloc_ptr_);
+            SetMetaPtr(cp, alloc_ptr_);
             //save the location
             auto ret = alloc_ptr_;
             //bump pointer for next call
@@ -206,13 +236,21 @@ private:
         }
         //forward references between scan_ptr_ and alloc_ptr_
         while (scan_ptr_ < alloc_ptr_) {
-            //for each ref in user data
-            for (intptr_t i = 0; i < GetRefCount(scan_ptr_); ++i) {
-                //get the user pointer from the ref area at scan_ptr_
-                auto user = (intptr_t*)GetUserPtr(scan_ptr_)[i];
-                //then get the gc pointer for it, forward it and return the forwarded
-                //value to its place in the scan_ptr_allocation
-                GetUserPtr(scan_ptr_)[i] = (intptr_t)GetUserPtr(Forward(GetGCPtr(user)));
+            if (GetMetaFlag(scan_ptr_) == LAYOUT) {
+                //something to do, check for references
+                if (GetMetaPtr(scan_ptr_) == layout_ref_array) {
+                    //for each ref in ref array
+                    for (intptr_t i = 0; i < GetAllocSize(scan_ptr_) - META_SIZE; ++i) {
+                        //get the user pointer from the ref area at scan_ptr_
+                        auto user = (intptr_t*)GetUserPtr(scan_ptr_)[i];
+                        //then get the gc pointer for it, forward it and return the forwarded
+                        //value to its place in the scan_ptr_allocation
+                        GetUserPtr(scan_ptr_)[i] = (intptr_t)GetUserPtr(Forward(GetGCPtr(user)));
+                    }
+                } else if (GetMetaPtr(scan_ptr_)[0] == LAYOUT_BITMAP) {
+                    //TODO: forward refs found using bitmap
+                } //TODO: other layout options
+                //else there are no refs to forward because scan_ptr_ points to something with no refs
             }
             //done with refs so bump scan_ptr_ to next allocation
             scan_ptr_ += GetAllocSize(scan_ptr_);
@@ -245,6 +283,12 @@ private:
     intptr_t *alloc_end_ = nullptr;
     
 };
+
+intptr_t GC::layout_ref_array[] = { GC::LAYOUT_REF_ARRAY };
+
+intptr_t GC::layout_int_array[] = { GC::LAYOUT_INT_ARRAY };
+
+intptr_t GC::layout_bitmap_example[] = { GC::LAYOUT_BITMAP, /*bitmap goes here*/ };
 
 #endif //GC_HPP
 

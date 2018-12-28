@@ -61,24 +61,23 @@ public:
         refs_(0) {}
     
     enum OpCode : int8_t {
-        ADD,        //
-        SUB,        //rd=rl-rr
-        MUL,        //rd=rl*rr
-        DIV,        //rd=rl/rr
-        MOD,        //rd=rl%rr
+        ADD,        //*(sp-2) = *(sp-2)  + *(sp-1); sp -= 1;
+        SUB,        //*(sp-2) = *(sp-2)  - *(sp-1); sp -= 1;
+        MUL,        //*(sp-2) = *(sp-2)  * *(sp-1); sp -= 1;
+        DIV,        //*(sp-2) = *(sp-2)  / *(sp-1); sp -= 1;
+        MOD,        //*(sp-2) = *(sp-2)  % *(sp-1); sp -= 1;
+        SHL,        //*(sp-2) = *(sp-2) << *(sp-1); sp -= 1;
+        SHR,        //*(sp-2) = *(sp-2) >> *(sp-1); sp -= 1;
         CMP,        //compare top two items on the stack [...|lhs|rhs]->[...|int] where int=-1 if lhs<rhs, 0 if lhs==rhs, 1 if lhs>rhs
+        SKIPZ,      //if tos is zero then skip the next instruction
+        IP,         //push the current instruction pointer onto the stack
         CALL,       //jump to the instruction pointer on the stack and leave the current instruction pointer on the stack
         RETURN,     //jump to the address on the stack
-        IJUMP,      //jump to the address on the top of the stack
-        IJUMPZ,     //[...|a|t]->[...] if t==0 ip=a
-        RJUMP,      //adjust ip_ by amount in next byte in instruction stream
-        RJUMPZ,     //RJUMP if tos is zero
         PUSH,       //push the next byte in the instruction stream
         PUSHW,      //push the next word in the instruction stream
-        DUP,        //duplicate the top value 
+        DUP,        //duplicate the top value
         POP,        //pop the top value from the stack
         SWAP,       //swap the top two items on the stack
-        HALT,       //stop execution
         PUSHREF,    //to indicate the next higher word on the stack is a reference
         POPREF,     //to pop the reference indicator
         ENTER,      //enter a stack frame
@@ -158,13 +157,22 @@ private:
                 *(sp_ - 2) = *(sp_ - 2) % *(sp_ - 1);
                 sp_--;
                 break;
-            case CMP: {
-                auto lhs = *(sp_ - 2);
-                auto rhs = *(sp_ - 1);
-                *(sp_ - 2) = lhs < rhs ? -1 : lhs > rhs ? 1 : 0;
+            case SHL:
+                *(sp_ - 2) = *(sp_ - 2) << *(sp_ - 1);
                 sp_--;
                 break;
-            }
+            case SHR:
+                *(sp_ - 2) = *(sp_ - 2) >> *(sp_ - 1);
+                sp_--;
+                break;
+            case CMP: 
+                *(sp_ - 2) = *(sp_ - 2) < *(sp_ - 1) 
+                                        ? -1 
+                                        : *(sp_ - 2) > *(sp_ - 1) 
+                                                     ? 1 
+                                                     : 0;
+                sp_--;
+                break;
             case CALL: {
                 auto temp = ip_;
                 ip_ = (int8_t*)*(sp_ - 1);
@@ -172,25 +180,7 @@ private:
                 break;
             }
             case RETURN:
-            case IJUMP:
                 ip_ = (int8_t*)*(sp_ - 1);
-                sp_--;
-                break;
-            case IJUMPZ:
-                if (*(sp_ - 1) == 0) {
-                    ip_ = (int8_t*)*(sp_ - 2);
-                }
-                sp_ -= 2;
-                break;
-            case RJUMP:
-                ip_ += deref_(ip_);
-                break;
-            case RJUMPZ:
-                if (*(sp_ - 1) == 0) {
-                    ip_ += deref_(ip_);
-                } else {
-                    ip_++;
-                }
                 sp_--;
                 break;
             case PUSH:
