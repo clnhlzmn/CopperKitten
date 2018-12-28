@@ -2,14 +2,6 @@
 #include <stdio.h>
 #include <assert.h>
 #include "gc.h"
-#include "bitmap.h"
-
-intptr_t bitmap[] = {0b0000000000000000000000001010101010101010101010101010101010101010, 0b0000000000000000000000001010101010101010101010101010101010101010};
-
-void bitmap_cb(intptr_t i, void *ctx) {
-    (void)ctx;
-    printf("%lld\r\n", i);
-}
 
 //forwards yields one root pointed to by root
 void roots_foreach(void (*cb)(void *item, void *ctx), void *cb_ctx, void *foreach_ctx) {
@@ -18,8 +10,6 @@ void roots_foreach(void (*cb)(void *item, void *ctx), void *cb_ctx, void *foreac
 }
 
 int main() {
-    printf("sizeof(intptr_t)=%lld\r\n", sizeof(intptr_t));
-    bitmap_foreach(bitmap, 128, bitmap_cb, NULL);
     //printf("%d", __LINE__);
     //memory for gc
     intptr_t mem[1000];

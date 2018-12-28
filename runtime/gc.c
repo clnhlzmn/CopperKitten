@@ -23,21 +23,55 @@
 
 #include "gc.h"
 
-//definitions for layouts*************************************************************
+//foreach functions for built in layouts
 
-intptr_t layout_ref_array[] = {LAYOUT_REF_ARRAY};
+static void layout_ref_array(
+    void (*cb)(void*, void*), 
+    void *cb_ctx, 
+    void *layout_ctx) 
+{
+    //call callback for each element
+    struct layout_context *lc = layout_ctx;
+    for (int i = 0; i < gc_get_size(lc->user_ptr); ++i) {
+        cb(&lc->user_ptr[i], cb_ctx);
+    }
+}
 
-intptr_t layout_int_array[] = {LAYOUT_INT_ARRAY};
+static void layout_int_array(
+    void (*cb)(void*, void*), 
+    void *cb_ctx, 
+    void *layout_ctx) 
+{
+    //does nothing because int array has no references
+    (void)cb;
+    (void)cb_ctx;
+    (void)layout_ctx;
+}
 
-intptr_t layout_bitmap_example[] = {LAYOUT_BITMAP};
+//example layout for dynamic language with tagged ints
+static void layout_example_tagged_ints(
+    void (*cb)(void*, void*), 
+    void *cb_ctx, 
+    void *layout_ctx) 
+{
+    //call callback for each element if it's a reference
+    struct layout_context *lc = layout_ctx;
+    for (int i = 0; i < gc_get_size(lc->user_ptr); ++i) {
+        //check tag
+        if (lc->user_ptr[i] & 1 == 0) {
+            //it's a pointer
+            cb(&lc->user_ptr[i], cb_ctx);
+        }
+    }
+}
 
-//meta flag meanings*****************************************************************
+//meta flag meanings***********************************************************
 //refs means the high order bits are a layout pointer
 #define LAYOUT 0
 //forward means that a forwarding pointer is held in the high order bits
 #define FORWARD 1
 
-//an allocation looks like *********************************************************
+//an allocation looks like ****************************************************
 //[size|type|ref0|ref1|...|refm-1|bytes0|bytes1|...|bytesn-1]
 //where size is the size (in units of intptr_t) of the entire allocation
 //the type field is layed out as follows
@@ -47,7 +81,7 @@ intptr_t layout_bitmap_example[] = {LAYOUT_BITMAP};
 //where ref_count is the number of references following the type intptr_t
 //the remaining intptr_ts are non references
 
-//allocation indices****************************************************************
+//allocation indices***********************************************************
 #define SIZE 0
 #define META 1
 #define USER 2
@@ -94,12 +128,12 @@ static inline void set_meta_int(intptr_t *cp, intptr_t meta_int) {
 }
 
 //get pointer from the meta field
-static inline intptr_t *get_meta_ptr(intptr_t *cp) {
+static inline void *get_meta_ptr(intptr_t *cp) {
     return (intptr_t*)(cp[META] & ~FLAG_MASK);
 }
 
 //set a pointer in the meta field
-static inline void set_meta_ptr(intptr_t *cp, intptr_t *fp) {
+static inline void set_meta_ptr(intptr_t *cp, void *fp) {
     cp[META] &= FLAG_MASK;
     cp[META] |= ((intptr_t)fp & ~FLAG_MASK);
 }
@@ -159,13 +193,31 @@ static inline intptr_t *gc_forward(struct gc *self, intptr_t *cp) {
     }
 }
 
-static inline void gc_forward_root(void *it, void *ctx) {
-    /*printf("gc_forward_root: self = %p, root = %p\r\n", data, it);*/
-    *(intptr_t**)it = get_user_ptr(gc_forward((struct gc*)ctx, get_gc_ptr(*(intptr_t**)it)));
+//a callback function for foreach_t to forward the reference
+//pointed to by it. takes struct gc* as ctx
+static inline void forward_ref_cb(void *it, void *ctx) {
+    /*printf("forward_ref_cb: self = %p, root = %p\r\n", data, it);*/
+    *(intptr_t**)it 
+        = get_user_ptr(
+            gc_forward((struct gc*)ctx, get_gc_ptr(*(intptr_t**)it)));
 }
 
+/*static inline void forward_object_refs_cb(void *it, void *ctx) {*/
+    /*intptr_t **user = it;*/
+    /*//then get the gc pointer for it, */
+    /*//forward it and return the forwarded*/
+    /*//value to its place in the scan_ptr_allocation*/
+    /**user = (intptr_t)get_user_ptr(*/
+                /*gc_forward((struct gc*)ctx, get_gc_ptr(*user)));*/
+/*}*/
+
 //perform collection freeing required_size cells
-static inline void gc_collect(struct gc *self, foreach_t roots_foreach, void *data, intptr_t required_size) {
+static inline void gc_collect(
+    struct gc *self, 
+    foreach_t root_iter, 
+    void *root_iter_ctx, 
+    intptr_t required_size) 
+{
     //switch space
     if (self->alloc_end == self->a_space + self->size) {
         gc_init_pointers(self, self->b_space, self->b_space + self->size);
@@ -173,29 +225,16 @@ static inline void gc_collect(struct gc *self, foreach_t roots_foreach, void *da
         gc_init_pointers(self, self->a_space, self->a_space + self->size);
     }
     //forward roots
-    /*for (auto it = begin; it != end; ++it) {*/
-        /*//it is a user pointer, gc_forward takes GC pointers*/
-        /**it = get_user_ptr(gc_forward(get_gc_ptr(*it)));*/
-    /*}*/
-    roots_foreach(gc_forward_root, self, data);
+    root_iter(forward_ref_cb, self, root_iter_ctx);
     //forward references between scan_ptr_ and alloc_ptr_
     while (self->scan_ptr < self->alloc_ptr) {
         if (get_meta_flag(self->scan_ptr) == LAYOUT) {
-            //something to do, check for references
-            if (get_meta_ptr(self->scan_ptr) == layout_ref_array) {
-                //for each ref in ref array
-                for (intptr_t i = 0; i < get_alloc_size(self->scan_ptr) - META_SIZE; ++i) {
-                    //get the user pointer from the ref area at scan_ptr_
-                    intptr_t *user = (intptr_t*)get_user_ptr(self->scan_ptr)[i];
-                    //then get the gc pointer for it, forward it and return the forwarded
-                    //value to its place in the scan_ptr_allocation
-                    get_user_ptr(self->scan_ptr)[i] = (intptr_t)get_user_ptr(gc_forward(self, get_gc_ptr(user)));
-                }
-            } else if (get_meta_ptr(self->scan_ptr)[0] == LAYOUT_BITMAP) {
-                assert(0);
-                //TODO: forward refs found using bitmap
-            } //TODO: other layout options
-            //else there are no refs to forward because scan_ptr_ points to something with no refs
+            //use the layout function to get the references
+            foreach_t ref_iter = (foreach_t)get_meta_ptr(self->scan_ptr);
+            struct layout_context lc = { 
+                .user_ptr = get_user_ptr(self->scan_ptr) 
+            };
+            ref_iter(forward_ref_cb, self, &lc);
         }
         //done with refs so bump scan_ptr_ to next allocation
         self->scan_ptr += get_alloc_size(self->scan_ptr);
@@ -228,27 +267,33 @@ static inline intptr_t *gc_alloc(
     return gc_alloc_unchecked(self, size);
 }
 
+//callback for foreach_t. zeros the reference pointed to by it.
+//doesn't care about context
+static inline void zero_ref_cb(void *it, void *ctx) {
+    (void)ctx;
+    *(intptr_t**)it = NULL;
+}
+
 //allocate GC managed memory with custom layout
 intptr_t *gc_alloc_with_layout(
     struct gc *self, 
     foreach_t root_iter, 
     void *root_iter_ctx, 
     intptr_t size, 
-    intptr_t *layout) 
+    foreach_t layout) 
 {
     intptr_t *ret = 
         gc_alloc(self, root_iter, root_iter_ctx, size + META_SIZE);
     set_alloc_size(ret, size + META_SIZE);
+    //set the layout pointer
     set_meta_flag(ret, LAYOUT);
     set_meta_ptr(ret, layout);
-    //clear refs using locations in layouts
-    if (layout == layout_ref_array) {
-        for (intptr_t i = 0; i < size; ++i) {
-            get_user_ptr(ret)[i] = 0;
-        }
-    } else if (layout[0] == LAYOUT_BITMAP) {
-        assert(0);
-    }//TODO: clear refs using other layout types
+    //create layout context
+    struct layout_context lc = {
+        .user_ptr = get_user_ptr(ret)
+    };
+    //use the layout to zero the references
+    layout(zero_ref_cb, NULL, &lc);
     return get_user_ptr(ret);
 }
 
