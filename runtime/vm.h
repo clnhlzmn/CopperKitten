@@ -3,6 +3,7 @@
 #ifndef VM_HPP
 #define VM_HPP
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -15,7 +16,7 @@ struct vm {
     intptr_t *sb;
     intptr_t size;
     intptr_t *frame;
-}
+};
 
 static inline void vm_init(
     struct vm *self, 
@@ -33,7 +34,7 @@ static inline void vm_init(
     self->frame = NULL;
 }
 
-enum vm_op_code : int8_t {
+enum vm_op_code {
     ADD,        //*(sp-2) = *(sp-2)  + *(sp-1); sp -= 1;
     SUB,        //*(sp-2) = *(sp-2)  - *(sp-1); sp -= 1;
     MUL,        //*(sp-2) = *(sp-2)  * *(sp-1); sp -= 1;
@@ -56,11 +57,13 @@ enum vm_op_code : int8_t {
     IN,         //read a byte from the console
     OUT,        //print a byte to the console
     ALLOC,      //[...|n|layout]->[...|ref], allocate n cells with given layout
-    LOAD,       //[...|ref|index]->[...|value], get the cell at ref+index
-    STORE,      //[...|ref|index|value]->[...], set the cell at ref+index
+    LOAD,       //[...|ref]->[...|value], get the cell at ref
+    STORE,      //[...|ref|value]->[...], set the cell at ref
     NCALL,      //[...|N]->[...], call the native function N
     NOP,        //
 };
+
+static inline void vm_dispatch(struct vm *self, uint8_t instruction);
 
 static inline void vm_execute(struct vm *self, int8_t *code) {
     for (self->ip = code; self->ip; ) {
@@ -153,7 +156,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
                     case PUSHW:
                         self->ip += sizeof(intptr_t);
                         break;
-                    default break;
+                    default: break;
                 }
             }
             break;
@@ -175,8 +178,8 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case PUSHW: {
             intptr_t word = 0;
-            for (int i = 0; i < sizeof(intptr_t); ++i) {
-                auto byte = (uint8_t)VM_DEREF_IP(self->ip++);
+            for (size_t i = 0; i < sizeof(intptr_t); ++i) {
+                uint8_t byte = (uint8_t)VM_DEREF_IP(self->ip++);
                 word |= byte << i * 8;
             }
             *self->sp = word;
@@ -213,26 +216,25 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         }
         case OUT:
-            printf("%c", *(self->sp - 1));
+            printf("%c", (int)*(self->sp - 1));
             self->sp--;
             break;
         case ALLOC:
             //TODO: foreach_t funtion for this guy
-            *(self->sp - 2) = gc_alloc_with_layout(&self->gc, NULL, NULL, *(self->sp - 2), *(self->sp - 1));
+            *(self->sp - 2) = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 2), (void*)*(self->sp - 1));
             self->sp--;
             break;
         case LOAD:
-            *(self->sp - 2) = ((intptr_t*)*(self->sp - 2))[*(self->sp - 1)];
-            self->sp--;
+            *(self->sp - 1) = *(intptr_t*)*(self->sp - 1);
             break;
         case STORE:
-            ((intptr_t*)*(self->sp - 3))[*(self->sp - 2)] = *(self->sp - 1);
-            self->sp -= 3;
+            *(intptr_t*)*(self->sp - 2) = *(self->sp - 1);
+            self->sp -= 2;
             break;
         case NCALL: {
-            auto fun = (void(*)(VM&))*(self->sp-1);
+            void(*fun)(struct vm *) = (void(*)(struct vm *))*(self->sp-1);
             self->sp--;
-            fun(*this);
+            fun(self);
             break;
         }
         case NOP:
