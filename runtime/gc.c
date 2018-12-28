@@ -1,30 +1,27 @@
 
 
-//GC is meant to provide a generic interface for
-//allocating managed memory.
-
 //Memory is allocated in units of intptr_t.
-//Allocated memory can be declared reference or not.
-//A reference in this case refers to a pointer
-//to another GC allocation. GC uses two intptr_t
-//to maintain allocation state. One is for the 
-//size (in intptr_t) and the other contains a single
-//bit flag to indicate if the intptr_t contains a 
-//count of references, or a forwarding pointer.
-//All references must be in the lower memory address 
-//area of the allocation like below
-//ptr->|                ptr+6->|
-//     [ref|ref|ref|bytes|bytes|bytes]
-//in the case above the ref count would be 3 and
-//the allocation size is 6 (not including metadata)
+//Each allocation is acompanied by a foreach_t
+//function that gives the gc access to the refs
+//of that allocation.
+//An allocation looks like this
+//           ptr
+//            |
+//            V
+//[size|layout|user0|...|usern-1]
+//size in the case above is n + 2
+//layout is a foreach_t function
+//that calls the callback for 
+//each user0-usern-1 that is a 
+//reference. The callback expects
+//that it's first argument is an intptr_t**
+//See examples below.
 
 #include <assert.h>
 #include <stdio.h>
-
 #include "gc.h"
 
-//foreach functions for built in layouts
-
+//builtin layout for array of references
 static void layout_ref_array(
     void (*cb)(void*, void*), 
     void *cb_ctx, 
@@ -37,6 +34,7 @@ static void layout_ref_array(
     }
 }
 
+//builtin layout for integer arrays
 static void layout_int_array(
     void (*cb)(void*, void*), 
     void *cb_ctx, 
@@ -58,7 +56,7 @@ static void layout_example_tagged_ints(
     struct layout_context *lc = layout_ctx;
     for (int i = 0; i < gc_get_size(lc->user_ptr); ++i) {
         //check tag
-        if (lc->user_ptr[i] & 1 == 0) {
+        if ((lc->user_ptr[i] & 1) == 0) {
             //it's a pointer
             cb(&lc->user_ptr[i], cb_ctx);
         }
@@ -86,12 +84,14 @@ static void layout_example_tagged_ints(
 #define META 1
 #define USER 2
 
-//size of allocation meta
+//size of allocation meta******************************************************
 #define META_SIZE 2
 
-//flag meta
+//flag meta********************************************************************
 #define FLAG_BITS 1
 #define FLAG_MASK 0x01
+
+//utility functions************************************************************
 
 //get the size from an allocation pointer
 static inline intptr_t get_alloc_size(intptr_t *cp) {
@@ -148,10 +148,14 @@ static inline intptr_t *get_gc_ptr(intptr_t *user) {
     return user - USER;
 }
 
+//methods**********************************************************************
+
 static void gc_init_pointers(struct gc *, intptr_t *, intptr_t *);
 
 //create a GC instance with the given memory of the given size
 void gc_init(struct gc *self, intptr_t *mem, size_t size) {
+    //because it's not used anywhere else
+    (void)layout_example_tagged_ints;
     /*printf("gc_init: self = %p\r\n", self);*/
     assert(mem);
     self->size = size / 2;
@@ -196,27 +200,20 @@ static inline intptr_t *gc_forward(struct gc *self, intptr_t *cp) {
 //a callback function for foreach_t to forward the reference
 //pointed to by it. takes struct gc* as ctx
 static inline void forward_ref_cb(void *it, void *ctx) {
+    assert(it);
+    assert(ctx);
     /*printf("forward_ref_cb: self = %p, root = %p\r\n", data, it);*/
     *(intptr_t**)it 
         = get_user_ptr(
             gc_forward((struct gc*)ctx, get_gc_ptr(*(intptr_t**)it)));
 }
 
-/*static inline void forward_object_refs_cb(void *it, void *ctx) {*/
-    /*intptr_t **user = it;*/
-    /*//then get the gc pointer for it, */
-    /*//forward it and return the forwarded*/
-    /*//value to its place in the scan_ptr_allocation*/
-    /**user = (intptr_t)get_user_ptr(*/
-                /*gc_forward((struct gc*)ctx, get_gc_ptr(*user)));*/
-/*}*/
-
 //perform collection freeing required_size cells
 static inline void gc_collect(
-    struct gc *self, 
-    foreach_t root_iter, 
-    void *root_iter_ctx, 
-    intptr_t required_size) 
+    struct gc *self,
+    foreach_t root_iter,
+    void *root_iter_ctx,
+    intptr_t required_size)
 {
     //switch space
     if (self->alloc_end == self->a_space + self->size) {
@@ -271,6 +268,7 @@ static inline intptr_t *gc_alloc(
 //doesn't care about context
 static inline void zero_ref_cb(void *it, void *ctx) {
     (void)ctx;
+    assert(it);
     *(intptr_t**)it = NULL;
 }
 
@@ -282,6 +280,9 @@ intptr_t *gc_alloc_with_layout(
     intptr_t size, 
     foreach_t layout) 
 {
+    assert(self);
+    assert(root_iter);
+    assert(layout);
     intptr_t *ret = 
         gc_alloc(self, root_iter, root_iter_ctx, size + META_SIZE);
     set_alloc_size(ret, size + META_SIZE);

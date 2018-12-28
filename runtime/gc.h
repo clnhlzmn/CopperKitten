@@ -10,35 +10,22 @@
 extern "C" {
 #endif
 
-//foreach_t is the type of the callback function that must be passed to
-//gc_alloc*. the pointed-to function takes a pointer to a callback function 
-//and a pointer to data for that function. additionally the foreach function
-//takes its own data pointer
-typedef void (*foreach_t)(
-    void (*cb)(void *it, void *ctx),
-    void *cb_ctx,
-    void *foreach_ctx);
+//this is a simple copying garbage collector
+//written in relatively clean c99 in a way
+//that is meant to be as generic as possible.
 
-//the foreach function pointer type is also 
-//used for finding references in layouts
-//inside each allocated object is a pointer
-//to a foreach function that allows the
-//gc to do things to the cells that are roots
-//inside the object
-//the layout function should take a struct layout_context
-//as it's foreach_ctx parameter and call the cb parameter
-//with a pointer to each reference cell in user_ptr array
-//from user_ptr we can get allocation size with gc_get_size
-
-//see gc.c for example layout functions 
-//layout_ref_array and layout_int_array
-
-struct layout_context {
-    //the user pointer to the allocation
-    //of interest. to get its size call
-    //gc_get_size(user_ptr)
-    intptr_t *user_ptr;
-};
+//The methods listed below allow users to 
+//allocate memory using the garbage collector.
+//In order to do so, sometimes memory must be
+//reclaimed. In order to reclaim memory your
+//struct gc instance must be able to find 
+//and possibly modify references to the memory
+//that it manages. This can be done with the 
+//root_iter parameter. It is a foreach_t function 
+//that must be implemented by the user in such 
+//a way as to provide the struct gc instance
+//a view of the user's references. An example of 
+//this can be seen in test/gc/test_gc.c.
 
 //instance data for garbage collector
 //these things should not be touched
@@ -60,6 +47,29 @@ struct gc {
 
 //initialize gc with pointer to self, pointer to memory, and size of memory
 void gc_init(struct gc *self, intptr_t *mem, size_t size);
+
+//function type used by gc_* functions to access
+//user's root references and to access references
+//in allocated objects.
+typedef void (*foreach_t)(
+    void (*cb)(void *it, void *ctx),
+    void *cb_ctx,
+    void *foreach_ctx);
+
+//type of struct that is given as context to the
+//foreach_t function acting as layout for an alloc
+//This allows the layout function to know about the 
+//allocation it's supposed to be informing on
+struct layout_context {
+    //the user pointer to the allocation
+    //of interest. to get its size call
+    //gc_get_size(user_ptr)
+    intptr_t *user_ptr;
+};
+
+//see gc.c for example layout functions 
+//layout_ref_array and layout_int_array
+//and layout_example_tagged_ints
 
 //allocate with an explicit layout
 intptr_t *gc_alloc_with_layout(
