@@ -129,29 +129,6 @@ public:
         InitPointers(a_space_, a_space_ + size_);
     }
     
-    //allocate GC managed array of refs
-    template<typename RootIterator>
-    intptr_t *AllocRefArray(RootIterator begin, RootIterator end, intptr_t size) {
-        auto ret = Alloc(begin, end, size + META_SIZE);
-        SetAllocSize(ret, size + META_SIZE);
-        SetMetaFlag(ret, LAYOUT);
-        SetMetaPtr(ret, layout_ref_array);
-        for (intptr_t i = 0; i < size; ++i) {
-            GetUserPtr(ret)[i] = 0;
-        }
-        return GetUserPtr(ret);
-    }
-    
-    //allocate GC managed array of ints (not set to zero)
-    template<typename RootIterator>
-    intptr_t *AllocIntArray(RootIterator begin, RootIterator end, intptr_t size) {
-        auto ret = Alloc(begin, end, size + META_SIZE);
-        SetAllocSize(ret, size + META_SIZE);
-        SetMetaFlag(ret, LAYOUT);
-        SetMetaPtr(ret, layout_int_array);
-        return GetUserPtr(ret);
-    }
-    
     //allocate GC managed memory with custom layout
     template<typename RootIterator>
     intptr_t *AllocWithLayout(RootIterator begin, RootIterator end, intptr_t size, intptr_t *layout) {
@@ -159,8 +136,25 @@ public:
         SetAllocSize(ret, size + META_SIZE);
         SetMetaFlag(ret, LAYOUT);
         SetMetaPtr(ret, layout);
-        //TODO: clear refs using locations in layouts
+        //clear refs using locations in layouts
+        if (layout == layout_ref_array) {
+            for (intptr_t i = 0; i < size; ++i) {
+                GetUserPtr(ret)[i] = 0;
+            }
+        } //TODO: clear refs using other layout types
         return GetUserPtr(ret);
+    }
+    
+    //allocate GC managed array of refs
+    template<typename RootIterator>
+    intptr_t *AllocRefArray(RootIterator begin, RootIterator end, intptr_t size) {
+        return AllocWithLayout(begin, end, size, layout_ref_array);
+    }
+    
+    //allocate GC managed array of ints (not set to zero)
+    template<typename RootIterator>
+    intptr_t *AllocIntArray(RootIterator begin, RootIterator end, intptr_t size) {
+        return AllocWithLayout(begin, end, size, layout_int_array);
     }
     
     //get the size of user data from a pointer
