@@ -24,6 +24,7 @@
 #include "gc.h"
 
 //definitions for layouts*************************************************************
+
 intptr_t layout_ref_array[] = {LAYOUT_REF_ARRAY};
 
 intptr_t layout_int_array[] = {LAYOUT_INT_ARRAY};
@@ -87,9 +88,9 @@ static inline intptr_t get_meta_int(intptr_t *cp) {
 }
 
 //set an int in the meta field
-static inline void set_meta_int(intptr_t *cp, intptr_t ref_count) {
+static inline void set_meta_int(intptr_t *cp, intptr_t meta_int) {
     cp[META] &= FLAG_MASK;
-    cp[META] |= (ref_count << FLAG_BITS);
+    cp[META] |= (meta_int << FLAG_BITS);
 }
 
 //get pointer from the meta field
@@ -117,7 +118,7 @@ static void gc_init_pointers(struct gc *, intptr_t *, intptr_t *);
 
 //create a GC instance with the given memory of the given size
 void gc_init(struct gc *self, intptr_t *mem, size_t size) {
-    printf("gc_init: self = %p\r\n", self);
+    /*printf("gc_init: self = %p\r\n", self);*/
     assert(mem);
     self->size = size / 2;
     self->a_space = mem;
@@ -129,7 +130,7 @@ void gc_init(struct gc *self, intptr_t *mem, size_t size) {
 //takes and returns gc pointers, that means
 //pointers must be converted when forwarding
 static inline intptr_t *gc_forward(struct gc *self, intptr_t *cp) {
-    printf("gc_forward: self = %p, cp = %p\r\n", self, cp);
+    /*printf("gc_forward: self = %p, cp = %p\r\n", self, cp);*/
     if (cp == NULL) {
         //nothing to do
         return cp;
@@ -158,13 +159,13 @@ static inline intptr_t *gc_forward(struct gc *self, intptr_t *cp) {
     }
 }
 
-static inline void gc_forward_root(intptr_t **it, void *data) {
-    printf("gc_forward_root: self = %p, root = %p\r\n", data, it);
-    *it = get_user_ptr(gc_forward((struct gc*)data, get_gc_ptr(*it)));
+static inline void gc_forward_root(void *it, void *ctx) {
+    /*printf("gc_forward_root: self = %p, root = %p\r\n", data, it);*/
+    *(intptr_t**)it = get_user_ptr(gc_forward((struct gc*)ctx, get_gc_ptr(*(intptr_t**)it)));
 }
 
 //perform collection freeing required_size cells
-static inline void gc_collect(struct gc *self, roots_foreach_t roots_foreach, void *data, intptr_t required_size) {
+static inline void gc_collect(struct gc *self, foreach_t roots_foreach, void *data, intptr_t required_size) {
     //switch space
     if (self->alloc_end == self->a_space + self->size) {
         gc_init_pointers(self, self->b_space, self->b_space + self->size);
@@ -214,17 +215,29 @@ static inline intptr_t *gc_alloc_unchecked(struct gc *self, intptr_t size) {
 }
 
 //allocates n Cells, collecting if necessary
-static inline intptr_t *gc_alloc(struct gc *self, roots_foreach_t foreach, void *data, intptr_t size) {
+static inline intptr_t *gc_alloc(
+    struct gc *self, 
+    foreach_t root_iter, 
+    void *root_iter_ctx, 
+    intptr_t size) 
+{
     //sz is number of Cells to allocate
     if ((self->alloc_end - self->alloc_ptr) < size) {
-        gc_collect(self, foreach, data, size);
+        gc_collect(self, root_iter, root_iter_ctx, size);
     }
     return gc_alloc_unchecked(self, size);
 }
 
 //allocate GC managed memory with custom layout
-intptr_t *gc_alloc_with_layout(struct gc *self, roots_foreach_t foreach, void *data, intptr_t size, intptr_t *layout) {
-    intptr_t *ret = gc_alloc(self, foreach, data, size + META_SIZE);
+intptr_t *gc_alloc_with_layout(
+    struct gc *self, 
+    foreach_t root_iter, 
+    void *root_iter_ctx, 
+    intptr_t size, 
+    intptr_t *layout) 
+{
+    intptr_t *ret = 
+        gc_alloc(self, root_iter, root_iter_ctx, size + META_SIZE);
     set_alloc_size(ret, size + META_SIZE);
     set_meta_flag(ret, LAYOUT);
     set_meta_ptr(ret, layout);
@@ -240,13 +253,25 @@ intptr_t *gc_alloc_with_layout(struct gc *self, roots_foreach_t foreach, void *d
 }
 
 //allocate GC managed array of refs
-intptr_t *gc_alloc_ref_array(struct gc *self, roots_foreach_t foreach, void *data, intptr_t size) {
-    return gc_alloc_with_layout(self, foreach, data, size, layout_ref_array);
+intptr_t *gc_alloc_ref_array(
+    struct gc *self, 
+    foreach_t root_iter, 
+    void *root_iter_ctx, 
+    intptr_t size) 
+{
+    return gc_alloc_with_layout(
+        self, root_iter, root_iter_ctx, size, layout_ref_array);
 }
 
 //allocate GC managed array of ints (not set to zero)
-intptr_t *gc_alloc_int_array(struct gc *self, roots_foreach_t foreach, void *data, intptr_t size) {
-    return gc_alloc_with_layout(self, foreach, data, size, layout_int_array);
+intptr_t *gc_alloc_int_array(
+    struct gc *self, 
+    foreach_t root_iter, 
+    void *root_iter_ctx, 
+    intptr_t size) 
+{
+    return gc_alloc_with_layout(
+        self, root_iter, root_iter_ctx, size, layout_int_array);
 }
 
 //get the size of user data from a pointer
@@ -257,7 +282,11 @@ intptr_t gc_get_size(intptr_t *cp) {
 
 //initialize alloc_ptr_, scan_ptr_, alloc_begin_ and alloc_end_
 //with the given memory range
-static inline void gc_init_pointers(struct gc *self, intptr_t *begin, intptr_t *end) {
+static inline void gc_init_pointers(
+    struct gc *self, 
+    intptr_t *begin, 
+    intptr_t *end) 
+{
     self->alloc_ptr = self->scan_ptr = self->alloc_begin = begin;
     self->alloc_end = end;
 }

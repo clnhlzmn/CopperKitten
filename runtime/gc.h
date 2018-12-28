@@ -10,14 +10,14 @@
 extern "C" {
 #endif
 
-//roots_foreach_t is the type of the callback function that must be passed to
+//foreach_t is the type of the callback function that must be passed to
 //gc_alloc*. the pointed-to function takes a pointer to a callback function 
 //and a pointer to data for that function. additionally the foreach function
 //takes its own data pointer
-typedef void (*roots_foreach_t)(
-    void (*cb)(intptr_t **, void *), 
-    void *cb_data, 
-    void *foreach_data);
+typedef void (*foreach_t)(
+    void (*cb)(void *item, void *ctx),
+    void *cb_ctx,
+    void *foreach_ctx);
 
 struct gc {
     //PRIVATE
@@ -52,23 +52,23 @@ void gc_init(struct gc *self, intptr_t *mem, size_t size);
 //allocate with an explicit layout
 intptr_t *gc_alloc_with_layout(
     struct gc *self,                //pointer to instance
-    roots_foreach_t foreach,        //pointer to root iterator
-    void *data,                     //root iterator context
+    foreach_t root_iter,            //pointer to root iterator
+    void *root_iter_ctx,            //root iterator context
     intptr_t size,                  //size of allocation
     intptr_t *layout);              //layout of allocation
 
 //allocate GC managed array of refs
 intptr_t *gc_alloc_ref_array(
     struct gc *self,                //instance
-    roots_foreach_t foreach,        //root iterator
-    void *data,                     //root iterator context
+    foreach_t root_iter,            //root iterator
+    void *root_iter_ctx,            //root iterator context
     intptr_t size);                 //number of refs (uses LAYOUT_REF_ARRAY internally)
 
 //allocate GC managed array of ints (not set to zero)
 intptr_t *gc_alloc_int_array(
     struct gc *self,                //instance
-    roots_foreach_t foreach,        //root iterator
-    void *data,                     //root iterator context
+    foreach_t root_iter,            //root iterator
+    void *root_iter_ctx,            //root iterator context
     intptr_t size);                 //number of ints (uses LAYOUT_INT_ARRAY internally)
 
 //gets the size of an allocation returned from gc_alloc_*

@@ -2,14 +2,24 @@
 #include <stdio.h>
 #include <assert.h>
 #include "gc.h"
+#include "bitmap.h"
+
+intptr_t bitmap[] = {0b0000000000000000000000001010101010101010101010101010101010101010, 0b0000000000000000000000001010101010101010101010101010101010101010};
+
+void bitmap_cb(intptr_t i, void *ctx) {
+    (void)ctx;
+    printf("%lld\r\n", i);
+}
 
 //forwards yields one root pointed to by root
-void roots_foreach(void (*cb)(intptr_t **, void *data), void *cb_data, void *root) {
-    intptr_t **it = root;
-    cb(it, cb_data);
+void roots_foreach(void (*cb)(void *item, void *ctx), void *cb_ctx, void *foreach_ctx) {
+    intptr_t **it = foreach_ctx;
+    cb(it, cb_ctx);
 }
 
 int main() {
+    printf("sizeof(intptr_t)=%lld\r\n", sizeof(intptr_t));
+    bitmap_foreach(bitmap, 128, bitmap_cb, NULL);
     //printf("%d", __LINE__);
     //memory for gc
     intptr_t mem[1000];
@@ -19,7 +29,7 @@ int main() {
     //printf("%d", __LINE__);
     //alloc one ref cell (no roots yet)
     intptr_t *root = NULL;
-    printf("main: &root = %p\r\n", &root);
+    /*printf("main: &root = %p\r\n", &root);*/
     root = gc_alloc_ref_array(&gc_inst, roots_foreach, &root, 1);
     //printf("%d", __LINE__);
     assert(gc_get_size(root) == 1);
@@ -41,7 +51,7 @@ int main() {
         //alloc chunks of 10 cells, no refs
         intptr_t *a = gc_alloc_int_array(&gc_inst, roots_foreach, &root, 10);
         assert(a);
-        printf("%d : %d\r\n", __LINE__, i);
+        /*printf("%d : %d\r\n", __LINE__, i);*/
         //overwrite memory a little
         for (int i = 0; i < 10; ++i) {
             a[i] = i;
@@ -50,7 +60,7 @@ int main() {
     }
     //check that our two allocations survived
     assert(((intptr_t*)root[0])[0] == 42);
-    printf("%ld\r\n", ((intptr_t*)root[0])[0]);
+    printf("%lld\r\n", ((intptr_t*)root[0])[0]);
 }
 
 
