@@ -1,7 +1,5 @@
 
 
-#define VM_DEREF_IP(ip) (*(ip))
-
 #include <stdio.h>
 
 #include "vm.h"

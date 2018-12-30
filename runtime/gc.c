@@ -64,20 +64,18 @@ static void layout_example_tagged_ints(
 }
 
 //meta flag meanings***********************************************************
-//refs means the high order bits are a layout pointer
+//LAYOUT means the high order bits are a layout pointer
 #define LAYOUT 0
-//forward means that a forwarding pointer is held in the high order bits
+//FORWARD means that a forwarding pointer is held in the high order bits
 #define FORWARD 1
 
 //an allocation looks like ****************************************************
-//[size|type|ref0|ref1|...|refm-1|bytes0|bytes1|...|bytesn-1]
+//[size|meta|ref0|ref1|...|refm-1|bytes0|bytes1|...|bytesn-1]
 //where size is the size (in units of intptr_t) of the entire allocation
-//the type field is layed out as follows
-//[data|flag]
-//where flag is one bit to indicate the meaning of data
-//if flag is LAYOUT then data == (ref_count << 1)
-//where ref_count is the number of references following the type intptr_t
-//the remaining intptr_ts are non references
+//The meta field is usually a pointer to a layout function.
+//If the FORWARD flag is set then the meta field actually
+//is a pointer that points to the forwarded location of
+//that allocation.
 
 //allocation indices***********************************************************
 #define SIZE 0

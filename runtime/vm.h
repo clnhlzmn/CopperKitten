@@ -9,6 +9,10 @@
 
 #include "gc.h"
 
+#ifndef VM_DEREF_IP
+#define VM_DEREF_IP(ip) (*(ip))
+#endif
+
 struct vm {
     struct gc *gc;
     int8_t *ip;
