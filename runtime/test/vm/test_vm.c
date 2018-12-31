@@ -18,11 +18,15 @@ int main(void) {
     gc_init(&gc_inst, heap, HEAPSIZE);
     vm_init(&vm_inst, &gc_inst, stack, STACKSIZE);
     int8_t program[] = {
-        IN, 
-        PUSH, 3, 
+        //get input
+        IN,
+        //process input
+        PUSH, 3,
         ADD,
+        //print result
         OUT,
-        IP,
+        //halt
+        PUSH, 0,
         JUMP
     };
     vm_execute(&vm_inst, program);

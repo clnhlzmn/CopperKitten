@@ -71,45 +71,13 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction);
 
 static inline void vm_execute(struct vm *self, int8_t *code) {
     for (self->ip = code; self->ip; ) {
+        int8_t inst = VM_DEREF_IP(self->ip);
         //increment self->ip here so its before Dispatch gets it (where it might be modified)
-        vm_dispatch(self, VM_DEREF_IP(self->ip++)); 
+        printf("vm_execute %p\r\n", self->ip);
+        self->ip++;
+        vm_dispatch(self, inst);
     }
 }
-
-//Rooterator implements the root iterator required for GC::Alloc
-//class Rooterator {
-    //
-    /*head of the root list*/
-    //intptr_t *ref_;
-    //
-//public:
-//
-    /*create a Rooterator given the root list head*/
-    //Rooterator(intptr_t *ref)
-        //: ref_(ref) {}
-    //
-    /*return a reference to the cell below ref_ cast as a intptr_t*&*/
-    //intptr_t *&operator*() {
-        //return (intptr_t*&)*(ref_ - 1);
-    //}
-    //
-    /*equality*/
-    //bool operator== (const Rooterator &other) const {
-        //return ref_ == other.ref_;
-    //}
-    //
-    /*not equality*/
-    //bool operator!= (const Rooterator &other) const {
-        //return !(*this == other);
-    //}
-    //
-    /*next root (singly linked list traversal)*/
-    //Rooterator &operator++ () {
-        //ref_ = (intptr_t*)*ref_;
-        //return *this;
-    //}
-    //
-//};
 
 static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
     switch (instruction) {
@@ -165,6 +133,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             }
             break;
         case IP:
+            printf("ip: %p\r\n", self->ip);
             *self->sp = (intptr_t)self->ip;
             self->sp++;
             break;
@@ -172,10 +141,13 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             *self->sp = (intptr_t)self->frame;
             self->sp++;
             break;
-        case JUMP:
+        case JUMP: {
+            int8_t *orig = self->ip;
             self->ip = (int8_t*)*(self->sp - 1);
             self->sp--;
+            printf("jump: before=%p, after=%p\r\n", orig, self->ip);
             break;
+        }
         case PUSH:
             *self->sp = VM_DEREF_IP(self->ip++);
             self->sp++;
