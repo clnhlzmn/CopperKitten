@@ -1,9 +1,13 @@
 
-test: test_vm.o
-	g++ -g -o test test_vm.o
+#to make mingw use proper printf format strings like %lld
+CFLAGS = -Wall -Wextra -Werror -std=c99 -g -D__USE_MINGW_ANSI_STDIO=1 -fmax-errors=5
+LDFLAGS = -g
 
-test_vm.o: test_vm.cpp ../../include/vm/vm.hpp
-	g++ -Wall -Wextra -g -I../../include -std=c++11 -c test_vm.cpp -o test_vm.o
+test: test_vm.o ../gc/gc.o
+	gcc $(LDFLAGS) -o test test_vm.o ../gc/gc.o
+
+test_vm.o: test_vm.c ../../vm.h
+	gcc $(CFLAGS) -I../../ -c test_vm.c -o test_vm.o
 
 clean:
 	rm -rf test_vm.o
