@@ -1,11 +1,11 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include "gc.h"
+#include "mark_compact_gc.h"
 
 //forwards yields one root pointed to by root
 void roots_foreach(void (*cb)(void *item, void *ctx), void *cb_ctx, void *foreach_ctx) {
-    intptr_t **it = foreach_ctx;
+    uintptr_t **it = foreach_ctx;
     cb(it, cb_ctx);
 }
 
@@ -32,7 +32,7 @@ int main() {
     //store a value in non ref cell
     a[0] = 42;
     //store a in root
-    root[0] = (intptr_t)a;
+    root[0] = (uintptr_t)a;
     //now object map looks like
     //root->[*]
     //       |->[42]
@@ -41,6 +41,7 @@ int main() {
         //alloc chunks of 10 cells, no refs
         uintptr_t *a = gc_alloc_int_array(&gc_inst, roots_foreach, &root, 10);
         assert(a);
+        assert(gc_get_size(a) == 10);
         /*printf("%d : %d\r\n", __LINE__, i);*/
         //overwrite memory a little
         for (int i = 0; i < 10; ++i) {
