@@ -69,15 +69,15 @@ static inline void update_ref_address_cb(void *it, void *ctx) {
     }
 }
 
-static inline void gc_print_heap(struct gc *self) {
-    printf("gc_print_heap\r\n");
-    for (uintptr_t *it = self->heap; it < self->alloc_ptr; ) {
-        struct gc_object *obj = (struct gc_object *) it;
-        printf("obj @ %p\r\n", obj);
-        printf("    marked = %d, forward = %p, size = %llu\r\n", obj->mark, (void*)obj->forward, (uintptr_t)obj->size);
-        it += obj->size;
-    }
-}
+/*static inline void gc_print_heap(struct gc *self) {*/
+    /*printf("gc_print_heap\r\n");*/
+    /*for (uintptr_t *it = self->heap; it < self->alloc_ptr; ) {*/
+        /*struct gc_object *obj = (struct gc_object *) it;*/
+        /*printf("obj @ %p\r\n", obj);*/
+        /*printf("    marked = %d, forward = %p, size = %llu\r\n", obj->mark, (void*)obj->forward, (uintptr_t)obj->size);*/
+        /*it += obj->size;*/
+    /*}*/
+/*}*/
 
 //perform collection freeing required_size cells
 static inline void gc_collect(
@@ -193,31 +193,6 @@ uintptr_t *gc_alloc_with_layout(
     return ret->user;
 }
 
-//builtin layout for array of references
-static void layout_ref_array(
-    void (*cb)(void*, void*), 
-    void *cb_ctx, 
-    void *layout_ctx) 
-{
-    //call callback for each element
-    uintptr_t *ref = layout_ctx;
-    for (uintptr_t i = 0; i < gc_get_size(ref); ++i) {
-        cb(&ref[i], cb_ctx);
-    }
-}
-
-//builtin layout for integer arrays
-static void layout_int_array(
-    void (*cb)(void*, void*), 
-    void *cb_ctx, 
-    void *layout_ctx) 
-{
-    //does nothing because int array has no references
-    (void)cb;
-    (void)cb_ctx;
-    (void)layout_ctx;
-}
-
 //allocate GC managed array of refs
 uintptr_t *gc_alloc_ref_array(
     struct gc *self, 
@@ -226,7 +201,7 @@ uintptr_t *gc_alloc_ref_array(
     uintptr_t size) 
 {
     return gc_alloc_with_layout(
-        self, root_iter, root_iter_ctx, size, layout_ref_array);
+        self, root_iter, root_iter_ctx, size, gc_layout_ref_array);
 }
 
 //allocate GC managed array of ints (not set to zero)
@@ -237,5 +212,5 @@ uintptr_t *gc_alloc_int_array(
     uintptr_t size) 
 {
     return gc_alloc_with_layout(
-        self, root_iter, root_iter_ctx, size, layout_int_array);
+        self, root_iter, root_iter_ctx, size, gc_layout_int_array);
 }

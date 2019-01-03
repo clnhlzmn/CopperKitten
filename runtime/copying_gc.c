@@ -19,52 +19,7 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include "gc.h"
-
-//builtin layout functions. 
-//user pointer to object is passed as context to layout function
-
-//builtin layout for array of references
-static void layout_ref_array(
-    void (*cb)(void*, void*), 
-    void *cb_ctx, 
-    void *layout_ctx) 
-{
-    //call callback for each element
-    uintptr_t *user_ptr = layout_ctx;
-    for (uintptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
-        cb(&user_ptr[i], cb_ctx);
-    }
-}
-
-//builtin layout for integer arrays
-static void layout_int_array(
-    void (*cb)(void*, void*), 
-    void *cb_ctx, 
-    void *layout_ctx) 
-{
-    //does nothing because int array has no references
-    (void)cb;
-    (void)cb_ctx;
-    (void)layout_ctx;
-}
-
-//example layout for dynamic language with tagged ints
-static void layout_example_tagged_ints(
-    void (*cb)(void*, void*), 
-    void *cb_ctx, 
-    void *layout_ctx) 
-{
-    //call callback for each element if it's a reference
-    uintptr_t *user_ptr = layout_ctx;
-    for (uintptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
-        //check tag
-        if ((user_ptr[i] & 1) == 0) {
-            //it's a pointer
-            cb(&user_ptr[i], cb_ctx);
-        }
-    }
-}
+#include "copying_gc.h"
 
 //meta flag meanings***********************************************************
 //LAYOUT means the high order bits are a layout pointer
@@ -117,17 +72,6 @@ static inline void set_meta_flag(uintptr_t *cp, uintptr_t flag) {
     cp[META] |= (flag & FLAG_MASK);
 }
 
-//an int from the meta field
-static inline uintptr_t get_meta_int(uintptr_t *cp) {
-    return cp[META] >> FLAG_BITS;
-}
-
-//set an int in the meta field
-static inline void set_meta_int(uintptr_t *cp, uintptr_t meta_int) {
-    cp[META] &= FLAG_MASK;
-    cp[META] |= (meta_int << FLAG_BITS);
-}
-
 //get pointer from the meta field
 static inline void *get_meta_ptr(uintptr_t *cp) {
     return (uintptr_t*)(cp[META] & ~FLAG_MASK);
@@ -155,8 +99,6 @@ static void gc_init_pointers(struct gc *, uintptr_t *, uintptr_t *);
 
 //create a GC instance with the given memory of the given size
 void gc_init(struct gc *self, uintptr_t *mem, size_t size) {
-    //because it's not used anywhere else
-    (void)layout_example_tagged_ints;
     /*printf("gc_init: self = %p\r\n", self);*/
     assert(mem);
     self->size = size / 2;
@@ -200,7 +142,7 @@ static inline uintptr_t *gc_forward(struct gc *self, uintptr_t *cp) {
 
 //a callback function for foreach_t to forward the reference
 //pointed to by it. takes struct gc* as ctx
-static inline void forward_ref_cb(void *it, void *ctx) {
+static inline void forward_ref_cb(uintptr_t **it, void *ctx) {
     assert(it);
     assert(ctx);
     /*printf("forward_ref_cb: self = %p, root = %p\r\n", data, it);*/
@@ -264,7 +206,7 @@ static inline uintptr_t *gc_alloc(
 
 //callback for foreach_t. zeros the reference pointed to by it.
 //doesn't care about context
-static inline void zero_ref_cb(void *it, void *ctx) {
+static inline void zero_ref_cb(uintptr_t **it, void *ctx) {
     (void)ctx;
     assert(it);
     *(uintptr_t**)it = NULL;
@@ -300,7 +242,7 @@ uintptr_t *gc_alloc_ref_array(
     uintptr_t size) 
 {
     return gc_alloc_with_layout(
-        self, root_iter, root_iter_ctx, size, layout_ref_array);
+        self, root_iter, root_iter_ctx, size, gc_layout_ref_array);
 }
 
 //allocate GC managed array of ints (not set to zero)
@@ -311,7 +253,7 @@ uintptr_t *gc_alloc_int_array(
     uintptr_t size) 
 {
     return gc_alloc_with_layout(
-        self, root_iter, root_iter_ctx, size, layout_int_array);
+        self, root_iter, root_iter_ctx, size, gc_layout_int_array);
 }
 
 //get the size of user data from a pointer

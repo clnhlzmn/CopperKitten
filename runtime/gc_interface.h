@@ -1,7 +1,7 @@
 
 
-#ifndef GC_H
-#define GC_H
+#ifndef GC_INTERFACE_H
+#define GC_INTERFACE_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -10,9 +10,8 @@
 extern "C" {
 #endif
 
-//this is a simple copying garbage collector
-//written in relatively clean c99 in a way
-//that is meant to be as generic as possible.
+//this is intended as a user (pl implementation) 
+//interface to a generic memory allocator/manager
 
 //The methods listed below allow users to 
 //allocate memory using the garbage collector.
@@ -27,34 +26,19 @@ extern "C" {
 //a view of the user's references. An example of 
 //this can be seen in test/gc/test_gc.c.
 
-//instance data for garbage collector
-//these things should not be touched
-struct gc {
-    //PRIVATE
-    //pointers to semispaces
-    uintptr_t *a_space;
-    uintptr_t *b_space;
-    //size of each space (equal)
-    size_t size;
-    //to keep track of allocation and 
-    //collection
-    uintptr_t *alloc_ptr;
-    uintptr_t *scan_ptr;
-    uintptr_t *alloc_begin;
-    uintptr_t *alloc_end;
-    //PRIVATE
-};
-
-//initialize gc with pointer to self, pointer to memory, and size of memory
-void gc_init(struct gc *self, uintptr_t *mem, size_t size);
-
 //function type used by gc_* functions to access
 //user's root references and to access references
 //in allocated objects.
 typedef void (*foreach_t)(
-    void (*cb)(void *it, void *ctx),
+    void (*cb)(uintptr_t **it, void *ctx),
     void *cb_ctx,
     void *foreach_ctx);
+
+//forward declaration of the instance struct
+struct gc;
+
+//initialize gc with pointer to self, pointer to memory, and size of memory
+void gc_init(struct gc *self, uintptr_t *mem, size_t size);
 
 //see gc.c for example layout functions 
 //layout_ref_array and layout_int_array
@@ -85,9 +69,34 @@ uintptr_t *gc_alloc_int_array(
 //gets the size of an allocation returned from gc_alloc_*
 uintptr_t gc_get_size(uintptr_t *);
 
+//to call on pointers that are read from memory
+//may change the pointer
+void gc_read_barrier(struct gc *, uintptr_t **);
+
+//to call when objects have managed pointers written to them
+void gc_write_barrier(struct gc *, uintptr_t *);
+
+//builtin layout for an array of references
+void gc_layout_ref_array(
+    void (*cb)(uintptr_t**, void*), 
+    void *cb_ctx, 
+    void *layout_ctx);
+
+//builtin layout for integer arrays
+void gc_layout_int_array(
+    void (*cb)(uintptr_t**, void*), 
+    void *cb_ctx, 
+    void *layout_ctx);
+
+//example layout for dynamic language with tagged ints
+void gc_layout_example_tagged_ints(
+    void (*cb)(uintptr_t**, void*), 
+    void *cb_ctx, 
+    void *layout_ctx);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif //GC_H
+#endif //GC_INTERFACE_H
 
