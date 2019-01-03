@@ -1,0 +1,92 @@
+
+get_color(ptr):
+    if ptr >= alloc_begin and ptr < alloc_end:
+        //ptr is in to-space, and therefore is either grey or black
+        if ptr >= scan:
+            //ptr is grey (has yet to be scanned)
+            return grey
+        else:
+            //ptr has been scanned and is black
+            return black
+    else:
+        //ptr is not in to-space
+        return white
+
+//must be called by mutator whenever 
+//a pointer has been read from memory
+//this ensures that the mutator doesn't
+//ever have a pointer to a white object
+read_barrier(ptr by ref):
+    if get_color(ptr) is white:
+        ptr = forward(ptr)
+
+//bumps pointer and returns last value
+alloc_unchecked(size):
+    ret = alloc
+    alloc += size
+    return ret
+
+//attempts to allocate size words
+//not shown here: how alloc knows 
+//about all roots, how alloc knows 
+//where pointers are in objects.
+alloc(size):
+
+    //check collecting flag
+    //not sure if there is another way to determine this
+    if collecting:
+        //in collection phase
+        
+        //scan K grey objects
+        //K determined by experiment?
+        //alternatively scan objects until X bytes have been forwarded?
+        //K must be large enough that new allocations don't fill to-space
+        //before we're done collecting
+        for i in [0 K):
+            for ptr by ref in obj @ scan:
+                //forward all pointers in object at scan ptr
+                ptr = forward(ptr)
+            //advance scan ptr to next object 
+            //(also "coloring" the last scanned obj black)
+            scan = scan + size(obj @ scan)
+        
+        //check if any grey objects remain
+        if scan >= alloc:
+            //no more grey objects
+            collecting = false
+            //and we keep allocating in the current 
+            //space until it's full, then collect again
+        
+        //check enough space
+        assert(end - alloc >= size)
+        
+        return alloc_unchecked(size)
+        
+    else:
+        //not in collection phase
+        
+        if end - alloc < size:
+            //not enough space
+            
+            //set flag for next time
+            collecting = true
+            
+            //change end, alloc, scan ptrs
+            swap_spaces()
+            
+            //forward roots to new space
+            forward_roots()
+            
+            //make sure we still have enough space for the new alloc
+            assert(end - alloc >= size)
+            
+            return alloc_unchecked(size)
+            
+        else:
+            //enough space
+            //alloc normally
+            
+            return alloc_unchecked(size)
+
+
+
