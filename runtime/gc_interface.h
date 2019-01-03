@@ -73,7 +73,8 @@ uintptr_t gc_get_size(uintptr_t *);
 //may change the pointer
 void gc_read_barrier(struct gc *, uintptr_t **);
 
-//to call when objects have managed pointers written to them
+//to call on objects that have had 
+//managed pointers written to them
 void gc_write_barrier(struct gc *, uintptr_t *);
 
 //builtin layout for an array of references

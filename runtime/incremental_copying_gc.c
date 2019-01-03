@@ -9,8 +9,9 @@
 #define UINTPTR_BIT (CHAR_BIT * sizeof(uintptr_t))
 
 struct gc_object {
-    uintptr_t size      :UINTPTR_BIT - 1;   //total size of the allocation
+    uintptr_t size      :UINTPTR_BIT - 2;   //total size of the allocation
     uintptr_t forward   :1;                 //layout is a forward ptr if set
+    uintptr_t black     :1;                 //to mark black objects
     uintptr_t layout;                       //pointer to layout function
     uintptr_t user[];                       //user data
 };
@@ -29,7 +30,16 @@ uintptr_t gc_get_size(uintptr_t *ref) {
     return get_gc_ptr(ref)->size - META_SIZE;
 }
 
-static void gc_init_pointers(struct gc *, uintptr_t *, uintptr_t *);
+//initialize alloc_ptr_, scan_ptr_, alloc_begin_ and alloc_end_
+//with the given memory range
+static inline void gc_init_pointers(
+    struct gc *self, 
+    uintptr_t *begin, 
+    uintptr_t *end) 
+{
+    self->alloc_ptr = self->scan_ptr = self->alloc_begin = begin;
+    self->alloc_end = end;
+}
 
 //create a GC instance with the given memory of the given size
 void gc_init(struct gc *self, uintptr_t *mem, size_t size) {
@@ -40,3 +50,14 @@ void gc_init(struct gc *self, uintptr_t *mem, size_t size) {
     self->b_space = mem + self->size;
     gc_init_pointers(self, self->a_space, self->a_space + self->size);
 }
+
+uintptr_t *gc_alloc_with_layout(
+    struct gc *self,
+    foreach_t root_iter,
+    void *root_iter_ctx,
+    uintptr_t size,
+    foreach_t layout)
+{
+    
+}
+
