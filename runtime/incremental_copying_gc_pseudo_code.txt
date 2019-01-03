@@ -1,4 +1,31 @@
 
+
+//gc instance variables
+//total memory for heap
+heap[HEAP_SIZE]
+//size of each semispace
+space_size = HEAP_SIZE / 2
+//a semispace
+a_space = heap
+//b semispace
+b_space = heap + space_size
+//to-space pointers
+alloc = a_space
+end = a_space + space_size
+scan = alloc
+
+swap_space():
+    if end is a_space + space_size
+        //to-space is currently a_space
+        alloc = a_space
+        end = a_space + space_size
+    else 
+        //to-space is currently b_space
+        alloc = b_space
+        end = b_space + space_size
+    //scan always begins pointed to alloc
+    scan = alloc
+
 get_color(ptr):
     if ptr >= alloc_begin and ptr < alloc_end:
         //ptr is in to-space, and therefore is either grey or black
@@ -11,6 +38,47 @@ get_color(ptr):
     else:
         //ptr is not in to-space
         return white
+
+//returns the size of the allocation at ptr
+size(ptr):
+    //implementation detail
+
+//returns true if the object at ptr has been forwarded
+forwarded(ptr):
+    //implementation detail
+
+//returns the forwarding address of the object at ptr
+get_forward_location(ptr):
+    //implementation detail
+
+//sets the forwarding pointer in the object at ptr
+set_forward_location(ptr, loc):
+    //implementation detail
+
+forward(ptr):
+    if forwarded(ptr):
+        return get_forward_location(ptr)
+    else:
+        //make sure enough space to copy
+        assert(end - alloc >= size(ptr))
+        //copy object to to-space
+        memcpy(alloc, ptr, size(ptr))
+        //return new address
+        ret = alloc
+        //set the to-space address in the from-space version 
+        //of object so we know how to update references to
+        //the from-space version
+        set_forward_location(ptr, alloc)
+        //bump alloc
+        alloc = alloc + size(ptr)
+        //return to-space address
+        return ret
+
+//forward all roots
+forward_roots():
+    for ptr by ref in roots:
+        //enumerating all roots is implementation detail
+        ptr = forward(ptr)
 
 //must be called by mutator whenever 
 //a pointer has been read from memory
@@ -43,12 +111,12 @@ alloc(size):
         //K must be large enough that new allocations don't fill to-space
         //before we're done collecting
         for i in [0 K):
-            for ptr by ref in obj @ scan:
+            for ptr by ref in scan:
                 //forward all pointers in object at scan ptr
                 ptr = forward(ptr)
-            //advance scan ptr to next object 
-            //(also "coloring" the last scanned obj black)
-            scan = scan + size(obj @ scan)
+            //advance scan ptr to next object
+            //this also "colors" the last scanned obj black
+            scan = scan + size(scan)
         
         //check if any grey objects remain
         if scan >= alloc:
@@ -72,7 +140,7 @@ alloc(size):
             collecting = true
             
             //change end, alloc, scan ptrs
-            swap_spaces()
+            swap_space()
             
             //forward roots to new space
             forward_roots()
