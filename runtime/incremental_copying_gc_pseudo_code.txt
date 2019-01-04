@@ -17,12 +17,12 @@ scan = alloc
 swap_space():
     if end is a_space + space_size
         //to-space is currently a_space
-        alloc = a_space
-        end = a_space + space_size
-    else 
-        //to-space is currently b_space
         alloc = b_space
         end = b_space + space_size
+    else 
+        //to-space is currently b_space
+        alloc = a_space
+        end = a_space + space_size
     //scan always begins pointed to alloc
     scan = alloc
 

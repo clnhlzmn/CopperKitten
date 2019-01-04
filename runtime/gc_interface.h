@@ -3,12 +3,12 @@
 #ifndef GC_INTERFACE_H
 #define GC_INTERFACE_H
 
-#include <stddef.h>
-#include <stdint.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stddef.h>
+#include <stdint.h>
 
 //this is intended as a user (pl implementation) 
 //interface to a generic memory allocator/manager
@@ -34,7 +34,7 @@ typedef void (*foreach_t)(
     void *cb_ctx,
     void *foreach_ctx);
 
-//forward declaration of the instance struct
+//forward declaration of gc instance
 struct gc;
 
 //initialize gc with pointer to self, pointer to memory, and size of memory
@@ -77,23 +77,48 @@ void gc_read_barrier(struct gc *, uintptr_t **);
 //managed pointers written to them
 void gc_write_barrier(struct gc *, uintptr_t *);
 
-//builtin layout for an array of references
-void gc_layout_ref_array(
+//builtin layout for array of references
+static inline void gc_layout_ref_array(
     void (*cb)(uintptr_t**, void*), 
     void *cb_ctx, 
-    void *layout_ctx);
+    void *layout_ctx) 
+{
+    //call callback for each element
+    uintptr_t *user_ptr = layout_ctx;
+    for (uintptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
+        cb((uintptr_t**)&user_ptr[i], cb_ctx);
+    }
+}
 
 //builtin layout for integer arrays
-void gc_layout_int_array(
+static inline void gc_layout_int_array(
     void (*cb)(uintptr_t**, void*), 
     void *cb_ctx, 
-    void *layout_ctx);
+    void *layout_ctx) 
+{
+    //does nothing because int array has no references
+    (void)cb;
+    (void)cb_ctx;
+    (void)layout_ctx;
+    (void)gc_layout_example_tagged_ints;
+}
 
 //example layout for dynamic language with tagged ints
-void gc_layout_example_tagged_ints(
+static inline void gc_layout_example_tagged_ints(
     void (*cb)(uintptr_t**, void*), 
     void *cb_ctx, 
-    void *layout_ctx);
+    void *layout_ctx) 
+{
+    //call callback for each element if it's a reference
+    uintptr_t *user_ptr = layout_ctx;
+    for (uintptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
+        //check tag
+        if ((user_ptr[i] & 1) == 0) {
+            //it's a pointer
+            cb((uintptr_t**)&user_ptr[i], cb_ctx);
+        }
+    }
+}
 
 #ifdef __cplusplus
 }

@@ -18,10 +18,11 @@ struct gc {
     size_t size;
     //to keep track of allocation and 
     //collection
-    uintptr_t *alloc_ptr;
-    uintptr_t *scan_ptr;
-    uintptr_t *alloc_begin;
-    uintptr_t *alloc_end;
+    uintptr_t *alloc;
+    uintptr_t *scan;
+    uintptr_t *end;
+    //to know what to do during alloc
+    bool collecting;
     //PRIVATE
 };
 
