@@ -1,9 +1,11 @@
 
 #to make mingw use proper printf format strings like %lld
-CFLAGS = -Wall -Wextra -Werror -std=c99 -g -D__USE_MINGW_ANSI_STDIO=1 -fmax-errors=5 -Wno-error=unused-command-line-argument
-LDFLAGS = -g
+CFLAGS = -Wall -Wextra -Werror -std=c99 -Og -D__USE_MINGW_ANSI_STDIO=1 -fmax-errors=5
+LDFLAGS = -Og
 
-test: test_gc.o gc.o gc_interface.o
+#-Wno-error=unused-command-line-argument
+
+test: test_gc.o gc.o
 	@echo test
 	gcc $(LDFLAGS) -o test test_gc.o gc.o
 

@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -77,6 +78,23 @@ void gc_read_barrier(struct gc *, uintptr_t **);
 //managed pointers written to them
 void gc_write_barrier(struct gc *, uintptr_t *);
 
+//example layout for dynamic language with tagged ints
+static inline void gc_layout_example_tagged_ints(
+    void (*cb)(uintptr_t**, void*), 
+    void *cb_ctx, 
+    void *layout_ctx) 
+{
+    //call callback for each element if it's a reference
+    uintptr_t *user_ptr = layout_ctx;
+    for (uintptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
+        //check tag
+        if ((user_ptr[i] & 1) == 0) {
+            //it's a pointer
+            cb((uintptr_t**)&user_ptr[i], cb_ctx);
+        }
+    }
+}
+
 //builtin layout for array of references
 static inline void gc_layout_ref_array(
     void (*cb)(uintptr_t**, void*), 
@@ -101,23 +119,6 @@ static inline void gc_layout_int_array(
     (void)cb_ctx;
     (void)layout_ctx;
     (void)gc_layout_example_tagged_ints;
-}
-
-//example layout for dynamic language with tagged ints
-static inline void gc_layout_example_tagged_ints(
-    void (*cb)(uintptr_t**, void*), 
-    void *cb_ctx, 
-    void *layout_ctx) 
-{
-    //call callback for each element if it's a reference
-    uintptr_t *user_ptr = layout_ctx;
-    for (uintptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
-        //check tag
-        if ((user_ptr[i] & 1) == 0) {
-            //it's a pointer
-            cb((uintptr_t**)&user_ptr[i], cb_ctx);
-        }
-    }
 }
 
 #ifdef __cplusplus

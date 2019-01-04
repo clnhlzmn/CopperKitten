@@ -20,6 +20,7 @@ struct gc {
     //collection
     uintptr_t *alloc;
     uintptr_t *scan;
+    uintptr_t *begin;
     uintptr_t *end;
     //to know what to do during alloc
     bool collecting;
