@@ -1,0 +1,27 @@
+
+
+From NlightNFotis @ https://stackoverflow.com/questions/34119721/simple-programming-language-in-ebnf-form
+
+Program --> Funs
+
+Funs --> Fun
+Funs --> Fun Funs
+
+Fun --> TypeId ( TypeIds ) = Exp
+
+TypeId --> *int* **id**
+TypeId --> *bool* **id**
+
+TypeIds --> TypeId
+TypeIds --> TypeId , TypeIds
+
+Exp --> num
+Exp --> id
+Exp --> Exp + Exp
+Exp --> Exp = Exp
+Exp --> if Exp then Exp else Exp
+Exp --> id ( Exps ) 
+Exp --> let id = Exp in Exp
+
+Exps --> Exp 
+Exps --> Exp , Exps
