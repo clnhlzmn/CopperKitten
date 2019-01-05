@@ -15,10 +15,14 @@
 
 //layout of gc object meta data
 struct gc_object {
-    uintptr_t size      :UINTPTR_BIT - 1;   //total size of the allocation
-    uintptr_t forward   :1;                 //layout is a forward ptr if set
-    uintptr_t layout;                       //pointer to layout function (or forward)
-    uintptr_t user[];                       //user data
+	//total size of the allocation (in units of uintptr_t)
+    uintptr_t size      :UINTPTR_BIT - 1;
+	//layout is a forward ptr if set
+    uintptr_t forward   :1;
+	//pointer to layout function (or forward)
+    uintptr_t layout;
+	//user data
+    uintptr_t user[];
 };
 
 //size of gc object meta
@@ -123,10 +127,6 @@ void gc_init(struct gc *self, uintptr_t *mem, size_t size) {
 #define GC_CHECK_SIZE(self, size) \
     ((self)->alloc + (size) <= (self)->end)
 
-//asserts enough size
-#define GC_ASSERT_SIZE(self, size) \
-    assert((self)->alloc + (size) <= (self)->end)
-
 //simple allocation of size cells with no checking
 static inline uintptr_t *gc_alloc_unchecked(struct gc *self, uintptr_t size) {
     uintptr_t *ret = self->alloc;
@@ -138,6 +138,8 @@ static inline uintptr_t *gc_alloc_unchecked(struct gc *self, uintptr_t size) {
 //forward the allocation pointed to by cp
 //takes and returns gc pointers, that means
 //pointers must be converted when forwarding
+//caller must check that there is enough space
+//to forward the object
 static inline struct gc_object *gc_forward(
     struct gc *self, 
     struct gc_object *obj) 
@@ -152,8 +154,6 @@ static inline struct gc_object *gc_forward(
         return (struct gc_object *)obj->layout;
     } else {
         //obj needs to be forwarded
-        //make sure enough size
-        GC_ASSERT_SIZE(self, obj->size);
         //copy size uintptr_t from old to new space
         memcpy(self->alloc, obj, obj->size * sizeof(uintptr_t));
         //set the forward flag at obj
@@ -202,7 +202,7 @@ static inline void forward_ref_cb(uintptr_t **it, void *ctx) {
 }
 
 //allocates n Cells, collecting if necessary
-static inline uintptr_t *gc_alloc(
+static inline struct gc_object *gc_alloc(
     struct gc *self, 
     foreach_t root_iter, 
     void *root_iter_ctx, 
@@ -213,6 +213,7 @@ static inline uintptr_t *gc_alloc(
     if (self->collecting) {
         //scan K grey objects
         //keep original alloc here, it's liable to change while we scan objs
+		//TODO: scan X bytes instead? maybe X related to size?
         uintptr_t *alloc = self->alloc;
         for (uintptr_t i = 0; i < GC_K && self->scan < alloc; ++i) {
             struct gc_object *obj = (struct gc_object *)self->scan;
@@ -233,14 +234,18 @@ static inline uintptr_t *gc_alloc(
         //done collecting? (no more grey objects)
         if (self->scan >= self->alloc) {
             self->collecting = false;
-            //check all objects reachable from roots are black
+#ifndef NDEBUG
+			//check all objects reachable from roots are black
             gc_integrity_check(self, root_iter, root_iter_ctx);
+#endif
             //and then fill up the rest of to-space
             //printf("done collecting\r\n");
             //gc_print_heap(self);
         }
         //check size
-        GC_ASSERT_SIZE(self, size);
+		if (!GC_CHECK_SIZE(self, size)) {
+			return NULL;
+		}
     } else {
         //not collecting
         if (!GC_CHECK_SIZE(self, size)) {
@@ -252,7 +257,7 @@ static inline uintptr_t *gc_alloc(
             //effectively paint all current objects white
             gc_swap_spaces(self);
             //forward roots
-            //maybe this can be done incrementally too?
+            //TODO: maybe this can be done incrementally too?
             root_iter(forward_ref_cb, self, root_iter_ctx);
             //check size
             GC_ASSERT_SIZE(self, size);
@@ -260,10 +265,8 @@ static inline uintptr_t *gc_alloc(
     }
     /*printf("alloc end\r\n");
     gc_print_heap(self);*/
-    uintptr_t *ret = gc_alloc_unchecked(self, size);
-    if (!gc_obj_is_grey(self, ((struct gc_object *)ret)->user)) {
-        assert(0);
-    }
+	struct gc_object *ret = (struct gc_object *)gc_alloc_unchecked(self, size);
+    assert(gc_obj_is_grey(self, ret->user));
     return ret;
 }
 
