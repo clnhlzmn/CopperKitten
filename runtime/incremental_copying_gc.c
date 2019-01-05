@@ -165,8 +165,8 @@ static inline struct gc_object *gc_forward(
     }
 }
 
-//a callback function for foreach_t to forward the reference
-//pointed to by it. takes struct gc* as ctx
+//a callback function for foreach_t to traverse 
+//the object graph and assert all objs are black 
 static inline void integrity_check_cb(uintptr_t **it, void *ctx) {
     assert(it);
     assert(ctx);
