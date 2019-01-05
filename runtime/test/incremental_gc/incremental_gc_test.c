@@ -10,7 +10,7 @@ void roots_foreach(void (*cb)(uintptr_t **item, void *ctx), void *cb_ctx, void *
     cb(it, cb_ctx);
 }
 
-#define MEM_SIZE (100)
+#define MEM_SIZE (1000)
 
 uintptr_t mem[MEM_SIZE];
 
@@ -31,17 +31,13 @@ void test_gc(void) {
         uintptr_t *root = NULL;
         /*printf("main: &root = %p\r\n", &root);*/
         root = gc_alloc_ref_array(&gc_inst, roots_foreach, &root, OBJ_SIZE);
-        //not necessary because newly allocated object should be grey
-        gc_read_barrier(&gc_inst, &root);
-        assert(root);
+		assert(root);
         //printf("%d", __LINE__);
         assert(gc_get_size(root) == OBJ_SIZE);
         //printf("%d", __LINE__);
         //store a value in non ref cell
         for (int i = 0; i < OBJ_SIZE; ++i) {
             root[i] = (uintptr_t)gc_alloc_int_array(&gc_inst, roots_foreach, &root, OBJ_SIZE);
-            //not necessary because newly allocated object should be grey
-            gc_read_barrier(&gc_inst, (uintptr_t**)&root[i]);
             assert(root[i]);
             assert(gc_get_size((uintptr_t*)root[i]) == OBJ_SIZE);
             for (unsigned j = 0; j < OBJ_SIZE; ++j) {
@@ -52,7 +48,6 @@ void test_gc(void) {
         for (int i = 0; i < 10000; ++i) {
             //alloc chunks of 10 cells, no refs
             uintptr_t *a = gc_alloc_int_array(&gc_inst, roots_foreach, &root, OBJ_SIZE);
-            gc_read_barrier(&gc_inst, &a);
             assert(a);
             assert(gc_get_size(a) == OBJ_SIZE);
             /*printf("%d : %d\r\n", __LINE__, i);*/
@@ -67,6 +62,7 @@ void test_gc(void) {
         for (int i = 0; i < OBJ_SIZE; ++i) {
             assert(root[i]);
             assert(gc_get_size((uintptr_t*)root[i]) == OBJ_SIZE);
+			gc_read_barrier(&gc_inst, &(uintptr_t*)root[i]);
             for (unsigned j = 0; j < OBJ_SIZE; ++j) {
                 assert(((uintptr_t*)root[i])[j] == INT_DATA);
             }

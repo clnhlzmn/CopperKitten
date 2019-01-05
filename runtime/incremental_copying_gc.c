@@ -8,7 +8,7 @@
 #include <string.h>
 
 //number of objects to scan each increment
-#define GC_K (3)
+#define GC_K (2)
 
 //number of bits in a uintptr_t
 #define UINTPTR_BIT (CHAR_BIT * sizeof(uintptr_t))
@@ -138,8 +138,6 @@ static inline uintptr_t *gc_alloc_unchecked(struct gc *self, uintptr_t size) {
 //forward the allocation pointed to by cp
 //takes and returns gc pointers, that means
 //pointers must be converted when forwarding
-//caller must check that there is enough space
-//to forward the object
 static inline struct gc_object *gc_forward(
     struct gc *self, 
     struct gc_object *obj) 
@@ -154,6 +152,17 @@ static inline struct gc_object *gc_forward(
         return (struct gc_object *)obj->layout;
     } else {
         //obj needs to be forwarded
+		if (!GC_CHECK_SIZE(self, obj->size)) {
+			assert(0 && "");
+			//TODO: signal self that forwarding has 
+			//and how to resume if it's possible to 
+			//increase memory size, if memory can't
+			//be increased then allocation can't continue.
+			//will be tricky because alloc doesn't call 
+			//gc_forward directly, but through a 
+			//callback given to a foreach_t function
+			//iterating the roots or an object's refs
+		}
         //copy size uintptr_t from old to new space
         memcpy(self->alloc, obj, obj->size * sizeof(uintptr_t));
         //set the forward flag at obj
@@ -198,6 +207,8 @@ static inline void forward_ref_cb(uintptr_t **it, void *ctx) {
     assert(ctx);
     /*printf("forward_ref_cb: self = %p, root = %p\r\n", data, it);*/
     if (*it == NULL) { return; }
+	//check if there is enough room first. If not, report that to
+	//(struct gc *)ctx and don't forward
     *it = gc_forward((struct gc*)ctx, get_gc_ptr(*it))->user;
 }
 
@@ -217,11 +228,6 @@ static inline struct gc_object *gc_alloc(
         uintptr_t *alloc = self->alloc;
         for (uintptr_t i = 0; i < GC_K && self->scan < alloc; ++i) {
             struct gc_object *obj = (struct gc_object *)self->scan;
-            if (obj->forward) {
-                printf("hmm\r\n");
-                gc_print_heap(self);
-                assert(0);
-            }
             //these objects are in to-space; should not have forward bit set
             assert(!obj->forward);
             //get the layout
@@ -259,8 +265,10 @@ static inline struct gc_object *gc_alloc(
             //forward roots
             //TODO: maybe this can be done incrementally too?
             root_iter(forward_ref_cb, self, root_iter_ctx);
-            //check size
-            GC_ASSERT_SIZE(self, size);
+			//check size
+			if (!GC_CHECK_SIZE(self, size)) {
+				return NULL;
+			}
         }
     }
     /*printf("alloc end\r\n");
@@ -291,8 +299,7 @@ uintptr_t *gc_alloc_with_layout(
     struct gc_object *ret = 
         (struct gc_object *)
         gc_alloc(self, root_iter, root_iter_ctx, size + META_SIZE);
-    assert((uintptr_t*)ret < self->end);
-    assert((uintptr_t*)ret >= self->begin);
+	assert(ret);
     ret->size = size + META_SIZE;
     //set the layout pointer
     ret->layout = (uintptr_t)layout;
@@ -300,7 +307,6 @@ uintptr_t *gc_alloc_with_layout(
     //use the layout to zero the references
     layout(zero_ref_cb, NULL, ret->user);
     assert(gc_get_size(ret->user) == size);
-    assert(gc_obj_is_grey(self, ret->user));
     return ret->user;
 }
 
