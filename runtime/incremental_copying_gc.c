@@ -207,8 +207,6 @@ static inline void forward_ref_cb(uintptr_t **it, void *ctx) {
     assert(ctx);
     /*printf("forward_ref_cb: self = %p, root = %p\r\n", data, it);*/
     if (*it == NULL) { return; }
-	//check if there is enough room first. If not, report that to
-	//(struct gc *)ctx and don't forward
     *it = gc_forward((struct gc*)ctx, get_gc_ptr(*it))->user;
 }
 
@@ -299,6 +297,7 @@ uintptr_t *gc_alloc_with_layout(
     struct gc_object *ret = 
         (struct gc_object *)
         gc_alloc(self, root_iter, root_iter_ctx, size + META_SIZE);
+	//TODO: actually handle the case that we can't allocate the thing
 	assert(ret);
     ret->size = size + META_SIZE;
     //set the layout pointer

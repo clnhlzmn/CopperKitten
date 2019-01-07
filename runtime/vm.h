@@ -15,18 +15,18 @@
 
 struct vm {
     struct gc *gc;
-    int8_t *ip;
-    intptr_t *sp;
-    intptr_t *sb;
-    intptr_t size;
-    intptr_t *frame;
+    uint8_t *ip;
+    uintptr_t *sp;
+    uintptr_t *sb;
+    uintptr_t size;
+    uintptr_t *frame;
 };
 
 static inline void vm_init(
     struct vm *self, 
     struct gc *gc, 
-    intptr_t *stack, 
-    intptr_t size)
+    uintptr_t *stack, 
+    uintptr_t size)
 {
     assert(self);
     assert(gc);
@@ -69,9 +69,9 @@ enum vm_op_code {
 
 static inline void vm_dispatch(struct vm *self, uint8_t instruction);
 
-static inline void vm_execute(struct vm *self, int8_t *code) {
+static inline void vm_execute(struct vm *self, uint8_t *code) {
     for (self->ip = code; self->ip; ) {
-        int8_t inst = VM_DEREF_IP(self->ip);
+        uint8_t inst = VM_DEREF_IP(self->ip);
         //increment self->ip here so its before Dispatch gets it (where it might be modified)
         printf("vm_execute %p\r\n", self->ip);
         self->ip++;
@@ -126,7 +126,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
                         self->ip++;
                         break;
                     case PUSHW:
-                        self->ip += sizeof(intptr_t);
+                        self->ip += sizeof(uintptr_t);
                         break;
                     default: break;
                 }
@@ -134,16 +134,16 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case IP:
             printf("ip: %p\r\n", self->ip);
-            *self->sp = (intptr_t)self->ip;
+            *self->sp = (uintptr_t)self->ip;
             self->sp++;
             break;
         case FP:
-            *self->sp = (intptr_t)self->frame;
+            *self->sp = (uintptr_t)self->frame;
             self->sp++;
             break;
         case JUMP: {
-            int8_t *orig = self->ip;
-            self->ip = (int8_t*)*(self->sp - 1);
+            uint8_t *orig = self->ip;
+            self->ip = (uint8_t*)*(self->sp - 1);
             self->sp--;
             printf("jump: before=%p, after=%p\r\n", orig, self->ip);
             break;
@@ -153,8 +153,8 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp++;
             break;
         case PUSHW: {
-            intptr_t word = 0;
-            for (size_t i = 0; i < sizeof(intptr_t); ++i) {
+            uintptr_t word = 0;
+            for (size_t i = 0; i < sizeof(uintptr_t); ++i) {
                 uint8_t byte = (uint8_t)VM_DEREF_IP(self->ip++);
                 word |= byte << i * 8;
             }
@@ -173,7 +173,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             *(self->sp - 2) = *(self->sp - 1);
             break;
         case ENTER:
-            *self->sp = (intptr_t)self->frame;
+            *self->sp = (uintptr_t)self->frame;
             self->frame = self->sp;
             self->sp++;
             *self->sp = 0;
@@ -181,7 +181,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case LEAVE:
             self->sp--;
-            self->frame = (intptr_t*)*(self->sp - 1);
+            self->frame = (uintptr_t*)*(self->sp - 1);
             self->sp--;
             break;
         case IN: {
@@ -197,14 +197,16 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case ALLOC:
             //TODO: foreach_t funtion for this guy
-            *(self->sp - 2) = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 2), (void*)*(self->sp - 1));
+            *(self->sp - 2) = (uintptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 2), (void*)*(self->sp - 1));
             self->sp--;
             break;
         case LOAD:
-            *(self->sp - 1) = *(intptr_t*)*(self->sp - 1);
+            //TODO: gc_read_barrier
+            *(self->sp - 1) = *(uintptr_t*)*(self->sp - 1);
             break;
         case STORE:
-            *(intptr_t*)*(self->sp - 2) = *(self->sp - 1);
+            //TODO: gc_write_barrier
+            *(uintptr_t*)*(self->sp - 2) = *(self->sp - 1);
             self->sp -= 2;
             break;
         case NCALL: {
