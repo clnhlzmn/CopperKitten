@@ -14,7 +14,7 @@ void roots_foreach(void (*cb)(uintptr_t **item, void *ctx), void *cb_ctx, void *
 
 uintptr_t mem[MEM_SIZE];
 
-#define OBJ_SIZE (5)
+#define OBJ_SIZE (10)
 
 #define INT_DATA ((uintptr_t)-1)
 
