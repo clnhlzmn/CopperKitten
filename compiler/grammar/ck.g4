@@ -15,6 +15,7 @@ statement
     | 'for' '(' statement? ';' expr ';' expr? ')' statement                             #forStatement
     | 'if' '(' expr ')' statement ( 'else' statement )                                  #ifStatement
     | 'match' '(' expr ')' ( 'with' expr ':' statement )* ( 'default' ':' statement )?  #matchStatement
+    | 'return' expr?                                                                    #returnStatement
     | expr                                                                              #exprStatement
     ;
 
