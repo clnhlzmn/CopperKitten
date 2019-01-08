@@ -24,7 +24,20 @@ class visitor : ckBaseVisitor<ckObject>() {
     }
 }
 
+fun foo(): (Int)->Unit {
+    return fun (i:Int) { print("inner") };
+}
+
+fun bar() {
+
+}
+
 fun main() {
+
+    foo()
+
+    (42)
+
     println("Hello, World!")
     val res = visitor().visit(context)
     println(res)
