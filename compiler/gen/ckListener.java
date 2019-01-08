@@ -1,5 +1,4 @@
-// Generated from C:/code/ck/compiler/grammar\ck.g4 by ANTLR 4.7.2
-package compiler;
+// Generated from C:/code/CopperKitten/compiler/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -18,15 +17,113 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitFile(ckParser.FileContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ckParser#statement}.
+	 * Enter a parse tree produced by the {@code blockStatement}
+	 * labeled alternative in {@link ckParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterStatement(ckParser.StatementContext ctx);
+	void enterBlockStatement(ckParser.BlockStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ckParser#statement}.
+	 * Exit a parse tree produced by the {@code blockStatement}
+	 * labeled alternative in {@link ckParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitStatement(ckParser.StatementContext ctx);
+	void exitBlockStatement(ckParser.BlockStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code letStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterLetStatement(ckParser.LetStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code letStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitLetStatement(ckParser.LetStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code doStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterDoStatement(ckParser.DoStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code doStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitDoStatement(ckParser.DoStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code whileStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterWhileStatement(ckParser.WhileStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code whileStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitWhileStatement(ckParser.WhileStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code forStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForStatement(ckParser.ForStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code forStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForStatement(ckParser.ForStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ifStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterIfStatement(ckParser.IfStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ifStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitIfStatement(ckParser.IfStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code matchStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterMatchStatement(ckParser.MatchStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code matchStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitMatchStatement(ckParser.MatchStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code returnStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterReturnStatement(ckParser.ReturnStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code returnStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitReturnStatement(ckParser.ReturnStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code exprStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterExprStatement(ckParser.ExprStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code exprStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitExprStatement(ckParser.ExprStatementContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ckParser#statements}.
 	 * @param ctx the parse tree
@@ -85,18 +182,6 @@ public interface ckListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitOrExpr(ckParser.OrExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code seqExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterSeqExpr(ckParser.SeqExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code seqExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitSeqExpr(ckParser.SeqExprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code subExpr}
 	 * labeled alternative in {@link ckParser#expr}.

@@ -1,5 +1,4 @@
-// Generated from C:/code/ck/compiler/grammar\ck.g4 by ANTLR 4.7.2
-package compiler;
+// Generated from C:/code/CopperKitten/compiler/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -17,11 +16,68 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFile(ckParser.FileContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ckParser#statement}.
+	 * Visit a parse tree produced by the {@code blockStatement}
+	 * labeled alternative in {@link ckParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitStatement(ckParser.StatementContext ctx);
+	T visitBlockStatement(ckParser.BlockStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code letStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLetStatement(ckParser.LetStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code doStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDoStatement(ckParser.DoStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code whileStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWhileStatement(ckParser.WhileStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code forStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForStatement(ckParser.ForStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ifStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIfStatement(ckParser.IfStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code matchStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMatchStatement(ckParser.MatchStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code returnStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitReturnStatement(ckParser.ReturnStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprStatement}
+	 * labeled alternative in {@link ckParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprStatement(ckParser.ExprStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ckParser#statements}.
 	 * @param ctx the parse tree
@@ -56,13 +112,6 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitOrExpr(ckParser.OrExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code seqExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSeqExpr(ckParser.SeqExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code subExpr}
 	 * labeled alternative in {@link ckParser#expr}.
