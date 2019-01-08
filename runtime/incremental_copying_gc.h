@@ -18,6 +18,10 @@ struct gc {
     size_t size;
     //to keep track of allocation and 
     //collection
+#ifndef NDEBUG
+	//for printing the heap
+	uintptr_t *last_alloc;
+#endif
     uintptr_t *alloc;
     uintptr_t *scan;
     uintptr_t *begin;

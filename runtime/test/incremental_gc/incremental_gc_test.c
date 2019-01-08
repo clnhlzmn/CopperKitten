@@ -10,11 +10,11 @@ void roots_foreach(void (*cb)(uintptr_t **item, void *ctx), void *cb_ctx, void *
     cb(it, cb_ctx);
 }
 
-#define MEM_SIZE (1000)
+#define MEM_SIZE (34)
 
 uintptr_t mem[MEM_SIZE];
 
-#define OBJ_SIZE (10)
+#define OBJ_SIZE (1)
 
 #define INT_DATA ((uintptr_t)-1)
 

@@ -55,6 +55,8 @@ static bool gc_obj_is_white(struct gc *self, uintptr_t *ref) {
     assert(ref);
     //get a gc pointer, but not a gc_object
     uintptr_t *obj = (uintptr_t*)get_gc_ptr(ref);
+	//assert obj is in heap
+	assert(obj >= self->a_space && obj < self->a_space + 2 * self->size);
     //obj is white if it's in from-space
     //i.e. not in to-space
     return obj < self->begin || obj >= self->end;
@@ -81,6 +83,7 @@ static bool gc_obj_is_black(struct gc *self, uintptr_t *ref) {
 
 //initialize alloc, scan, and end
 static inline void gc_swap_spaces(struct gc *self) {
+	self->last_alloc = self->alloc;
     if (self->begin == self->a_space) {
         self->begin = self->b_space;
         self->end = self->b_space + self->size;
@@ -92,24 +95,60 @@ static inline void gc_swap_spaces(struct gc *self) {
     self->scan = self->begin;
 }
 
-static inline void gc_print_heap(struct gc *self) {
-    printf("gc_print_heap\r\n");
-    for (uintptr_t *it = self->begin; it < self->alloc; ) {
-        struct gc_object *obj = (struct gc_object *) it;
-        const char *which = obj->forward ? "forward" : "layout";
-        printf("{addr:%p, size:%llu, %s:%p}[\r\n", 
-            obj, 
-            obj->size, 
-            which, 
-            (void*)obj->layout
-        );
-        for (uintptr_t i = 0; i < gc_get_size(obj->user); ++i) {
-            printf("    %p\r\n", (void*)obj->user[i]);
-        }
-        printf("]\r\n");
-        it += obj->size;
-    }
+#ifndef NDEBUG
+
+static inline void gc_print_object(uintptr_t *heap_begin, struct gc_object *obj) {
+	if (obj->forward) {
+		printf("{addr:%p, size:%llu, forward:%lld}[\r\n",
+			(uintptr_t*)obj - heap_begin,
+			obj->size,
+			(uintptr_t*)obj->forward - heap_begin
+		);
+	} else {
+		const char *layout = 
+			obj->layout == gc_layout_ref_array 
+						? "refs" 
+						: obj->layout == gc_alloc_int_array 
+									  ? "ints" 
+									  : "?";
+		printf("{addr:%p, size:%llu, layout:%s}[\r\n",
+			(uintptr_t*)obj - heap_begin,
+			obj->size,
+			layout
+		);
+	}
+	for (uintptr_t i = 0; i < gc_get_size(obj->user); ++i) {
+		printf("    %p\r\n", (void*)obj->user[i]);
+	}
+	printf("]\r\n");
 }
+
+static inline void gc_print_heap(struct gc *self) {
+	if (self->last_alloc) {
+		printf("from-space\r\n");
+		//get the other ptr
+		uintptr_t begin = self->begin == self->a_space 
+									   ? self->b_space 
+									   : self->a_space;
+		//for each objects
+		for (uintptr_t *it = begin; it < self->last_alloc; ) {
+			struct gc_object *obj = (struct gc_object *) it;
+			gc_print_object(self->a_space, obj);
+			it += obj->size;
+		}
+	}
+	printf("to-space\r\n");
+	for (uintptr_t *it = self->begin; it < self->alloc; ) {
+		struct gc_object *obj = (struct gc_object *) it;
+		if (it == self->scan) {
+			printf("scan:\r\n");
+		}
+		gc_print_object(self->a_space, obj);
+		it += obj->size;
+	}
+}
+
+#endif
 
 //create a GC instance with the given memory of the given size
 void gc_init(struct gc *self, uintptr_t *mem, size_t size) {
@@ -120,6 +159,7 @@ void gc_init(struct gc *self, uintptr_t *mem, size_t size) {
     self->b_space = mem + self->size;
     self->collecting = false;
     self->begin = NULL;
+	self->alloc = NULL;
     gc_swap_spaces(self);
 }
 
@@ -163,6 +203,10 @@ static inline struct gc_object *gc_forward(
 			//callback given to a foreach_t function
 			//iterating the roots or an object's refs
 		}
+		if (!gc_obj_is_white(self, obj->user)) {
+			gc_print_heap(self);
+			printf("hmm");
+		}
         //copy size uintptr_t from old to new space
         memcpy(self->alloc, obj, obj->size * sizeof(uintptr_t));
         //set the forward flag at obj
@@ -191,15 +235,6 @@ static inline void integrity_check_cb(uintptr_t **it, void *ctx) {
     layout(integrity_check_cb, self, *it);
 }
 
-//walk the object graph and assert that all objects are black
-static inline void gc_integrity_check(
-    struct gc *self, 
-    foreach_t root_iter,
-    void *root_iter_ctx)
-{
-    root_iter(integrity_check_cb, self, root_iter_ctx);
-}
-
 //a callback function for foreach_t to forward the reference
 //pointed to by it. takes struct gc* as ctx
 static inline void forward_ref_cb(uintptr_t **it, void *ctx) {
@@ -217,8 +252,7 @@ static inline struct gc_object *gc_alloc(
     void *root_iter_ctx, 
     uintptr_t size) 
 {
-    /*printf("alloc begin\r\n");
-    gc_print_heap(self);*/
+    /*printf("alloc begin\r\n");*/
     if (self->collecting) {
         //scan K grey objects
         //keep original alloc here, it's liable to change while we scan objs
@@ -227,6 +261,10 @@ static inline struct gc_object *gc_alloc(
         for (uintptr_t i = 0; i < GC_K && self->scan < alloc; ++i) {
             struct gc_object *obj = (struct gc_object *)self->scan;
             //these objects are in to-space; should not have forward bit set
+			if (obj->forward) {
+				gc_print_heap(self);
+				printf("hmm");
+			}
             assert(!obj->forward);
             //get the layout
             foreach_t layout = (foreach_t) obj->layout;
@@ -240,7 +278,7 @@ static inline struct gc_object *gc_alloc(
             self->collecting = false;
 #ifndef NDEBUG
 			//check all objects reachable from roots are black
-            gc_integrity_check(self, root_iter, root_iter_ctx);
+			root_iter(integrity_check_cb, self, root_iter_ctx);
 #endif
             //and then fill up the rest of to-space
             //printf("done collecting\r\n");
