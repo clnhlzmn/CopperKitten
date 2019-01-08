@@ -29,7 +29,7 @@ struct gc_object {
 #define META_SIZE (sizeof(struct gc_object) / sizeof(uintptr_t))
 
 //make sure it's right
-//C_STATIC_ASSERT(META_SIZE == 2, incr_copy_gc);
+C_STATIC_ASSERT(META_SIZE == 2, incr_copy_gc);
 
 //convert a user pointer to an allocation pointer
 static inline struct gc_object *get_gc_ptr(uintptr_t *user) {
@@ -83,7 +83,9 @@ static bool gc_obj_is_black(struct gc *self, uintptr_t *ref) {
 
 //initialize alloc, scan, and end
 static inline void gc_swap_spaces(struct gc *self) {
-	self->last_alloc = self->alloc;
+#ifndef NDEBUG
+    self->last_alloc = self->alloc;
+#endif
     if (self->begin == self->a_space) {
         self->begin = self->b_space;
         self->end = self->b_space + self->size;
@@ -99,19 +101,19 @@ static inline void gc_swap_spaces(struct gc *self) {
 
 static inline void gc_print_object(uintptr_t *heap_begin, struct gc_object *obj) {
 	if (obj->forward) {
-		printf("{addr:%p, size:%llu, forward:%lld}[\r\n",
+		printf("{addr:%lld, size:%llu, forward:%lld}[\r\n",
 			(uintptr_t*)obj - heap_begin,
 			obj->size,
 			(uintptr_t*)obj->forward - heap_begin
 		);
 	} else {
 		const char *layout = 
-			obj->layout == gc_layout_ref_array 
+			obj->layout == (uintptr_t)gc_layout_ref_array 
 						? "refs" 
-						: obj->layout == gc_alloc_int_array 
+						: obj->layout == (uintptr_t)gc_alloc_int_array
 									  ? "ints" 
 									  : "?";
-		printf("{addr:%p, size:%llu, layout:%s}[\r\n",
+		printf("{addr:%lld, size:%llu, layout:%s}[\r\n",
 			(uintptr_t*)obj - heap_begin,
 			obj->size,
 			layout
@@ -127,7 +129,7 @@ static inline void gc_print_heap(struct gc *self) {
 	if (self->last_alloc) {
 		printf("from-space\r\n");
 		//get the other ptr
-		uintptr_t begin = self->begin == self->a_space 
+		uintptr_t *begin = self->begin == self->a_space 
 									   ? self->b_space 
 									   : self->a_space;
 		//for each objects
@@ -192,23 +194,23 @@ static inline struct gc_object *gc_forward(
         return (struct gc_object *)obj->layout;
     } else {
         //obj needs to be forwarded
-		if (!GC_CHECK_SIZE(self, obj->size)) {
-			assert(0 && "");
-			//TODO: signal self that forwarding has 
-			//and how to resume if it's possible to 
-			//increase memory size, if memory can't
-			//be increased then allocation can't continue.
-			//will be tricky because alloc doesn't call 
-			//gc_forward directly, but through a 
-			//callback given to a foreach_t function
-			//iterating the roots or an object's refs
-		}
-		if (!gc_obj_is_white(self, obj->user)) {
-			/*gc_print_heap(self);
-			printf("hmm");*/
-			//don't forward unless obj is white?
-			return obj;
-		}
+        if (!GC_CHECK_SIZE(self, obj->size)) {
+            assert(0 && "");
+            //TODO: signal self that forwarding has 
+            //and how to resume if it's possible to 
+            //increase memory size, if memory can't
+            //be increased then allocation can't continue.
+            //will be tricky because alloc doesn't call 
+            //gc_forward directly, but through a 
+            //callback given to a foreach_t function
+            //iterating the roots or an object's refs
+        }
+        if (!gc_obj_is_white(self, obj->user)) {
+            /*gc_print_heap(self);
+            printf("hmm");*/
+            //don't forward unless obj is white?
+            return obj;
+        }
         //copy size uintptr_t from old to new space
         memcpy(self->alloc, obj, obj->size * sizeof(uintptr_t));
         //set the forward flag at obj
@@ -263,10 +265,6 @@ static inline struct gc_object *gc_alloc(
         for (uintptr_t i = 0; i < GC_K && self->scan < alloc; ++i) {
             struct gc_object *obj = (struct gc_object *)self->scan;
             //these objects are in to-space; should not have forward bit set
-			if (obj->forward) {
-				gc_print_heap(self);
-				printf("hmm");
-			}
             assert(!obj->forward);
             //get the layout
             foreach_t layout = (foreach_t) obj->layout;

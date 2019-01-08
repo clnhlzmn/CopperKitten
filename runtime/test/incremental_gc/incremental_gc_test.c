@@ -10,11 +10,11 @@ void roots_foreach(void (*cb)(uintptr_t **item, void *ctx), void *cb_ctx, void *
     cb(it, cb_ctx);
 }
 
-#define MEM_SIZE (34)
+#define MEM_SIZE (100)
 
 uintptr_t mem[MEM_SIZE];
 
-#define OBJ_SIZE (1)
+#define OBJ_SIZE (3)
 
 #define INT_DATA ((uintptr_t)-1)
 
@@ -25,7 +25,7 @@ void test_gc(void) {
     struct gc gc_inst;
     //gc instance
     gc_init(&gc_inst, mem, MEM_SIZE);
-    for (int repeat = 0; repeat < 5; ++repeat) {
+    for (int repeat = 0; repeat < 500; ++repeat) {
         //printf("%d", __LINE__);
         //alloc one ref cell (no roots yet)
         uintptr_t *root = NULL;
