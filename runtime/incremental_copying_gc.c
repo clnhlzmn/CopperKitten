@@ -204,8 +204,10 @@ static inline struct gc_object *gc_forward(
 			//iterating the roots or an object's refs
 		}
 		if (!gc_obj_is_white(self, obj->user)) {
-			gc_print_heap(self);
-			printf("hmm");
+			/*gc_print_heap(self);
+			printf("hmm");*/
+			//don't forward unless obj is white?
+			return obj;
 		}
         //copy size uintptr_t from old to new space
         memcpy(self->alloc, obj, obj->size * sizeof(uintptr_t));
