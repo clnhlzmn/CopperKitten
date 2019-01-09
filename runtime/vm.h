@@ -63,7 +63,7 @@ enum vm_op_code {
     ALLOC,      //[...|n|layout]->[...|ref], allocate n cells with given layout
     LOAD,       //[...|ref]->[...|value], get the cell at ref
     STORE,      //[...|ref|value]->[...], set the cell at ref
-    NCALL,      //[...|N]->[...], call the native function N
+    NCALL,      //[...|N]->[...], call the native function N i.e. (void(*)(void))*(sp-1)();
     NOP,        //
 };
 

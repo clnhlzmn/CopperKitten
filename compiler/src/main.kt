@@ -2,44 +2,33 @@
 
 package cph.ck.compiler
 
-import ckBaseListener
 import ckBaseVisitor
 import ckLexer
 import ckParser
 import org.antlr.v4.runtime.*
-import org.antlr.v4.runtime.tree.ParseTreeVisitor
-import org.antlr.v4.runtime.tree.ParseTreeWalker
 
-val stream = CharStreams.fromString("let foo = 42 ; let bar = \\():Int 42")
+val stream = CharStreams.fromString("42")
 val lexer = ckLexer(stream)
 val tokens = CommonTokenStream(lexer)
 val parser = ckParser(tokens)
 val context = parser.file()
 
-class ckObject {}
+class Object {}
 
-class visitor : ckBaseVisitor<ckObject>() {
-    override fun visitExprStatement(ctx: ckParser.ExprStatementContext?): ckObject {
-        return ckObject()
-    }
+data class NaturalExpr(val value:Int)
+
+class visitNaturalExpr : ckBaseVisitor<NaturalExpr>() {
+    override fun visitNaturalExpr(ctx: ckParser.NaturalExprContext?): NaturalExpr =
+        NaturalExpr(Integer.valueOf(ctx!!.text))
 }
 
-fun foo(): (Int)->Unit {
-    return fun (i:Int) { print("inner") };
-}
-
-fun bar() {
-
+class visitor : ckBaseVisitor<Object>() {
+    override fun visitExprStatement(ctx: ckParser.ExprStatementContext?): Object =
+            Object()
 }
 
 fun main() {
-
-    foo()
-
-    (42)
-
-    println("Hello, World!")
-    val res = visitor().visit(context)
+    val res = visitNaturalExpr().visit(context)
     println(res)
 }
 

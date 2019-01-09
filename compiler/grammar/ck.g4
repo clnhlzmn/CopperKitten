@@ -21,7 +21,8 @@ statement
 
 statements
     : statement ';'?
-    | statement ';' statements ;
+    | statement ';' statements 
+    ;
 
 expr
     : NATURAL                                       #naturalExpr
