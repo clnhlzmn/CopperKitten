@@ -266,6 +266,17 @@ class FileVisitor : ckBaseVisitor<String>() {
     }
 }
 
+class FileInterpreter : ckBaseVisitor<Unit>() {
+    override fun visitFile(ctx: ckParser.FileContext?) {
+        if (ctx!!.statements() != null) {
+            for (statement in StatementsVisitor().visit(ctx.statements())) {
+                //TODO: evaluate statement
+                
+            }
+        }
+    }
+}
+
 fun main() {
     val res = FileVisitor().visit(context)
     println(res)
