@@ -1,5 +1,4 @@
-// Generated from C:/code/ck/compiler/grammar\ck.g4 by ANTLR 4.7.2
-package cph.ck.compiler;
+// Generated from C:/code/CopperKitten/compiler/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -357,4 +356,38 @@ public interface ckListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitParams(ckParser.ParamsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code simpleType}
+	 * labeled alternative in {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void enterSimpleType(ckParser.SimpleTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code simpleType}
+	 * labeled alternative in {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void exitSimpleType(ckParser.SimpleTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code funType}
+	 * labeled alternative in {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunType(ckParser.FunTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code funType}
+	 * labeled alternative in {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunType(ckParser.FunTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ckParser#types}.
+	 * @param ctx the parse tree
+	 */
+	void enterTypes(ckParser.TypesContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckParser#types}.
+	 * @param ctx the parse tree
+	 */
+	void exitTypes(ckParser.TypesContext ctx);
 }

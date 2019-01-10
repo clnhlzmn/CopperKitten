@@ -1,10 +1,8 @@
 
 
-package cph.ck.compiler
-
 import org.antlr.v4.runtime.*
 
-val stream = CharStreams.fromString("let foo = bar(42, 43); baz(); for (;1;) {} ; if(1) doThis() else doThat()")
+val stream = CharStreams.fromString("let foo = bar(42, 43); baz(); for (;1;) {} ; if(1) doThis() else doThat(); foo = ()->Unit{}")
 val lexer = ckLexer(stream)
 val tokens = CommonTokenStream(lexer)
 val parser = ckParser(tokens)
@@ -37,7 +35,7 @@ data class ForStatement(
 
 data class IfStatement(val cond:Expr, val con:Statement, val alt:Statement?) : Statement() {
     override fun toString(): String =
-        "if ($cond) $con ${if (alt != null) " else $alt" else "" }"
+        "if ($cond) $con${if (alt != null) " else $alt" else "" }"
 }
 
 data class ReturnStatement(val expr:Expr?) : Statement() {
@@ -62,26 +60,56 @@ data class RefExpr(val id:String) : Expr() {
         id
 }
 
-data class ApplyExpr(val target:Expr, val args:List<Expr>?) : Expr() {
+data class ApplyExpr(val target:Expr, val args:List<Expr>) : Expr() {
     override fun toString(): String =
-        "$target(${if (args != null)
-                    args.map { a -> a.toString() }.reduce { acc, s -> "$acc, $s" }
-                   else ""})"
+        "$target(${if (args.isNotEmpty())
+                       args.map { a -> a.toString() }.reduce { acc, s -> "$acc, $s" }
+                   else
+                       ""})"
 }
 
-data class UnaryExpr(val op:String, val expr:Expr) : Expr()
+data class UnaryExpr(val op:String, val expr:Expr) : Expr() {
+    override fun toString(): String =
+        "$op $expr"
+}
 
-data class BinaryExpr(val lhs:Expr, val op:String, val rhs:Expr) : Expr()
+data class BinaryExpr(val lhs:Expr, val op:String, val rhs:Expr) : Expr() {
+    override fun toString(): String =
+            "$lhs $op $rhs"
+}
 
-data class CondExpr(val cond:Expr, val con:Expr, val alt:Expr) : Expr()
+data class CondExpr(val cond:Expr, val con:Expr, val alt:Expr) : Expr() {
+    override fun toString(): String =
+            "$cond ? $con : $alt"
+}
 
-data class AssignExpr(val target:Expr, val value:Expr) : Expr()
+data class AssignExpr(val target:Expr, val value:Expr) : Expr() {
+    override fun toString(): String =
+            "$target = $value"
+}
 
 data class FormalParameter(val id:String, val type:String)
 
-data class FunExpr(val parameters:List<FormalParameter>, val type:String, val body:Statement) : Expr()
+data class FunExpr(val parameters:List<FormalParameter>, val type:Type?, val body:Statement) : Expr() {
+    override fun toString(): String =
+            "() ->${if (type != null) " $type" else ""} $body"
+}
 
 data class LetExpr(val id:String, val value:Expr, val body:Expr) : Expr()
+
+open class Type
+
+data class SimpleType(val id:String) : Type() {
+    override fun toString(): String = id
+}
+
+data class FunType(val argTypes:List<Type>, val returnType:Type) : Type() {
+    override fun toString(): String =
+        if (argTypes.isEmpty())
+            "() -> $returnType"
+        else
+            "(${argTypes.map { a -> toString() }.reduce { acc, s -> "$acc, $s" }}) -> $returnType"
+}
 
 //Expression Visitors
 
@@ -91,8 +119,31 @@ class ExprsVisitor : ckBaseVisitor<List<Expr>>() {
 }
 
 class ParamsVisitor : ckBaseVisitor<List<FormalParameter>>() {
-    override fun visitParams(ctx: ckParser.ParamsContext?): List<FormalParameter>? =
+    override fun visitParams(ctx: ckParser.ParamsContext?): List<FormalParameter> =
         ctx!!.param().map { p -> FormalParameter(p!!.ID().text, p.TYPEID().text) }
+}
+
+class TypesVisitor : ckBaseVisitor<List<Type>>() {
+    override fun visitTypes(ctx: ckParser.TypesContext?): List<Type> =
+        if (ctx!!.type().isNotEmpty())
+            ctx.type().map { t -> TypeVisitor().visit(t) }
+        else
+            ArrayList()
+}
+
+class TypeVisitor : ckBaseVisitor<Type>() {
+
+    override fun visitSimpleType(ctx: ckParser.SimpleTypeContext?): Type =
+        SimpleType(ctx!!.TYPEID().text)
+
+    override fun visitFunType(ctx: ckParser.FunTypeContext?): Type =
+        FunType(
+            argTypes = if (ctx!!.types() != null)
+                           TypesVisitor().visit(ctx.types())
+                       else
+                           ArrayList(),
+            returnType = TypeVisitor().visit(ctx.type())
+        )
 }
 
 class ExprVisitor : ckBaseVisitor<Expr>() {
@@ -108,7 +159,8 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     override fun visitApplyExpr(ctx: ckParser.ApplyExprContext?): Expr =
         ApplyExpr(
             target = ExprVisitor().visit(ctx!!.expr()),
-            args = if (ctx.exprs() != null) ExprsVisitor().visit(ctx.exprs()) else null
+            args = if (ctx.exprs() != null) ExprsVisitor().visit(ctx.exprs())
+                   else ArrayList()
         )
 
     override fun visitUnaryExpr(ctx: ckParser.UnaryExprContext?): Expr =
@@ -196,8 +248,10 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
 
     override fun visitFunExpr(ctx: ckParser.FunExprContext?): Expr =
         FunExpr(
-            parameters = ArrayList(ParamsVisitor().visit(ctx!!.params())),
-            type = ctx.TYPEID().text,
+            parameters = if (ctx!!.params() != null) ArrayList(ParamsVisitor().visit(ctx.params()))
+                         else ArrayList(),
+            type = if (ctx.type() != null) TypeVisitor().visit(ctx.type())
+                   else null,
             body = StatementVisitor().visit(ctx.statement())
         )
 
@@ -216,7 +270,7 @@ class StatementVisitor : ckBaseVisitor<Statement>() {
         if (ctx!!.statements() != null)
             BlockStatement(StatementsVisitor().visit(ctx.statements()))
         else
-            BlockStatement(ArrayList<Statement>())
+            BlockStatement(ArrayList())
 
     override fun visitIfStatement(ctx: ckParser.IfStatementContext?): Statement =
         IfStatement(
@@ -256,24 +310,12 @@ class StatementsVisitor : ckBaseVisitor<List<Statement>>() {
 
 //ck File visitor
 
-class FileVisitor : ckBaseVisitor<String>() {
-    override fun visitFile(ctx: ckParser.FileContext?): String {
+class FileVisitor : ckBaseVisitor<BlockStatement>() {
+    override fun visitFile(ctx: ckParser.FileContext?): BlockStatement {
         if (ctx!!.statements() != null) {
             return BlockStatement(StatementsVisitor().visit(ctx.statements()))
-                .toString()
         }
-        return "";
-    }
-}
-
-class FileInterpreter : ckBaseVisitor<Unit>() {
-    override fun visitFile(ctx: ckParser.FileContext?) {
-        if (ctx!!.statements() != null) {
-            for (statement in StatementsVisitor().visit(ctx.statements())) {
-                //TODO: evaluate statement
-                
-            }
-        }
+        return BlockStatement(ArrayList());
     }
 }
 

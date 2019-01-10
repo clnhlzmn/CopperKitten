@@ -40,7 +40,7 @@ expr
     | lhs=expr '||' rhs=expr                                    #orExpr
     | <assoc=right> cond=expr '?' con=expr ':' alt=expr         #condExpr
     | <assoc=right> target=expr '=' value=expr                  #assignExpr
-    | '(' params? ')' '->' TYPEID? statement                    #funExpr
+    | '(' params? ')' '->' type? statement                      #funExpr
     | 'let' ID '=' value=expr 'in' body=expr                    #letExpr
     ;
 
@@ -51,6 +51,15 @@ param
     ;
 
 params : param ( ',' param )* ;
+
+type
+    : TYPEID                            #simpleType
+    | '(' types? ')' '->' type          #funType
+    ;
+
+types
+    : type ( ',' type )*
+    ;
 
 NATURAL : ('0'..'9')+ ;
 
