@@ -1,4 +1,5 @@
-// Generated from C:/code/CopperKitten/compiler/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/ck/compiler/grammar\ck.g4 by ANTLR 4.7.2
+package cph.ck.compiler;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -51,30 +52,6 @@ public class ckBaseListener implements ckListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDoStatement(ckParser.DoStatementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitDoStatement(ckParser.DoStatementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterWhileStatement(ckParser.WhileStatementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitWhileStatement(ckParser.WhileStatementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterForStatement(ckParser.ForStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -94,18 +71,6 @@ public class ckBaseListener implements ckListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitIfStatement(ckParser.IfStatementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterMatchStatement(ckParser.MatchStatementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitMatchStatement(ckParser.MatchStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

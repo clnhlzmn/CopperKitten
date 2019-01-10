@@ -1,4 +1,5 @@
-// Generated from C:/code/CopperKitten/compiler/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/ck/compiler/grammar\ck.g4 by ANTLR 4.7.2
+package cph.ck.compiler;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -30,20 +31,6 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLetStatement(ckParser.LetStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code doStatement}
-	 * labeled alternative in {@link ckParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDoStatement(ckParser.DoStatementContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code whileStatement}
-	 * labeled alternative in {@link ckParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitWhileStatement(ckParser.WhileStatementContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code forStatement}
 	 * labeled alternative in {@link ckParser#statement}.
 	 * @param ctx the parse tree
@@ -57,13 +44,6 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitIfStatement(ckParser.IfStatementContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code matchStatement}
-	 * labeled alternative in {@link ckParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMatchStatement(ckParser.MatchStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code returnStatement}
 	 * labeled alternative in {@link ckParser#statement}.

@@ -1,4 +1,5 @@
 
+
 grammar ck;
 
 //basic CK
@@ -10,11 +11,8 @@ file
 statement
     : '{' statements? '}'                                                               #blockStatement
     | 'let' ID '=' expr                                                                 #letStatement
-    | 'do' statement 'while' '(' expr ')'                                               #doStatement
-    | 'while' '(' expr ')' statement                                                    #whileStatement
-    | 'for' '(' statement? ';' expr ';' expr? ')' statement                             #forStatement
-    | 'if' '(' expr ')' statement ( 'else' statement )                                  #ifStatement
-    | 'match' '(' expr ')' ( 'with' expr ':' statement )* ( 'default' ':' statement )?  #matchStatement
+    | 'for' '(' init=statement? ';' cond=expr ';' fin=expr? ')' block=statement         #forStatement
+    | 'if' '(' expr ')' con=statement ( 'else' alt=statement )                          #ifStatement
     | 'return' expr?                                                                    #returnStatement
     | expr                                                                              #exprStatement
     ;
@@ -25,25 +23,25 @@ statements
     ;
 
 expr
-    : NATURAL                                       #naturalExpr
-    | '(' expr ')'                                  #subExpr
-    | ID                                            #refExpr
-    | expr '(' exprs? ')'                           #applyExpr
-    | <assoc=right> ( '-' | '!' | '~' ) expr        #unaryExpr
-    | expr ( '*' | '/' | '%' ) expr                 #multExpr
-    | expr ( '+' | '-' ) expr                       #addExpr
-    | expr ( '<<' | '>>' ) expr                     #shiftExpr
-    | expr ( '<' | '<=' | '>' | '>=' | '<>' ) expr  #relExpr
-    | expr ( '==' | '!=' ) expr                     #equalityExpr
-    | expr '&' expr                                 #bitAndExpr
-    | expr '^' expr                                 #bitXorExpr
-    | expr '|' expr                                 #bitOrExpr
-    | expr '&&' expr                                #andExpr
-    | expr '||' expr                                #orExpr
-    | <assoc=right> expr '?' expr ':' expr          #condExpr
-    | <assoc=right> expr '=' expr                   #assignExpr
-    | '(' params? ')' '->' TYPEID? statement        #funExpr
-    | 'let' ID '=' expr 'in' expr                   #letExpr
+    : NATURAL                                                   #naturalExpr
+    | '(' expr ')'                                              #subExpr
+    | ID                                                        #refExpr
+    | expr '(' exprs? ')'                                       #applyExpr
+    | <assoc=right> op=( '-' | '!' | '~' ) expr                 #unaryExpr
+    | lhs=expr op=( '*' | '/' | '%' ) rhs=expr                  #multExpr
+    | lhs=expr op=( '+' | '-' ) rhs=expr                        #addExpr
+    | lhs=expr op=( '<<' | '>>' ) rhs=expr                      #shiftExpr
+    | lhs=expr op=( '<' | '<=' | '>' | '>=' | '<>' ) rhs=expr   #relExpr
+    | lhs=expr op=( '==' | '!=' ) rhs=expr                      #equalityExpr
+    | lhs=expr '&' rhs=expr                                     #bitAndExpr
+    | lhs=expr '^' rhs=expr                                     #bitXorExpr
+    | lhs=expr '|' rhs=expr                                     #bitOrExpr
+    | lhs=expr '&&' rhs=expr                                    #andExpr
+    | lhs=expr '||' rhs=expr                                    #orExpr
+    | <assoc=right> cond=expr '?' con=expr ':' alt=expr         #condExpr
+    | <assoc=right> target=expr '=' value=expr                  #assignExpr
+    | '(' params? ')' '->' TYPEID? statement                    #funExpr
+    | 'let' ID '=' value=expr 'in' body=expr                    #letExpr
     ;
 
 exprs : expr ( ',' expr )* ;

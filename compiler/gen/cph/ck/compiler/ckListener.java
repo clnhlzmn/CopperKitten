@@ -1,4 +1,5 @@
-// Generated from C:/code/CopperKitten/compiler/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/ck/compiler/grammar\ck.g4 by ANTLR 4.7.2
+package cph.ck.compiler;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -41,30 +42,6 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitLetStatement(ckParser.LetStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code doStatement}
-	 * labeled alternative in {@link ckParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterDoStatement(ckParser.DoStatementContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code doStatement}
-	 * labeled alternative in {@link ckParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitDoStatement(ckParser.DoStatementContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code whileStatement}
-	 * labeled alternative in {@link ckParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterWhileStatement(ckParser.WhileStatementContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code whileStatement}
-	 * labeled alternative in {@link ckParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitWhileStatement(ckParser.WhileStatementContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code forStatement}
 	 * labeled alternative in {@link ckParser#statement}.
 	 * @param ctx the parse tree
@@ -88,18 +65,6 @@ public interface ckListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitIfStatement(ckParser.IfStatementContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code matchStatement}
-	 * labeled alternative in {@link ckParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterMatchStatement(ckParser.MatchStatementContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code matchStatement}
-	 * labeled alternative in {@link ckParser#statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitMatchStatement(ckParser.MatchStatementContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code returnStatement}
 	 * labeled alternative in {@link ckParser#statement}.
