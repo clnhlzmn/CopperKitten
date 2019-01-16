@@ -1425,7 +1425,9 @@ public class ckParser extends Parser {
 
 	public static class ParamContext extends ParserRuleContext {
 		public TerminalNode ID() { return getToken(ckParser.ID, 0); }
-		public TerminalNode TYPEID() { return getToken(ckParser.TYPEID, 0); }
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
+		}
 		public ParamContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1456,7 +1458,7 @@ public class ckParser extends Parser {
 			setState(158);
 			match(T__33);
 			setState(159);
-			match(TYPEID);
+			type();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1793,9 +1795,9 @@ public class ckParser extends Parser {
 		"\t\3\2\2\2\u0096\u0094\3\2\2\2\u0097\u009c\5\b\5\2\u0098\u0099\7\'\2\2"+
 		"\u0099\u009b\5\b\5\2\u009a\u0098\3\2\2\2\u009b\u009e\3\2\2\2\u009c\u009a"+
 		"\3\2\2\2\u009c\u009d\3\2\2\2\u009d\13\3\2\2\2\u009e\u009c\3\2\2\2\u009f"+
-		"\u00a0\7)\2\2\u00a0\u00a1\7$\2\2\u00a1\u00a2\7*\2\2\u00a2\r\3\2\2\2\u00a3"+
-		"\u00a8\5\f\7\2\u00a4\u00a5\7\'\2\2\u00a5\u00a7\5\f\7\2\u00a6\u00a4\3\2"+
-		"\2\2\u00a7\u00aa\3\2\2\2\u00a8\u00a6\3\2\2\2\u00a8\u00a9\3\2\2\2\u00a9"+
+		"\u00a0\7)\2\2\u00a0\u00a1\7$\2\2\u00a1\u00a2\5\20\t\2\u00a2\r\3\2\2\2"+
+		"\u00a3\u00a8\5\f\7\2\u00a4\u00a5\7\'\2\2\u00a5\u00a7\5\f\7\2\u00a6\u00a4"+
+		"\3\2\2\2\u00a7\u00aa\3\2\2\2\u00a8\u00a6\3\2\2\2\u00a8\u00a9\3\2\2\2\u00a9"+
 		"\17\3\2\2\2\u00aa\u00a8\3\2\2\2\u00ab\u00b4\7*\2\2\u00ac\u00ae\7\b\2\2"+
 		"\u00ad\u00af\5\22\n\2\u00ae\u00ad\3\2\2\2\u00ae\u00af\3\2\2\2\u00af\u00b0"+
 		"\3\2\2\2\u00b0\u00b1\7\n\2\2\u00b1\u00b2\7%\2\2\u00b2\u00b4\5\20\t\2\u00b3"+

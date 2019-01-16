@@ -47,7 +47,7 @@ expr
 exprs : expr ( ',' expr )* ;
 
 param
-    : ID ':' TYPEID
+    : ID ':' type
     ;
 
 params : param ( ',' param )* ;
