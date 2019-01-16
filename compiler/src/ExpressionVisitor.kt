@@ -14,8 +14,9 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     override fun visitApplyExpr(ctx: ckParser.ApplyExprContext?): Expr =
             ApplyExpr(
                     target = ExprVisitor().visit(ctx!!.expr()),
-                    args = if (ctx.exprs() != null) ExprsVisitor().visit(ctx.exprs())
-                    else ArrayList()
+                    args =
+                    if (ctx.exprs() != null) ExprsVisitor().visit(ctx.exprs())
+                    else null
             )
 
     override fun visitUnaryExpr(ctx: ckParser.UnaryExprContext?): Expr =
@@ -103,9 +104,9 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
 
     override fun visitFunExpr(ctx: ckParser.FunExprContext?): Expr =
             FunExpr(
-                    parameters =
-                    if (ctx!!.params() != null) ArrayList(ParamsVisitor().visit(ctx.params()))
-                    else ArrayList(),
+                    params =
+                    if (ctx!!.params() != null) ParamsVisitor().visit(ctx.params())
+                    else null,
                     type =
                     if (ctx.type() != null) TypeVisitor().visit(ctx.type())
                     else null,
@@ -126,15 +127,35 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             )
 }
 
-class ExprsVisitor : ckBaseVisitor<List<Expr>>() {
-    override fun visitExprs(ctx: ckParser.ExprsContext?): List<Expr> =
-            ArrayList(ctx!!.expr().map { expr -> ExprVisitor().visit(expr) })
+class ExprsVisitor : ckBaseVisitor<Exprs>() {
+    override fun visitExprs(ctx: ckParser.ExprsContext?): Exprs =
+        Exprs(
+            expr = ExprVisitor().visit(ctx!!.expr()),
+            exprs =
+            if (ctx.exprs() != null)
+                ExprsVisitor().visit(ctx.exprs())
+            else
+                null
+        )
 }
 
-class ParamsVisitor : ckBaseVisitor<List<FormalParameter>>() {
-    override fun visitParams(ctx: ckParser.ParamsContext?): List<FormalParameter> =
-            ctx!!.param().map {
-                p -> FormalParameter(p!!.ID().text, TypeVisitor().visit(p.type()))
-            }
+class ParamVisitor : ckBaseVisitor<Param>() {
+    override fun visitParam(ctx: ckParser.ParamContext?): Param =
+        Param(
+            id = ctx!!.ID().text,
+            type = TypeVisitor().visit(ctx.type())
+        )
+}
+
+class ParamsVisitor : ckBaseVisitor<Params>() {
+    override fun visitParams(ctx: ckParser.ParamsContext?): Params =
+        Params(
+            param = ParamVisitor().visit(ctx!!.param()),
+            params =
+            if (ctx.params() != null)
+                ParamsVisitor().visit(ctx.params())
+            else
+                null
+        )
 }
 

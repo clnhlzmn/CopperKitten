@@ -14,12 +14,12 @@ data class RefExpr(val id:String) : Expr() {
             id
 }
 
-data class ApplyExpr(val target:Expr, val args:List<Expr>) : Expr() {
+data class ApplyExpr(val target:Expr, val args:Exprs?) : Expr() {
     override fun toString(): String =
-            "$target(${if (args.isNotEmpty())
-                args.map { a -> a.toString() }.reduce { acc, s -> "$acc, $s" }
-            else
-                ""})"
+        if (args == null)
+            "$target()"
+        else
+            "$target($args)"
 }
 
 data class UnaryExpr(val op:String, val expr:Expr) : Expr() {
@@ -42,19 +42,38 @@ data class AssignExpr(val target:Expr, val value:Expr) : Expr() {
             "$target = $value"
 }
 
-data class FormalParameter(val id:String, val type:Type) {
+data class Param(val id:String, val type:Type) {
     override fun toString(): String =
         "$id: $type"
 }
 
-data class FunExpr(val parameters:List<FormalParameter>, val type:Type?, val body:Statement) : Expr() {
+data class FunExpr(val params:Params?, val type:Type?, val body:Statement) : Expr() {
     override fun toString(): String {
-        if (parameters.isEmpty())
-            return "() ->${if (type != null) " $type" else ""} $body"
+        return if (params == null)
+            "() ->${if (type != null) " $type" else ""} $body"
         else
-            return "(${parameters.map { p -> p.toString() }.reduce { acc, s -> "$acc, $s" }}) ->${if (type != null) " $type" else ""} $body"
+            "($params) ->${if (type != null) " $type" else ""} $body"
     }
 
 }
 
 data class LetExpr(val id:String, val value:Expr, val body:Expr) : Expr()
+
+//a list of expressions
+data class Exprs(val expr:Expr, val exprs: Exprs?) {
+    override fun toString(): String =
+        if (exprs != null)
+            "$expr, $exprs"
+        else
+            "$expr"
+}
+
+//a list of function params
+data class Params(val param: Param, val params: Params?) {
+    override fun toString(): String =
+        if (params != null)
+            "$param, $params"
+        else
+            "$param"
+}
+

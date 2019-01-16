@@ -11,16 +11,20 @@ class TypeVisitor : ckBaseVisitor<Type>() {
                     if (ctx!!.types() != null)
                         TypesVisitor().visit(ctx.types())
                     else
-                        ArrayList(),
+                        null,
                     returnType = TypeVisitor().visit(ctx.type())
             )
 }
 
-class TypesVisitor : ckBaseVisitor<List<Type>>() {
-    override fun visitTypes(ctx: ckParser.TypesContext?): List<Type> =
-            if (ctx!!.type().isNotEmpty())
-                ctx.type().map { t -> TypeVisitor().visit(t) }
+class TypesVisitor : ckBaseVisitor<Types>() {
+    override fun visitTypes(ctx: ckParser.TypesContext?): Types =
+        Types(
+            type = TypeVisitor().visit(ctx!!.type()),
+            types =
+            if (ctx.types() != null)
+                TypesVisitor().visit(ctx.types())
             else
-                ArrayList()
+                null
+        )
 }
 

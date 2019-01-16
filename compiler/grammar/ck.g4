@@ -44,13 +44,18 @@ expr
     | 'let' ID '=' value=expr 'in' body=expr                    #letExpr
     ;
 
-exprs : expr ( ',' expr )* ;
+exprs
+    : expr
+    | expr ( ',' exprs )
+    ;
 
 param
     : ID ':' type
     ;
 
-params : param ( ',' param )* ;
+params
+    : param
+    | param ( ',' params ) ;
 
 type
     : TYPEID                            #simpleType
@@ -58,7 +63,8 @@ type
     ;
 
 types
-    : type ( ',' type )*
+    : type
+    | type ( ',' types )
     ;
 
 NATURAL : ('0'..'9')+ ;
