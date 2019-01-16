@@ -48,8 +48,13 @@ data class FormalParameter(val id:String, val type:Type) {
 }
 
 data class FunExpr(val parameters:List<FormalParameter>, val type:Type?, val body:Statement) : Expr() {
-    override fun toString(): String =
-            "() ->${if (type != null) " $type" else ""} $body"
+    override fun toString(): String {
+        if (parameters.isEmpty())
+            return "() ->${if (type != null) " $type" else ""} $body"
+        else
+            return "(${parameters.map { p -> p.toString() }.reduce { acc, s -> "$acc, $s" }}) ->${if (type != null) " $type" else ""} $body"
+    }
+
 }
 
 data class LetExpr(val id:String, val value:Expr, val body:Expr) : Expr()

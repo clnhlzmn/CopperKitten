@@ -133,6 +133,8 @@ class ExprsVisitor : ckBaseVisitor<List<Expr>>() {
 
 class ParamsVisitor : ckBaseVisitor<List<FormalParameter>>() {
     override fun visitParams(ctx: ckParser.ParamsContext?): List<FormalParameter> =
-            ctx!!.param().map { p -> FormalParameter(p!!.ID().text, TypeVisitor().visit(p.type())) }
+            ctx!!.param().map {
+                p -> FormalParameter(p!!.ID().text, TypeVisitor().visit(p.type()))
+            }
 }
 
