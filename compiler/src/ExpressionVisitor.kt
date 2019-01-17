@@ -16,7 +16,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
                     target = ExprVisitor().visit(ctx!!.expr()),
                     args =
                     if (ctx.exprs() != null) ExprsVisitor().visit(ctx.exprs())
-                    else null
+                    else ArrayList()
             )
 
     override fun visitUnaryExpr(ctx: ckParser.UnaryExprContext?): Expr =
@@ -106,7 +106,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             FunExpr(
                     params =
                     if (ctx!!.params() != null) ParamsVisitor().visit(ctx.params())
-                    else null,
+                    else ArrayList(),
                     type =
                     if (ctx.type() != null) TypeVisitor().visit(ctx.type())
                     else null,
@@ -127,16 +127,9 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             )
 }
 
-class ExprsVisitor : ckBaseVisitor<Exprs>() {
-    override fun visitExprs(ctx: ckParser.ExprsContext?): Exprs =
-        Exprs(
-            expr = ExprVisitor().visit(ctx!!.expr()),
-            exprs =
-            if (ctx.exprs() != null)
-                ExprsVisitor().visit(ctx.exprs())
-            else
-                null
-        )
+class ExprsVisitor : ckBaseVisitor<List<Expr>>() {
+    override fun visitExprs(ctx: ckParser.ExprsContext?): List<Expr> =
+        ctx!!.expr().map { e -> ExprVisitor().visit(e) }
 }
 
 class ParamVisitor : ckBaseVisitor<Param>() {
@@ -147,15 +140,8 @@ class ParamVisitor : ckBaseVisitor<Param>() {
         )
 }
 
-class ParamsVisitor : ckBaseVisitor<Params>() {
-    override fun visitParams(ctx: ckParser.ParamsContext?): Params =
-        Params(
-            param = ParamVisitor().visit(ctx!!.param()),
-            params =
-            if (ctx.params() != null)
-                ParamsVisitor().visit(ctx.params())
-            else
-                null
-        )
+class ParamsVisitor : ckBaseVisitor<List<Param>>() {
+    override fun visitParams(ctx: ckParser.ParamsContext?): List<Param> =
+        ctx!!.param().map { p -> ParamVisitor().visit(p) }
 }
 

@@ -6,34 +6,31 @@ open class Statement
 
 data class BlockStatement(val statements:List<Statement>) : Statement() {
     override fun toString(): String =
-            if (statements.isEmpty())
-                "{}"
-            else
-                "{${statements.map { a -> a.toString() }.reduce { acc, s -> "$acc; $s" }}}"
+        "{${statements.toString("; ")}}"
 }
 
 data class LetStatement(val id:String, val value:Expr) : Statement() {
     override fun toString(): String =
-            "let $id = $value"
+        "let $id = $value"
 }
 
 data class ForStatement(
         val init:Statement?, val cond:Expr, val fin:Expr?, val statement:Statement) : Statement() {
     override fun toString(): String =
-            "for (${init?.toString() ?: ""}; $cond; ${fin?.toString() ?: ""}) $statement"
+        "for (${init?.toString() ?: ""}; $cond; ${fin?.toString() ?: ""}) $statement"
 }
 
 data class IfStatement(val cond:Expr, val con:Statement, val alt:Statement?) : Statement() {
     override fun toString(): String =
-            "if ($cond) $con${if (alt != null) " else $alt" else "" }"
+        "if ($cond) $con${if (alt != null) " else $alt" else "" }"
 }
 
 data class ReturnStatement(val expr:Expr?) : Statement() {
     override fun toString(): String =
-            "return $expr"
+        "return $expr"
 }
 
 data class ExprStatement(val expr:Expr) : Statement() {
     override fun toString(): String =
-            "$expr"
+        "$expr"
 }
