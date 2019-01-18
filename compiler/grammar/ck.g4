@@ -18,8 +18,7 @@ statement
     ;
 
 statements
-    : statement ';'?
-    | statement ';' statements 
+    : statement ( ';' statement )*
     ;
 
 expr
