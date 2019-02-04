@@ -1,8 +1,10 @@
-
+import java.util.*
 
 data class Error(val what: String)
 
 class Checker: ckBaseVisitor<List<Error>>() {
+
+    val env: Deque<MutableMap<String, Type>> = ArrayDeque()
 
     override fun visitFile(ctx: ckParser.FileContext?): List<Error> =
         if (ctx!!.statements().isEmpty)
@@ -37,12 +39,15 @@ class Checker: ckBaseVisitor<List<Error>>() {
     }
 
     override fun visitLetStatement(ctx: ckParser.LetStatementContext?): List<Error> {
-        return super.visitLetStatement(ctx)
+        val ret = ArrayList<Error>()
+        val scope = env.last!!
+        val old = scope.put(ctx!!.ID().toString(), TypeVisitor().visit(ctx.expr()))
+        return ret
     }
 
     override fun visitReturnStatement(ctx: ckParser.ReturnStatementContext?): List<Error> {
         return super.visitReturnStatement(ctx)
     }
-    
+
 }
 
