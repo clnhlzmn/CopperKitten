@@ -17,5 +17,10 @@ class ExpressionTypeVisitor(val env: Environment<Type>, val error: MutableList<E
         }
         return type
     }
+
+    override fun visitEqualityExpr(ctx: ckParser.EqualityExprContext?): Type {
+        return super.visitEqualityExpr(ctx)
+    }
+
 }
 

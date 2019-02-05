@@ -16,8 +16,6 @@ class Checker: ckBaseVisitor<List<Error>>() {
         val ret = ArrayList<Error>()
         for (statement in ctx!!.statement()) {
             ret.addAll(visit(statement))
-            if (ret.isNotEmpty())
-                return ret;
         }
         return ret
     }
@@ -42,6 +40,10 @@ class Checker: ckBaseVisitor<List<Error>>() {
         val ret = ArrayList<Error>()
         val scope = env.last!!
         val old = scope.put(ctx!!.ID().toString(), TypeVisitor().visit(ctx.expr()))
+        if (old != null) {
+            ret.add(Error("duplicate definition"))
+            return ret
+        }
         return ret
     }
 
