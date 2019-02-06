@@ -4,7 +4,7 @@ data class Error(val what: String)
 
 class Checker: ckBaseVisitor<List<Error>>() {
 
-    val env: Deque<MutableMap<String, Type>> = ArrayDeque()
+    val env: Environment<Type> = Environment()
 
     override fun visitFile(ctx: ckParser.FileContext?): List<Error> =
         if (ctx!!.statements().isEmpty)
@@ -39,7 +39,7 @@ class Checker: ckBaseVisitor<List<Error>>() {
     override fun visitLetStatement(ctx: ckParser.LetStatementContext?): List<Error> {
         val ret = ArrayList<Error>()
         val scope = env.last!!
-        val old = scope.put(ctx!!.ID().toString(), TypeVisitor().visit(ctx.expr()))
+        val old = scope.put(ctx!!.ID().toString(), ExpressionTypeVisitor(env, ret).visit(ctx.expr()))
         if (old != null) {
             ret.add(Error("duplicate definition"))
             return ret

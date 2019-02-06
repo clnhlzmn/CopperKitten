@@ -18,4 +18,3 @@ class Environment<T> : ArrayDeque<MutableMap<String, T>>() {
 
 }
 
-
