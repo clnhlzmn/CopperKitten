@@ -1,5 +1,3 @@
-
-
 //ck File visitor
 
 class FileVisitor : ckBaseVisitor<BlockStatement>() {

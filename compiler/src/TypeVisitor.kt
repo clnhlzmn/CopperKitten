@@ -1,5 +1,3 @@
-
-
 class TypeVisitor : ckBaseVisitor<Type>() {
 
     override fun visitSimpleType(ctx: ckParser.SimpleTypeContext?): Type =

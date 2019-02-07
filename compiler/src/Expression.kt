@@ -1,53 +1,51 @@
-
-
 //Expressions
 
 open class Expr
 
-data class NaturalExpr(val value:Int) : Expr() {
-    override fun toString():String =
-            value.toString()
-}
-
-data class RefExpr(val id:String) : Expr() {
+data class NaturalExpr(val value: Int) : Expr() {
     override fun toString(): String =
-            id
+        value.toString()
 }
 
-data class ApplyExpr(val target:Expr, val args:List<Expr>) : Expr() {
+data class RefExpr(val id: String) : Expr() {
+    override fun toString(): String =
+        id
+}
+
+data class ApplyExpr(val target: Expr, val args: List<Expr>) : Expr() {
     override fun toString(): String =
         "$target(${args.toString(", ")})"
 }
 
-data class UnaryExpr(val op:String, val expr:Expr) : Expr() {
+data class UnaryExpr(val op: String, val expr: Expr) : Expr() {
     override fun toString(): String =
         "$op $expr"
 }
 
-data class BinaryExpr(val lhs:Expr, val op:String, val rhs:Expr) : Expr() {
+data class BinaryExpr(val lhs: Expr, val op: String, val rhs: Expr) : Expr() {
     override fun toString(): String =
         "$lhs $op $rhs"
 }
 
-data class CondExpr(val cond:Expr, val con:Expr, val alt:Expr) : Expr() {
+data class CondExpr(val cond: Expr, val con: Expr, val alt: Expr) : Expr() {
     override fun toString(): String =
         "$cond ? $con : $alt"
 }
 
-data class AssignExpr(val target:Expr, val value:Expr) : Expr() {
+data class AssignExpr(val target: Expr, val value: Expr) : Expr() {
     override fun toString(): String =
         "$target = $value"
 }
 
-data class Param(val id:String, val type:Type) {
+data class Param(val id: String, val type: Type) {
     override fun toString(): String =
         "$id: $type"
 }
 
-data class FunExpr(val params:List<Param>, val type:Type?, val body:Statement) : Expr() {
+data class FunExpr(val params: List<Param>, val type: Type?, val body: Statement) : Expr() {
     override fun toString(): String =
         "(${params.toString(", ")}) ->${if (type != null) " $type" else ""} $body"
 }
 
-data class LetExpr(val id:String, val value:Expr, val body:Expr) : Expr()
+data class LetExpr(val id: String, val value: Expr, val body: Expr) : Expr()
 

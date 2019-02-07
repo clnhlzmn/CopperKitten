@@ -2,7 +2,7 @@ import java.util.*
 
 data class Error(val what: String)
 
-class Checker: ckBaseVisitor<List<Error>>() {
+class Checker : ckBaseVisitor<List<Error>>() {
 
     val env: Environment<Type> = Environment()
 
