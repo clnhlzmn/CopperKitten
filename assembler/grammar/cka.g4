@@ -5,7 +5,7 @@ grammar cka;
 //basic CK
 
 file 
-    : instructions? NL* EOF
+    : NL* instructions? NL* EOF
     ;
 
 instructions
@@ -13,15 +13,49 @@ instructions
     ;
 
 instruction
-    : ID
+    : 'add'
+    | 'sub'
+    | 'mul'
+    | 'div'
+    | 'mod'
+    | 'shl'
+    | 'shr'
+    | 'cmp'
+    | 'skipz'
+    | 'ip'
+    | 'fp'
+    | 'jump'
+    | 'push' NATURAL
+    | 'dup'
+    | 'pop'
+    | 'swap'
+    | 'enter'
+    | 'leave'
+    | 'in'
+    | 'out'
+    | 'layout' frameLayout
+    | 'alloc' allocLayout
+    | 'load'
+    | 'store'
+    | 'nop'
+    | 'call' LABEL?
+    | 'return'
     | LABEL ':' instruction
-    | ID LABEL
-    | ID NATURAL
+    ;
+
+frameLayout
+    : '[' ']'
+    | '[' NATURAL ( ',' NATURAL )* ']'
+    ;
+
+allocLayout
+    : '[' NATURAL ',' '*' ']'               #refArrayLayout
+    | '[' NATURAL ( ',' NATURAL )* ']'      #customLayout
     ;
 
 NATURAL : ('0'..'9')+ ;
 
-ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
+//ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 LABEL : ('A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 
 NL : '\n'|'\r\n' ;
