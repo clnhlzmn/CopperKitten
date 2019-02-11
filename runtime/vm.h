@@ -62,8 +62,10 @@ enum vm_op_code {
     OUT,        //print a byte to the console
     LAYOUT,     //[...|layout]->[...], set the frame layout
     ALLOC,      //[...|n|layout]->[...|ref], allocate n cells with given layout
-    LOAD,       //[...|ref]->[...|value], get the cell at ref
-    STORE,      //[...|ref|value]->[...], set the cell at ref
+    FPLOAD,     //[...|index]->[...|value], get the word at fp+index
+    FPSTORE,    //[...|index|value]->[...], set the word at fp+index to the given value
+    RLOAD,      //[...|ref|index]->[...|value], get the word at ref+index
+    RSTORE,     //[...|ref|index|value]->[...], set the word at ref+index to the given value
     NCALL,      //[...|N]->[...], call the native function N i.e. (void(*)(void))*(sp-1)();
     NOP,        //
 };
@@ -206,14 +208,23 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             *(self->sp - 2) = (uintptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 2), (void*)*(self->sp - 1));
             self->sp--;
             break;
-        case LOAD:
-            //TODO: gc_read_barrier
-            *(self->sp - 1) = *(uintptr_t*)*(self->sp - 1);
+        case FPLOAD:
+            *(self->sp - 1) = *(self->fp + *(self->sp - 1));
+            self->sp--;
             break;
-        case STORE:
-            //TODO: gc_write_barrier
-            *(uintptr_t*)*(self->sp - 2) = *(self->sp - 1);
+        case FPSTORE:
+            *(self->fp + *(self->sp - 2)) = *(self->sp - 1);
             self->sp -= 2;
+            break;
+        case RLOAD:
+            //TODO: gc_read_barrier
+            *(self->sp - 2) = *((uintptr_t*)*(self->sp - 2) + *(self->sp - 1));
+            self->sp--;
+            break;
+        case RSTORE:
+            //TODO: gc_write_barrier
+            *((uintptr_t*)*(self->sp - 3) + *(self->sp - 2)) = *(self->sp - 1);
+            self->sp -= 3;
             break;
         case NCALL: {
             void(*fun)(struct vm *) = (void(*)(struct vm *))*(self->sp-1);

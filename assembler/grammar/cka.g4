@@ -35,11 +35,12 @@ instruction
     | 'out'
     | 'layout' frameLayout
     | 'alloc' allocLayout
-    | 'load'
-    | 'store'
+    | 'fpload'
+    | 'fpstore'
+    | 'rload'
+    | 'rstore'
     | 'ncall'
     | 'nop'
-    | LABEL ':' instruction
     ;
 
 frameLayout
