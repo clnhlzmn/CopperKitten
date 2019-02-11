@@ -60,6 +60,7 @@ enum vm_op_code {
     LEAVE,      //leave a stack frame
     IN,         //read a byte from the console
     OUT,        //print a byte to the console
+    LAYOUT,     //[...|layout]->[...], set the frame layout
     ALLOC,      //[...|n|layout]->[...|ref], allocate n cells with given layout
     LOAD,       //[...|ref]->[...|value], get the cell at ref
     STORE,      //[...|ref|value]->[...], set the cell at ref
@@ -193,6 +194,11 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
         }
         case OUT:
             printf("%c", (int)*(self->sp - 1));
+            self->sp--;
+            break;
+        case LAYOUT:
+            //set the first cell in the frame to the layout function pointer at tos
+            *(self->frame + 1) = *(self->sp - 1)
             self->sp--;
             break;
         case ALLOC:

@@ -37,9 +37,8 @@ instruction
     | 'alloc' allocLayout
     | 'load'
     | 'store'
+    | 'ncall'
     | 'nop'
-    | 'call' LABEL?
-    | 'return'
     | LABEL ':' instruction
     ;
 
