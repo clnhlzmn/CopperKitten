@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/assembler/grammar\cka.g4 by ANTLR 4.7.2
+// Generated from /Users/colinholzman/Documents/CopperKitten/assembler/grammar/cka.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -27,25 +27,113 @@ public interface ckaListener extends ParseTreeListener {
 	 */
 	void exitInstructions(ckaParser.InstructionsContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ckaParser#instruction}.
+	 * Enter a parse tree produced by the {@code labelInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 */
-	void enterInstruction(ckaParser.InstructionContext ctx);
+	void enterLabelInst(ckaParser.LabelInstContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ckaParser#instruction}.
+	 * Exit a parse tree produced by the {@code labelInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 */
-	void exitInstruction(ckaParser.InstructionContext ctx);
+	void exitLabelInst(ckaParser.LabelInstContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ckaParser#frameLayout}.
+	 * Enter a parse tree produced by the {@code intInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 */
-	void enterFrameLayout(ckaParser.FrameLayoutContext ctx);
+	void enterIntInst(ckaParser.IntInstContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ckaParser#frameLayout}.
+	 * Exit a parse tree produced by the {@code intInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 */
-	void exitFrameLayout(ckaParser.FrameLayoutContext ctx);
+	void exitIntInst(ckaParser.IntInstContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code simpleInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void enterSimpleInst(ckaParser.SimpleInstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code simpleInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void exitSimpleInst(ckaParser.SimpleInstContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code jumpInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void enterJumpInst(ckaParser.JumpInstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code jumpInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void exitJumpInst(ckaParser.JumpInstContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code pushInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void enterPushInst(ckaParser.PushInstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code pushInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void exitPushInst(ckaParser.PushInstContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code layoutInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void enterLayoutInst(ckaParser.LayoutInstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code layoutInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void exitLayoutInst(ckaParser.LayoutInstContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code allocInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void enterAllocInst(ckaParser.AllocInstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code allocInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void exitAllocInst(ckaParser.AllocInstContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code emptyFrameLayout}
+	 * labeled alternative in {@link ckaParser#frameLayout}.
+	 * @param ctx the parse tree
+	 */
+	void enterEmptyFrameLayout(ckaParser.EmptyFrameLayoutContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code emptyFrameLayout}
+	 * labeled alternative in {@link ckaParser#frameLayout}.
+	 * @param ctx the parse tree
+	 */
+	void exitEmptyFrameLayout(ckaParser.EmptyFrameLayoutContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code nonEmptyFrameLayout}
+	 * labeled alternative in {@link ckaParser#frameLayout}.
+	 * @param ctx the parse tree
+	 */
+	void enterNonEmptyFrameLayout(ckaParser.NonEmptyFrameLayoutContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code nonEmptyFrameLayout}
+	 * labeled alternative in {@link ckaParser#frameLayout}.
+	 * @param ctx the parse tree
+	 */
+	void exitNonEmptyFrameLayout(ckaParser.NonEmptyFrameLayoutContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code refArrayLayout}
 	 * labeled alternative in {@link ckaParser#allocLayout}.
@@ -70,4 +158,14 @@ public interface ckaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCustomLayout(ckaParser.CustomLayoutContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ckaParser#integer}.
+	 * @param ctx the parse tree
+	 */
+	void enterInteger(ckaParser.IntegerContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckaParser#integer}.
+	 * @param ctx the parse tree
+	 */
+	void exitInteger(ckaParser.IntegerContext ctx);
 }

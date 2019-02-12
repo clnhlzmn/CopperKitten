@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/assembler/grammar\cka.g4 by ANTLR 4.7.2
+// Generated from /Users/colinholzman/Documents/CopperKitten/assembler/grammar/cka.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -22,17 +22,68 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitInstructions(ckaParser.InstructionsContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ckaParser#instruction}.
+	 * Visit a parse tree produced by the {@code labelInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInstruction(ckaParser.InstructionContext ctx);
+	T visitLabelInst(ckaParser.LabelInstContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ckaParser#frameLayout}.
+	 * Visit a parse tree produced by the {@code intInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFrameLayout(ckaParser.FrameLayoutContext ctx);
+	T visitIntInst(ckaParser.IntInstContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code simpleInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSimpleInst(ckaParser.SimpleInstContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code jumpInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitJumpInst(ckaParser.JumpInstContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code pushInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPushInst(ckaParser.PushInstContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code layoutInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLayoutInst(ckaParser.LayoutInstContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code allocInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAllocInst(ckaParser.AllocInstContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code emptyFrameLayout}
+	 * labeled alternative in {@link ckaParser#frameLayout}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEmptyFrameLayout(ckaParser.EmptyFrameLayoutContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code nonEmptyFrameLayout}
+	 * labeled alternative in {@link ckaParser#frameLayout}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNonEmptyFrameLayout(ckaParser.NonEmptyFrameLayoutContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code refArrayLayout}
 	 * labeled alternative in {@link ckaParser#allocLayout}.
@@ -47,4 +98,10 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCustomLayout(ckaParser.CustomLayoutContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ckaParser#integer}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInteger(ckaParser.IntegerContext ctx);
 }

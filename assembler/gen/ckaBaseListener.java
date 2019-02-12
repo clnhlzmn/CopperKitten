@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/assembler/grammar\cka.g4 by ANTLR 4.7.2
+// Generated from /Users/colinholzman/Documents/CopperKitten/assembler/grammar/cka.g4 by ANTLR 4.7
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -39,25 +39,109 @@ public class ckaBaseListener implements ckaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterInstruction(ckaParser.InstructionContext ctx) { }
+	@Override public void enterLabelInst(ckaParser.LabelInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitInstruction(ckaParser.InstructionContext ctx) { }
+	@Override public void exitLabelInst(ckaParser.LabelInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFrameLayout(ckaParser.FrameLayoutContext ctx) { }
+	@Override public void enterIntInst(ckaParser.IntInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFrameLayout(ckaParser.FrameLayoutContext ctx) { }
+	@Override public void exitIntInst(ckaParser.IntInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSimpleInst(ckaParser.SimpleInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSimpleInst(ckaParser.SimpleInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterJumpInst(ckaParser.JumpInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJumpInst(ckaParser.JumpInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPushInst(ckaParser.PushInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPushInst(ckaParser.PushInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLayoutInst(ckaParser.LayoutInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLayoutInst(ckaParser.LayoutInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAllocInst(ckaParser.AllocInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAllocInst(ckaParser.AllocInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEmptyFrameLayout(ckaParser.EmptyFrameLayoutContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEmptyFrameLayout(ckaParser.EmptyFrameLayoutContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNonEmptyFrameLayout(ckaParser.NonEmptyFrameLayoutContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNonEmptyFrameLayout(ckaParser.NonEmptyFrameLayoutContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -82,6 +166,18 @@ public class ckaBaseListener implements ckaListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCustomLayout(ckaParser.CustomLayoutContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterInteger(ckaParser.IntegerContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitInteger(ckaParser.IntegerContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
