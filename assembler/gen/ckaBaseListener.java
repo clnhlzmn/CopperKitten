@@ -51,13 +51,25 @@ public class ckaBaseListener implements ckaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIntInst(ckaParser.IntInstContext ctx) { }
+	@Override public void enterPushIntInst(ckaParser.PushIntInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIntInst(ckaParser.IntInstContext ctx) { }
+	@Override public void exitPushIntInst(ckaParser.PushIntInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPushLabelInst(ckaParser.PushLabelInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPushLabelInst(ckaParser.PushLabelInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

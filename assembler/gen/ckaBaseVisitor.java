@@ -37,7 +37,14 @@ public class ckaBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements ck
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIntInst(ckaParser.IntInstContext ctx) { return visitChildren(ctx); }
+	@Override public T visitPushIntInst(ckaParser.PushIntInstContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitPushLabelInst(ckaParser.PushLabelInstContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

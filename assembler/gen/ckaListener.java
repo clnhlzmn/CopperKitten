@@ -39,17 +39,29 @@ public interface ckaListener extends ParseTreeListener {
 	 */
 	void exitLabelInst(ckaParser.LabelInstContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code intInst}
+	 * Enter a parse tree produced by the {@code pushIntInst}
 	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 */
-	void enterIntInst(ckaParser.IntInstContext ctx);
+	void enterPushIntInst(ckaParser.PushIntInstContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code intInst}
+	 * Exit a parse tree produced by the {@code pushIntInst}
 	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 */
-	void exitIntInst(ckaParser.IntInstContext ctx);
+	void exitPushIntInst(ckaParser.PushIntInstContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code pushLabelInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void enterPushLabelInst(ckaParser.PushLabelInstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code pushLabelInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void exitPushLabelInst(ckaParser.PushLabelInstContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code simpleInst}
 	 * labeled alternative in {@link ckaParser#instruction}.

@@ -39,20 +39,39 @@ static inline void vm_init(
 }
 
 enum vm_op_code {
-    ADD,        //*(sp-2) = *(sp-2)  + *(sp-1); sp -= 1;
-    SUB,        //*(sp-2) = *(sp-2)  - *(sp-1); sp -= 1;
-    MUL,        //*(sp-2) = *(sp-2)  * *(sp-1); sp -= 1;
-    DIV,        //*(sp-2) = *(sp-2)  / *(sp-1); sp -= 1;
-    MOD,        //*(sp-2) = *(sp-2)  % *(sp-1); sp -= 1;
-    SHL,        //*(sp-2) = *(sp-2) << *(sp-1); sp -= 1;
-    SHR,        //*(sp-2) = *(sp-2) >> *(sp-1); sp -= 1;
-    CMP,        //compare top two items on the stack [...|lhs|rhs]->[...|int] where int=-1 if lhs<rhs, 0 if lhs==rhs, 1 if lhs>rhs
-    SKIPZ,      //if tos is zero then skip the next instruction
-    IP,         //push the current instruction pointer onto the stack
-    FP,         //push the current frame pointer onto the stack
-    JUMP,       //jump to the address on the stack
-    PUSH,       //push the next byte in the instruction stream
-    PUSHW,      //push the next word in the instruction stream
+    N_NINE,
+    N_EIGHT,
+    N_SEVEN,
+    N_SIX,
+    N_FIVE,
+    N_FOUR,
+    N_THREE,
+    N_TWO,
+    N_ONE,
+    ZERO,
+    ONE,
+    TWO,
+    THREE,
+    FOUR,
+    FIVE,
+    SIX,
+    SEVEN,
+    EIGHT,
+    NINE,
+    ADD,        //[...|lhs|rhs]->[...|lhs+rhs]
+    SUB,        //[...|lhs|rhs]->[...|lhs-rhs]
+    MUL,        //[...|lhs|rhs]->[...|lhs*rhs]
+    DIV,        //[...|lhs|rhs]->[...|lhs/rhs]
+    MOD,        //[...|lhs|rhs]->[...|lhs%rhs]
+    SHL,        //[...|lhs|rhs]->[...|lhs<<rhs]
+    SHR,        //[...|lhs|rhs]->[...|lhs>>rhs]
+    CMP,        //[...|lhs|rhs]->[...|lhs<rhs?-1:lhs>rhs?1:0]
+    CALL,       //jump to the address on the stack and push current address
+    RET,        //pop address from the stack and jump to it
+    JMP,        //jump to the address formed from pc+offset where offset is the word following JMP
+    JMPZ,       //same as JMP if tos is zero
+    JMPNZ,      //same as JMP if toz is not zero
+    PUSH,       //push the next word in the instruction stream
     DUP,        //duplicate the top value
     POP,        //pop the top value from the stack
     SWAP,       //swap the top two items on the stack
@@ -62,8 +81,8 @@ enum vm_op_code {
     OUT,        //print a byte to the console
     LAYOUT,     //[...|layout]->[...], set the frame layout
     ALLOC,      //[...|n|layout]->[...|ref], allocate n cells with given layout
-    FPLOAD,     //[...|index]->[...|value], get the word at fp+index
-    FPSTORE,    //[...|index|value]->[...], set the word at fp+index to the given value
+    FLOAD,      //[...|index]->[...|value], get the word at fp+index
+    FSTORE,     //[...|index|value]->[...], set the word at fp+index to the given value
     RLOAD,      //[...|ref|index]->[...|value], get the word at ref+index
     RSTORE,     //[...|ref|index|value]->[...], set the word at ref+index to the given value
     NCALL,      //[...|N]->[...], call the native function N i.e. (void(*)(void))*(sp-1)();

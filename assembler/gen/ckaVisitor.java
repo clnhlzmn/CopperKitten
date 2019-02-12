@@ -29,12 +29,19 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLabelInst(ckaParser.LabelInstContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code intInst}
+	 * Visit a parse tree produced by the {@code pushIntInst}
 	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIntInst(ckaParser.IntInstContext ctx);
+	T visitPushIntInst(ckaParser.PushIntInstContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code pushLabelInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPushLabelInst(ckaParser.PushLabelInstContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code simpleInst}
 	 * labeled alternative in {@link ckaParser#instruction}.

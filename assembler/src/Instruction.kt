@@ -7,6 +7,8 @@ data class SimpleInstruction(val name: String) : Instruction()
 
 data class PushInstruction(val data: Int) : Instruction()
 
+data class PushLabelInstruction(val label: String) : Instruction()
+
 data class JumpInstruction(val type: String, val target: String) : Instruction()
 
 data class LayoutInstruction(val layout: List<Int>) : Instruction()

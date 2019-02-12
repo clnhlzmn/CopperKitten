@@ -3,7 +3,7 @@ import org.antlr.v4.runtime.*
 val stream = CharStreams.fromString(
     "Main:\n" +
     "in\n" +
-    "10\n" +
+    "push 10\n" +
     "enter\n" +
     "leave\n" +
     "layout [0, 2]\n" +

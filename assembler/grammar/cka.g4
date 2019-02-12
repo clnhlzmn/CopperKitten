@@ -14,7 +14,8 @@ instructions
 
 instruction
     : LABEL ':'                     #labelInst
-    | integer                       #intInst
+    | 'push' integer                #pushIntInst
+    | 'push' LABEL                  #pushLabelInst
     | ID                            #simpleInst
     | ID LABEL                      #jumpInst
     | ID integer                    #pushInst
