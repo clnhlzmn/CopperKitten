@@ -13,39 +13,18 @@ instructions
     ;
 
 instruction
-    : 'add'
-    | 'sub'
-    | 'mul'
-    | 'div'
-    | 'mod'
-    | 'shl'
-    | 'shr'
-    | 'cmp'
-    | 'skipz'
-    | 'ip'
-    | 'fp'
-    | 'jump'
-    | 'push' NATURAL
-    | 'dup'
-    | 'pop'
-    | 'swap'
-    | 'enter'
-    | 'leave'
-    | 'in'
-    | 'out'
-    | 'layout' frameLayout
-    | 'alloc' allocLayout
-    | 'fpload'
-    | 'fpstore'
-    | 'rload'
-    | 'rstore'
-    | 'ncall'
-    | 'nop'
+    : LABEL ':'                     #labelInst
+    | integer                       #intInst
+    | ID                            #simpleInst
+    | ID LABEL                      #jumpInst
+    | ID integer                    #pushInst
+    | 'layout' frameLayout          #layoutInst
+    | 'alloc' allocLayout           #allocInst
     ;
 
 frameLayout
-    : '[' ']'
-    | '[' NATURAL ( ',' NATURAL )* ']'
+    : '[' ']'                               #emptyFrameLayout
+    | '[' NATURAL ( ',' NATURAL )* ']'      #nonEmptyFrameLayout
     ;
 
 allocLayout
@@ -53,9 +32,11 @@ allocLayout
     | '[' NATURAL ( ',' NATURAL )* ']'      #customLayout
     ;
 
+integer : '-'? NATURAL ;
+
 NATURAL : ('0'..'9')+ ;
 
-//ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
+ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 LABEL : ('A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 
 NL : '\n'|'\r\n' ;
