@@ -41,10 +41,34 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
     }
 
     override fun visitLayoutInst(ctx: ckaParser.LayoutInstContext?) {
-        //TODO create frame layout visitor and use it to construct the frame layout for
-        pc.instructions.add(LayoutInstruction(/*TODO:parse frame layout*/))
+        pc.instructions.add(LayoutInstruction(FrameLayoutVisitor().visit(ctx!!.frameLayout())))
     }
 
-    //TODO: visit alloc inst
+    override fun visitAllocInst(ctx: ckaParser.AllocInstContext?) {
+        pc.instructions.add(AllocInstruction(AllocLayoutVisitor().visit(ctx!!.allocLayout())))
+    }
 
+}
+
+class FrameLayoutVisitor : ckaBaseVisitor<List<Int>>() {
+    override fun visitEmptyFrameLayout(ctx: ckaParser.EmptyFrameLayoutContext?): List<Int> {
+        return ArrayList()
+    }
+
+    override fun visitNonEmptyFrameLayout(ctx: ckaParser.NonEmptyFrameLayoutContext?): List<Int> {
+        return ctx!!.NATURAL().map { node -> node.text.toInt() }
+    }
+}
+
+class AllocLayoutVisitor : ckaBaseVisitor<AllocLayout>() {
+    override fun visitRefArrayLayout(ctx: ckaParser.RefArrayLayoutContext?): AllocLayout {
+        return RefArrayLayout(ctx!!.NATURAL().text.toInt())
+    }
+
+    override fun visitCustomLayout(ctx: ckaParser.CustomLayoutContext?): AllocLayout {
+        return CustomLayout(
+            ctx!!.NATURAL().first().text.toInt(),
+            ctx.NATURAL().subList(1, ctx.NATURAL().size).map { node -> node.text.toInt() }
+        )
+    }
 }

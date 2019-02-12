@@ -1,4 +1,4 @@
-// Generated from /Users/colinholzman/Documents/CopperKitten/assembler/grammar/cka.g4 by ANTLR 4.7
+// Generated from C:/code/CopperKitten/assembler/grammar\cka.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class ckaParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.7.2", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -21,17 +21,27 @@ public class ckaParser extends Parser {
 	public static final int
 		RULE_file = 0, RULE_instructions = 1, RULE_instruction = 2, RULE_frameLayout = 3, 
 		RULE_allocLayout = 4, RULE_integer = 5;
-	public static final String[] ruleNames = {
-		"file", "instructions", "instruction", "frameLayout", "allocLayout", "integer"
-	};
+	private static String[] makeRuleNames() {
+		return new String[] {
+			"file", "instructions", "instruction", "frameLayout", "allocLayout", 
+			"integer"
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
 
-	private static final String[] _LITERAL_NAMES = {
-		null, "':'", "'layout'", "'alloc'", "'['", "']'", "','", "'*'", "'-'"
-	};
-	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, null, null, null, null, null, null, "NATURAL", "ID", 
-		"LABEL", "NL", "WHITESPACE", "COMMENT"
-	};
+	private static String[] makeLiteralNames() {
+		return new String[] {
+			null, "':'", "'layout'", "'alloc'", "'['", "']'", "','", "'*'", "'-'"
+		};
+	}
+	private static final String[] _LITERAL_NAMES = makeLiteralNames();
+	private static String[] makeSymbolicNames() {
+		return new String[] {
+			null, null, null, null, null, null, null, null, null, "NATURAL", "ID", 
+			"LABEL", "NL", "WHITESPACE", "COMMENT"
+		};
+	}
+	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**
@@ -81,6 +91,7 @@ public class ckaParser extends Parser {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
+
 	public static class FileContext extends ParserRuleContext {
 		public TerminalNode EOF() { return getToken(ckaParser.EOF, 0); }
 		public List<TerminalNode> NL() { return getTokens(ckaParser.NL); }

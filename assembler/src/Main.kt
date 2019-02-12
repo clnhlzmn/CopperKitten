@@ -1,11 +1,15 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-        "let foo = bar(42, 43); " +
-        "baz(); " +
-        "for (;1;) {} ; " +
-        "if(1) doThis() else doThat() ; " +
-        "foo = (a:Int)->Unit{}"
+    "Main:\n" +
+    "in\n" +
+    "10\n" +
+    "enter\n" +
+    "leave\n" +
+    "layout [0, 2]\n" +
+    "alloc [10, 0, 1, 2]\n" +
+    "alloc [10, *]\n" +
+    "jump Main\n"
 )
 val lexer = ckaLexer(stream)
 val tokens = CommonTokenStream(lexer)
