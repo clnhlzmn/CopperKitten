@@ -25,7 +25,7 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
     }
 
     override fun visitPushIntInst(ctx: ckaParser.PushIntInstContext?) {
-        pc.instructions.add(PushInstruction(ctx!!.integer().text.toInt()))
+        pc.instructions.add(PushIntInstruction(ctx!!.integer().text.toInt()))
     }
 
     override fun visitPushLabelInst(ctx: ckaParser.PushLabelInstContext?) {

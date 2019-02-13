@@ -1,17 +1,84 @@
 import sun.java2d.pipe.SpanShapeRenderer
 import java.util.*
 
-open class Instruction
+interface Instruction {
+    fun size(targetWordSize: Int): Int
+    fun emit(
+        programBase: String,
+        mnemonicConverter: (String)->String,
+        targetWordSize: Int): String
+}
 
-data class SimpleInstruction(val name: String) : Instruction()
+data class SimpleInstruction(val name: String) : Instruction {
+    override fun size(targetWordSize: Int): Int {
+        return 1;
+    }
 
-data class PushInstruction(val data: Int) : Instruction()
+    override fun emit(programBase: String,
+                      mnemonicConverter: (String) -> String,
+                      targetWordSize: Int): String {
+        return mnemonicConverter(name)
+    }
+}
 
-data class PushLabelInstruction(val label: String) : Instruction()
+data class PushIntInstruction(val data: Int) : Instruction {
 
-data class JumpInstruction(val type: String, val target: String) : Instruction()
+    override fun size(targetWordSize: Int): Int {
+        return 1 + targetWordSize
+    }
 
-data class LayoutInstruction(val layout: List<Int>) : Instruction()
+    override fun emit(
+        programBase: String,
+        mnemonicConverter: (String) -> String,
+        targetWordSize: Int): String {
+        //TODO: check that data fits in targetWordSize
+        return "${mnemonicConverter("push")}, " +
+                (0 until targetWordSize)
+                    .map { i -> (data shr i * 8 and 0xFF).toString() }
+                    .reduce { acc, s -> "$acc, $s" }
+    }
+}
+
+data class PushLabelInstruction(val label: String) : Instruction {
+    override fun size(targetWordSize: Int): Int {
+        return 1 + targetWordSize
+    }
+
+    override fun emit(programBase: String, mnemonicConverter: (String) -> String, targetWordSize: Int): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}
+
+data class JumpInstruction(val type: String, val target: String) : Instruction {
+    override fun size(targetWordSize: Int): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun emit(programBase: String, mnemonicConverter: (String) -> String, targetWordSize: Int): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}
+
+data class LayoutInstruction(val layout: List<Int>) : Instruction {
+    override fun size(targetWordSize: Int): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun emit(programBase: String, mnemonicConverter: (String) -> String, targetWordSize: Int): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}
+
+data class AllocInstruction(val layout: AllocLayout) : Instruction {
+    override fun size(targetWordSize: Int): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun emit(programBase: String, mnemonicConverter: (String) -> String, targetWordSize: Int): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}
+
 
 open class AllocLayout(val size: Int) {
 
@@ -72,10 +139,14 @@ class CustomLayout(s: Int, val layout: List<Int>) : AllocLayout(s) {
     }
 
     override fun toString(): String {
-        val layoutString = if (layout.isEmpty()) "" else ", ${layout.map { i -> i.toString() }.reduce { acc, s -> "$acc, $s" }}"
+        val layoutString =
+            if (layout.isEmpty())
+                ""
+            else
+                ", ${layout.map { i -> i.toString() }.reduce { acc, s -> "$acc, $s" }}"
         return "[$size$layoutString]"
     }
 
 }
 
-data class AllocInstruction(val layout: AllocLayout) : Instruction()
+
