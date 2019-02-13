@@ -1,7 +1,7 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "push 128"
+    "push 12000"
 )
 val lexer = ckaLexer(stream)
 val tokens = CommonTokenStream(lexer)
@@ -14,7 +14,7 @@ fun main() {
     //to convert mnemonic to "opcode", which is really an enum
     val convert = { mnemonic:String -> "(vm_op_code)${mnemonic.toUpperCase()}" }
     //target word size in bytes
-    val wordSize = 4
+    val wordSize = 2
     val res = FileVisitor().visit(context)
     for (inst in res.instructions) {
         println(inst.emit(programBaseAddress, convert, wordSize))

@@ -1,4 +1,5 @@
 import sun.java2d.pipe.SpanShapeRenderer
+import java.lang.Math.pow
 import java.util.*
 
 interface Instruction {
@@ -31,7 +32,12 @@ data class PushIntInstruction(val data: Int) : Instruction {
         programBase: String,
         mnemonicConverter: (String) -> String,
         targetWordSize: Int): String {
-        //TODO: check that data fits in targetWordSize
+        val max = pow(2.0, (targetWordSize.toDouble()*8)-1)-1
+        val min = -pow(2.0, (targetWordSize.toDouble()*8)-1)
+        if (data < min || data > max) {
+            //TODO handle this better
+            throw RuntimeException("literal too large")
+        }
         return "${mnemonicConverter("push")}, " +
                 (0 until targetWordSize)
                     .map { i -> (data shr i * 8 and 0xFF).toString() }
