@@ -151,15 +151,11 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             printf("jump: before=%p, after=%p\r\n", orig, self->ip);
             break;
         }
-        case PUSH:
-            *self->sp = VM_DEREF_IP(self->ip++);
-            self->sp++;
-            break;
-        case PUSHW: {
+        case PUSH: {
             uintptr_t word = 0;
             for (size_t i = 0; i < sizeof(uintptr_t); ++i) {
                 uint8_t byte = (uint8_t)VM_DEREF_IP(self->ip++);
-                word |= byte << i * 8;
+                word |= (intptr_t)byte << i * 8;
             }
             *self->sp = word;
             self->sp++;
