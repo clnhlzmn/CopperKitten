@@ -33,15 +33,11 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
     }
 
     override fun visitSimpleInst(ctx: ckaParser.SimpleInstContext?) {
-        pc.instructions.add(SimpleInstruction(ctx!!.ID().text))
+        pc.instructions.add(SimpleInstruction(ctx!!.simpleInstruction().text))
     }
 
     override fun visitJumpInst(ctx: ckaParser.JumpInstContext?) {
-        pc.instructions.add(JumpInstruction(ctx!!.ID().text, ctx.LABEL().text))
-    }
-
-    override fun visitPushInst(ctx: ckaParser.PushInstContext?) {
-        pc.instructions.add(PushInstruction(ctx!!.integer().text.toInt()))
+        pc.instructions.add(JumpInstruction(ctx!!.jumpMnemonic().text, ctx.LABEL().text))
     }
 
     override fun visitLayoutInst(ctx: ckaParser.LayoutInstContext?) {

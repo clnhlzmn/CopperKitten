@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/assembler/grammar\cka.g4 by ANTLR 4.7.2
+// Generated from C:/code/ck/assembler/grammar\cka.g4 by ANTLR 4.7.2
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -99,18 +99,6 @@ public class ckaBaseListener implements ckaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPushInst(ckaParser.PushInstContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPushInst(ckaParser.PushInstContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterLayoutInst(ckaParser.LayoutInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -130,6 +118,30 @@ public class ckaBaseListener implements ckaListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAllocInst(ckaParser.AllocInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterJumpMnemonic(ckaParser.JumpMnemonicContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJumpMnemonic(ckaParser.JumpMnemonicContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSimpleInstruction(ckaParser.SimpleInstructionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSimpleInstruction(ckaParser.SimpleInstructionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

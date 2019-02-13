@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/assembler/grammar\cka.g4 by ANTLR 4.7.2
+// Generated from C:/code/ck/assembler/grammar\cka.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
@@ -65,13 +65,6 @@ public class ckaBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements ck
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPushInst(ckaParser.PushInstContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitLayoutInst(ckaParser.LayoutInstContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -80,6 +73,20 @@ public class ckaBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements ck
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitAllocInst(ckaParser.AllocInstContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitJumpMnemonic(ckaParser.JumpMnemonicContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitSimpleInstruction(ckaParser.SimpleInstructionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

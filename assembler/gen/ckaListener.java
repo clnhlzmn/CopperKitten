@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/assembler/grammar\cka.g4 by ANTLR 4.7.2
+// Generated from C:/code/ck/assembler/grammar\cka.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -87,18 +87,6 @@ public interface ckaListener extends ParseTreeListener {
 	 */
 	void exitJumpInst(ckaParser.JumpInstContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code pushInst}
-	 * labeled alternative in {@link ckaParser#instruction}.
-	 * @param ctx the parse tree
-	 */
-	void enterPushInst(ckaParser.PushInstContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code pushInst}
-	 * labeled alternative in {@link ckaParser#instruction}.
-	 * @param ctx the parse tree
-	 */
-	void exitPushInst(ckaParser.PushInstContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code layoutInst}
 	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
@@ -122,6 +110,26 @@ public interface ckaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAllocInst(ckaParser.AllocInstContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ckaParser#jumpMnemonic}.
+	 * @param ctx the parse tree
+	 */
+	void enterJumpMnemonic(ckaParser.JumpMnemonicContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckaParser#jumpMnemonic}.
+	 * @param ctx the parse tree
+	 */
+	void exitJumpMnemonic(ckaParser.JumpMnemonicContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ckaParser#simpleInstruction}.
+	 * @param ctx the parse tree
+	 */
+	void enterSimpleInstruction(ckaParser.SimpleInstructionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckaParser#simpleInstruction}.
+	 * @param ctx the parse tree
+	 */
+	void exitSimpleInstruction(ckaParser.SimpleInstructionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code emptyFrameLayout}
 	 * labeled alternative in {@link ckaParser#frameLayout}.

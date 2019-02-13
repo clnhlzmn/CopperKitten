@@ -16,11 +16,41 @@ instruction
     : LABEL ':'                     #labelInst
     | 'push' integer                #pushIntInst
     | 'push' LABEL                  #pushLabelInst
-    | ID                            #simpleInst
-    | ID LABEL                      #jumpInst
-    | ID integer                    #pushInst
+    | simpleInstruction             #simpleInst
+    | jumpMnemonic LABEL            #jumpInst
     | 'layout' frameLayout          #layoutInst
     | 'alloc' allocLayout           #allocInst
+    ;
+
+jumpMnemonic
+    : 'jump'
+    | 'jumpz'
+    | 'jumpnz'
+    ;
+
+simpleInstruction
+    : 'add'
+    | 'sub'
+    | 'mul'
+    | 'div'
+    | 'mod'
+    | 'shl'
+    | 'shr'
+    | 'cmp'
+    | 'call'
+    | 'ret'
+    | 'dup'
+    | 'pop'
+    | 'swap'
+    | 'enter'
+    | 'leave'
+    | 'in'
+    | 'out'
+    | 'fload'
+    | 'fstore'
+    | 'rload'
+    | 'rstore'
+    | 'nop'
     ;
 
 frameLayout
@@ -37,7 +67,7 @@ integer : '-'? NATURAL ;
 
 NATURAL : ('0'..'9')+ ;
 
-ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
+//ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 LABEL : ('A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 
 NL : '\n'|'\r\n' ;

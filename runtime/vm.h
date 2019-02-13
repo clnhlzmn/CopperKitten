@@ -39,25 +39,6 @@ static inline void vm_init(
 }
 
 enum vm_op_code {
-    N_NINE,
-    N_EIGHT,
-    N_SEVEN,
-    N_SIX,
-    N_FIVE,
-    N_FOUR,
-    N_THREE,
-    N_TWO,
-    N_ONE,
-    ZERO,
-    ONE,
-    TWO,
-    THREE,
-    FOUR,
-    FIVE,
-    SIX,
-    SEVEN,
-    EIGHT,
-    NINE,
     ADD,        //[...|lhs|rhs]->[...|lhs+rhs]
     SUB,        //[...|lhs|rhs]->[...|lhs-rhs]
     MUL,        //[...|lhs|rhs]->[...|lhs*rhs]
@@ -68,9 +49,9 @@ enum vm_op_code {
     CMP,        //[...|lhs|rhs]->[...|lhs<rhs?-1:lhs>rhs?1:0]
     CALL,       //jump to the address on the stack and push current address
     RET,        //pop address from the stack and jump to it
-    JMP,        //jump to the address formed from pc+offset where offset is the word following JMP
-    JMPZ,       //same as JMP if tos is zero
-    JMPNZ,      //same as JMP if toz is not zero
+    JUMP,       //jump to the address formed from pc+offset where offset is the word following JMP
+    JUMPZ,      //same as JMP if tos is zero
+    JUMPNZ,     //same as JMP if toz is not zero
     PUSH,       //push the next word in the instruction stream
     DUP,        //duplicate the top value
     POP,        //pop the top value from the stack
