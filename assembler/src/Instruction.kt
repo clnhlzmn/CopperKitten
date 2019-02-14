@@ -1,86 +1,88 @@
-import sun.java2d.pipe.SpanShapeRenderer
 import java.lang.Math.pow
-import java.util.*
 
 interface Instruction {
-    fun size(targetWordSize: Int): Int
+    fun size(tc: TargetContext): Int
     fun emit(
-        programBase: String,
-        mnemonicConverter: (String)->String,
-        targetWordSize: Int): String
+        pc: ParseContext,
+        tc: TargetContext
+    ): String
 }
 
 data class SimpleInstruction(val name: String) : Instruction {
-    override fun size(targetWordSize: Int): Int {
+    override fun size(tc: TargetContext): Int {
         return 1;
     }
 
-    override fun emit(programBase: String,
-                      mnemonicConverter: (String) -> String,
-                      targetWordSize: Int): String {
-        return mnemonicConverter(name)
+    override fun emit(pc: ParseContext, tc: TargetContext): String {
+        return tc.convert(name)
     }
 }
 
 data class PushIntInstruction(val data: Int) : Instruction {
 
-    override fun size(targetWordSize: Int): Int {
-        return 1 + targetWordSize
+    override fun size(tc: TargetContext): Int {
+        return 1 + tc.wordSize
     }
 
     override fun emit(
-        programBase: String,
-        mnemonicConverter: (String) -> String,
-        targetWordSize: Int): String {
-        val max = pow(2.0, (targetWordSize.toDouble()*8)-1)-1
-        val min = -pow(2.0, (targetWordSize.toDouble()*8)-1)
+        pc: ParseContext,
+        tc: TargetContext
+    ): String {
+        val max = pow(2.0, (tc.wordSize.toDouble()*8)-1)-1
+        val min = -pow(2.0, (tc.wordSize.toDouble()*8)-1)
         if (data < min || data > max) {
             //TODO handle this better
             throw RuntimeException("literal too large")
         }
-        return "${mnemonicConverter("push")}, " +
-                (0 until targetWordSize)
+        return "${tc.convert("push")}, " +
+                (0 until tc.wordSize)
                     .map { i -> (data shr i * 8 and 0xFF).toString() }
                     .reduce { acc, s -> "$acc, $s" }
     }
 }
 
 data class PushLabelInstruction(val label: String) : Instruction {
-    override fun size(targetWordSize: Int): Int {
-        return 1 + targetWordSize
+    override fun size(tc: TargetContext): Int {
+        return 1 + tc.wordSize
     }
 
-    override fun emit(programBase: String, mnemonicConverter: (String) -> String, targetWordSize: Int): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun emit(pc: ParseContext, tc: TargetContext): String {
+        //TODO: adjust label index according to size of instructions from 0 to index
+        //TODO: make sure that label fits in target word size
+        val targetIndex = pc.labels[label]
+        return "${tc.convert("push")}, " +
+            (0 until tc.wordSize)
+                .map { i -> "((${tc.programBaseAddress} + $targetIndex) >> ($i * 8)) & 0xFF" }
+                .reduce { acc, s -> "$acc, $s" }
     }
 }
 
 data class JumpInstruction(val type: String, val target: String) : Instruction {
-    override fun size(targetWordSize: Int): Int {
+    override fun size(tc: TargetContext): Int {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun emit(programBase: String, mnemonicConverter: (String) -> String, targetWordSize: Int): String {
+    override fun emit(pc: ParseContext, tc: TargetContext): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 
 data class LayoutInstruction(val layout: List<Int>) : Instruction {
-    override fun size(targetWordSize: Int): Int {
+    override fun size(tc: TargetContext): Int {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun emit(programBase: String, mnemonicConverter: (String) -> String, targetWordSize: Int): String {
+    override fun emit(pc: ParseContext, tc: TargetContext): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 
 data class AllocInstruction(val layout: AllocLayout) : Instruction {
-    override fun size(targetWordSize: Int): Int {
+    override fun size(tc: TargetContext): Int {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun emit(programBase: String, mnemonicConverter: (String) -> String, targetWordSize: Int): String {
+    override fun emit(pc: ParseContext, tc: TargetContext): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
