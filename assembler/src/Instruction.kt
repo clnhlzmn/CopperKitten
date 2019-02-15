@@ -1,5 +1,11 @@
 import java.lang.Math.pow
 
+fun checkSize(i: Int, tc: TargetContext):Boolean {
+    val max = pow(2.0, (tc.wordSize.toDouble() * 8) - 1) - 1
+    val min = -pow(2.0, (tc.wordSize.toDouble() * 8) - 1)
+    return i >= min && i <= max
+}
+
 interface Instruction {
     fun size(tc: TargetContext): Int
     fun emit(
@@ -24,46 +30,40 @@ data class PushIntInstruction(val data: Int) : Instruction {
         return 1 + tc.wordSize
     }
 
-    override fun emit(
-        pc: ParseContext,
-        tc: TargetContext
-    ): String {
-        val max = pow(2.0, (tc.wordSize.toDouble()*8)-1)-1
-        val min = -pow(2.0, (tc.wordSize.toDouble()*8)-1)
-        if (data < min || data > max) {
+    override fun emit(pc: ParseContext, tc: TargetContext): String {
+        if (!checkSize(data, tc)) {
             //TODO handle this better
             throw RuntimeException("literal too large")
         }
         return "${tc.convert("push")}, " +
-                (0 until tc.wordSize)
-                    .map { i -> (data shr i * 8 and 0xFF).toString() }
-                    .reduce { acc, s -> "$acc, $s" }
+            (0 until tc.wordSize)
+                .map { i -> (data shr i * 8 and 0xFF).toString() }
+                .reduce { acc, s -> "$acc, $s" }
     }
 }
 
-data class PushLabelInstruction(val label: String) : Instruction {
+//to be used for push Label and jumpxx Label
+data class LiteralLabelInstruction(val name: String, val label: String) : Instruction {
     override fun size(tc: TargetContext): Int {
         return 1 + tc.wordSize
     }
 
     override fun emit(pc: ParseContext, tc: TargetContext): String {
-        //TODO: adjust label index according to size of instructions from 0 to index
-        //TODO: make sure that label fits in target word size
-        val targetIndex = pc.labels[label]
-        return "${tc.convert("push")}, " +
+        val targetIndex = pc.labels[label]!!
+        //add the sizes of all the instructions from 0 until targetIndex
+        val adjustedTargetIndex =
+            pc.instructions
+                .slice(0 until targetIndex)
+                .map { inst -> inst.size(tc) }
+                .reduce { acc, i -> acc + i }
+        if (!checkSize(adjustedTargetIndex, tc)) {
+            //TODO handle this better
+            throw RuntimeException("label index too large")
+        }
+        return "${tc.convert(name)}, " +
             (0 until tc.wordSize)
-                .map { i -> "((${tc.programBaseAddress} + $targetIndex) >> ($i * 8)) & 0xFF" }
+                .map { i -> "((${tc.programBaseAddress} + $adjustedTargetIndex) >> ($i * 8)) & 0xFF" }
                 .reduce { acc, s -> "$acc, $s" }
-    }
-}
-
-data class JumpInstruction(val type: String, val target: String) : Instruction {
-    override fun size(tc: TargetContext): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun emit(pc: ParseContext, tc: TargetContext): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 

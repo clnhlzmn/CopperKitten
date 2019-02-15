@@ -5,8 +5,8 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  * This interface defines a complete generic visitor for a parse tree produced
  * by {@link ckaParser}.
  *
- * @param <T> The return type of the visit operation. Use {@link Void} for
- * operations with no return type.
+ * @param <T> The return name of the visit operation. Use {@link Void} for
+ * operations with no return name.
  */
 public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	/**

@@ -1,5 +1,3 @@
-
-
 class FileVisitor : ckaBaseVisitor<ParseContext>() {
 
     override fun visitFile(ctx: ckaParser.FileContext?): ParseContext {
@@ -29,7 +27,7 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
     }
 
     override fun visitPushLabelInst(ctx: ckaParser.PushLabelInstContext?) {
-        pc.instructions.add(PushLabelInstruction(ctx!!.LABEL().text))
+        pc.instructions.add(LiteralLabelInstruction("push", ctx!!.LABEL().text))
     }
 
     override fun visitSimpleInst(ctx: ckaParser.SimpleInstContext?) {
@@ -37,7 +35,7 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
     }
 
     override fun visitJumpInst(ctx: ckaParser.JumpInstContext?) {
-        pc.instructions.add(JumpInstruction(ctx!!.jumpMnemonic().text, ctx.LABEL().text))
+        pc.instructions.add(LiteralLabelInstruction(ctx!!.jumpMnemonic().text, ctx.LABEL().text))
     }
 
     override fun visitLayoutInst(ctx: ckaParser.LayoutInstContext?) {
