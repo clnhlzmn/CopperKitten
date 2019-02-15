@@ -8,10 +8,7 @@ fun checkSize(i: Int, tc: TargetContext):Boolean {
 
 interface Instruction {
     fun size(tc: TargetContext): Int
-    fun emit(
-        pc: ParseContext,
-        tc: TargetContext
-    ): String
+    fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext)
 }
 
 data class SimpleInstruction(val name: String) : Instruction {
@@ -19,8 +16,8 @@ data class SimpleInstruction(val name: String) : Instruction {
         return 1;
     }
 
-    override fun emit(pc: ParseContext, tc: TargetContext): String {
-        return tc.convert(name)
+    override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
+        oc.program.append(tc.convert(name) + ",")
     }
 }
 
@@ -30,15 +27,15 @@ data class PushIntInstruction(val data: Int) : Instruction {
         return 1 + tc.wordSize
     }
 
-    override fun emit(pc: ParseContext, tc: TargetContext): String {
+    override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
         if (!checkSize(data, tc)) {
             //TODO handle this better
             throw RuntimeException("literal too large")
         }
-        return "${tc.convert("push")}, " +
+        oc.program.append("${tc.convert("push")}, " +
             (0 until tc.wordSize)
                 .map { i -> (data shr i * 8 and 0xFF).toString() }
-                .reduce { acc, s -> "$acc, $s" }
+                .reduce { acc, s -> "$acc, $s" } + ",")
     }
 }
 
@@ -48,7 +45,7 @@ data class LiteralLabelInstruction(val name: String, val label: String) : Instru
         return 1 + tc.wordSize
     }
 
-    override fun emit(pc: ParseContext, tc: TargetContext): String {
+    override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
         val targetIndex = pc.labels[label]!!
         //add the sizes of all the instructions from 0 until targetIndex
         val adjustedTargetIndex =
@@ -60,10 +57,10 @@ data class LiteralLabelInstruction(val name: String, val label: String) : Instru
             //TODO handle this better
             throw RuntimeException("label index too large")
         }
-        return "${tc.convert(name)}, " +
+        oc.program.append("${tc.convert(name)}, " +
             (0 until tc.wordSize)
                 .map { i -> "((${tc.programBaseAddress} + $adjustedTargetIndex) >> ($i * 8)) & 0xFF" }
-                .reduce { acc, s -> "$acc, $s" }
+                .reduce { acc, s -> "$acc, $s" } + ", ")
     }
 }
 
@@ -72,7 +69,7 @@ data class LayoutInstruction(val layout: List<Int>) : Instruction {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun emit(pc: ParseContext, tc: TargetContext): String {
+    override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
@@ -82,7 +79,7 @@ data class AllocInstruction(val layout: AllocLayout) : Instruction {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun emit(pc: ParseContext, tc: TargetContext): String {
+    override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
