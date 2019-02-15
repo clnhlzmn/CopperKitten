@@ -64,19 +64,23 @@ data class LiteralLabelInstruction(val name: String, val label: String) : Instru
     }
 }
 
+//layout <layoutptr>
 data class LayoutInstruction(val layout: List<Int>) : Instruction {
     override fun size(tc: TargetContext): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return 1 + tc.wordSize
     }
 
     override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        oc.layoutFunctions.add(LayoutFunction(layout))
+        //todo: emit code
     }
 }
 
 data class AllocInstruction(val layout: AllocLayout) : Instruction {
     override fun size(tc: TargetContext): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //1 for opcode, wordSize for size, wordSize for layout
+        //generated code looks like alloc <size> <layout>
+        return 1 + 2 * tc.wordSize
     }
 
     override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {

@@ -60,8 +60,8 @@ enum vm_op_code {
     LEAVE,      //leave a stack frame
     IN,         //read a byte from the console
     OUT,        //print a byte to the console
-    LAYOUT,     //[...|layout]->[...], set the frame layout
-    ALLOC,      //[...|n|layout]->[...|ref], allocate n cells with given layout
+    LAYOUT,     //[...]->[...], set the frame layout from the next word in the program
+    ALLOC,      //[...]->[...|ref], allocate n cells with the given layout where n is the next word in the instruction stream and layout is after that
     FLOAD,      //[...|index]->[...|value], get the word at fp+index
     FSTORE,     //[...|index|value]->[...], set the word at fp+index to the given value
     RLOAD,      //[...|ref|index]->[...|value], get the word at ref+index
