@@ -10,10 +10,10 @@ extern "C" {
 #include "gc_interface.h"
 
 struct gc {
-    uintptr_t *heap;
+    intptr_t *heap;
     size_t size;
-    uintptr_t *alloc_ptr;
-    uintptr_t *alloc_end;
+    intptr_t *alloc_ptr;
+    intptr_t *alloc_end;
 };
 
 #ifdef __cplusplus

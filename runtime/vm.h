@@ -16,17 +16,17 @@
 struct vm {
     struct gc *gc;
     uint8_t *ip;
-    uintptr_t *sp;
-    uintptr_t *sb;
-    uintptr_t size;
-    uintptr_t *frame;
+    intptr_t *sp;
+    intptr_t *sb;
+    size_t size;
+    intptr_t *frame;
 };
 
 static inline void vm_init(
     struct vm *self, 
     struct gc *gc, 
-    uintptr_t *stack, 
-    uintptr_t size)
+    intptr_t *stack, 
+    size_t size)
 {
     assert(self);
     assert(gc);
@@ -129,7 +129,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
                         self->ip++;
                         break;
                     case PUSHW:
-                        self->ip += sizeof(uintptr_t);
+                        self->ip += sizeof(intptr_t);
                         break;
                     default: break;
                 }
@@ -137,11 +137,11 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case IP:
             printf("ip: %p\r\n", self->ip);
-            *self->sp = (uintptr_t)self->ip;
+            *self->sp = (intptr_t)self->ip;
             self->sp++;
             break;
         case FP:
-            *self->sp = (uintptr_t)self->frame;
+            *self->sp = (intptr_t)self->frame;
             self->sp++;
             break;
         case JUMP: {
@@ -152,8 +152,8 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         }
         case PUSH: {
-            uintptr_t word = 0;
-            for (size_t i = 0; i < sizeof(uintptr_t); ++i) {
+            intptr_t word = 0;
+            for (size_t i = 0; i < sizeof(intptr_t); ++i) {
                 uint8_t byte = (uint8_t)VM_DEREF_IP(self->ip++);
                 word |= (intptr_t)byte << i * 8;
             }
@@ -172,7 +172,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             *(self->sp - 2) = *(self->sp - 1);
             break;
         case ENTER:
-            *self->sp = (uintptr_t)self->frame;
+            *self->sp = (intptr_t)self->frame;
             self->frame = self->sp;
             self->sp++;
             *self->sp = 0;
@@ -180,7 +180,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case LEAVE:
             self->sp--;
-            self->frame = (uintptr_t*)*(self->sp - 1);
+            self->frame = (intptr_t*)*(self->sp - 1);
             self->sp--;
             break;
         case IN: {
@@ -201,7 +201,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case ALLOC:
             //TODO: foreach_t funtion for this guy
-            *(self->sp - 2) = (uintptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 2), (void*)*(self->sp - 1));
+            *(self->sp - 2) = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 2), (void*)*(self->sp - 1));
             self->sp--;
             break;
         case FPLOAD:
@@ -214,12 +214,12 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case RLOAD:
             //TODO: gc_read_barrier
-            *(self->sp - 2) = *((uintptr_t*)*(self->sp - 2) + *(self->sp - 1));
+            *(self->sp - 2) = *((intptr_t*)*(self->sp - 2) + *(self->sp - 1));
             self->sp--;
             break;
         case RSTORE:
             //TODO: gc_write_barrier
-            *((uintptr_t*)*(self->sp - 3) + *(self->sp - 2)) = *(self->sp - 1);
+            *((intptr_t*)*(self->sp - 3) + *(self->sp - 2)) = *(self->sp - 1);
             self->sp -= 3;
             break;
         case NCALL: {

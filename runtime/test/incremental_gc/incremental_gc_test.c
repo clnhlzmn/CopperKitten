@@ -5,18 +5,18 @@
 #include "../../incremental_copying_gc.h"
 
 //forwards yields one root pointed to by root
-void roots_foreach(void (*cb)(uintptr_t **item, void *ctx), void *cb_ctx, void *foreach_ctx) {
-    uintptr_t **it = foreach_ctx;
+void roots_foreach(void (*cb)(intptr_t **item, void *ctx), void *cb_ctx, void *foreach_ctx) {
+    intptr_t **it = foreach_ctx;
     cb(it, cb_ctx);
 }
 
 #define MEM_SIZE (100)
 
-uintptr_t mem[MEM_SIZE];
+intptr_t mem[MEM_SIZE];
 
 #define OBJ_SIZE (3)
 
-#define INT_DATA ((uintptr_t)-1)
+#define INT_DATA ((intptr_t)-1)
 
 void test_gc(void) {
     //printf("%d", __LINE__);
@@ -28,7 +28,7 @@ void test_gc(void) {
     for (int repeat = 0; repeat < 500; ++repeat) {
         //printf("%d", __LINE__);
         //alloc one ref cell (no roots yet)
-        uintptr_t *root = NULL;
+        intptr_t *root = NULL;
         /*printf("main: &root = %p\r\n", &root);*/
         root = gc_alloc_ref_array(&gc_inst, roots_foreach, &root, OBJ_SIZE);
 		assert(root);
@@ -37,17 +37,17 @@ void test_gc(void) {
         //printf("%d", __LINE__);
         //store a value in non ref cell
         for (int i = 0; i < OBJ_SIZE; ++i) {
-            root[i] = (uintptr_t)gc_alloc_int_array(&gc_inst, roots_foreach, &root, OBJ_SIZE);
+            root[i] = (intptr_t)gc_alloc_int_array(&gc_inst, roots_foreach, &root, OBJ_SIZE);
             assert(root[i]);
-            assert(gc_get_size((uintptr_t*)root[i]) == OBJ_SIZE);
+            assert(gc_get_size((intptr_t*)root[i]) == OBJ_SIZE);
             for (unsigned j = 0; j < OBJ_SIZE; ++j) {
-                ((uintptr_t*)root[i])[j] = INT_DATA;
+                ((intptr_t*)root[i])[j] = INT_DATA;
             }
         }
         //allocate a bunch
         for (int i = 0; i < 10000; ++i) {
             //alloc chunks of 10 cells, no refs
-            uintptr_t *a = gc_alloc_int_array(&gc_inst, roots_foreach, &root, OBJ_SIZE);
+            intptr_t *a = gc_alloc_int_array(&gc_inst, roots_foreach, &root, OBJ_SIZE);
             assert(a);
             assert(gc_get_size(a) == OBJ_SIZE);
             /*printf("%d : %d\r\n", __LINE__, i);*/
@@ -61,14 +61,14 @@ void test_gc(void) {
         assert(root);
         for (int i = 0; i < OBJ_SIZE; ++i) {
             assert(root[i]);
-            assert(gc_get_size((uintptr_t*)root[i]) == OBJ_SIZE);
-			gc_read_barrier(&gc_inst, &(uintptr_t*)root[i]);
+            assert(gc_get_size((intptr_t*)root[i]) == OBJ_SIZE);
+			gc_read_barrier(&gc_inst, &(intptr_t*)root[i]);
             for (unsigned j = 0; j < OBJ_SIZE; ++j) {
-                assert(((uintptr_t*)root[i])[j] == INT_DATA);
+                assert(((intptr_t*)root[i])[j] == INT_DATA);
             }
         }
     }
-    /*printf("%lld\r\n", ((uintptr_t*)root[0])[0]);*/
+    /*printf("%lld\r\n", ((intptr_t*)root[0])[0]);*/
     printf("elapsed = %f\r\n", timer_end(begin));
     char c = getc(stdin);
 }

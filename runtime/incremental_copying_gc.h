@@ -12,20 +12,20 @@ extern "C" {
 struct gc {
     //PRIVATE
     //pointers to semispaces
-    uintptr_t *a_space;
-    uintptr_t *b_space;
+    intptr_t *a_space;
+    intptr_t *b_space;
     //size of each space (equal)
     size_t size;
     //to keep track of allocation and 
     //collection
 #ifndef NDEBUG
 	//for printing the heap
-	uintptr_t *last_alloc;
+	intptr_t *last_alloc;
 #endif
-    uintptr_t *alloc;
-    uintptr_t *scan;
-    uintptr_t *begin;
-    uintptr_t *end;
+    intptr_t *alloc;
+    intptr_t *scan;
+    intptr_t *begin;
+    intptr_t *end;
     //to know what to do during alloc
     bool collecting;
     //PRIVATE

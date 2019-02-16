@@ -31,7 +31,7 @@ extern "C" {
 //user's root references and to access references
 //in allocated objects.
 typedef void (*foreach_t)(
-    void (*cb)(uintptr_t **it, void *ctx),
+    void (*cb)(intptr_t **it, void *ctx),
     void *cb_ctx,
     void *foreach_ctx);
 
@@ -39,78 +39,78 @@ typedef void (*foreach_t)(
 struct gc;
 
 //initialize gc with pointer to self, pointer to memory, and size of memory
-void gc_init(struct gc *self, uintptr_t *mem, size_t size);
+void gc_init(struct gc *self, intptr_t *mem, size_t size);
 
 //see gc.c for example layout functions 
 //layout_ref_array and layout_int_array
 //and layout_example_tagged_ints
 
 //allocate with an explicit layout
-uintptr_t *gc_alloc_with_layout(
+intptr_t *gc_alloc_with_layout(
     struct gc *self,                //pointer to instance
     foreach_t root_iter,            //pointer to root iterator
     void *root_iter_ctx,            //root iterator context
-    uintptr_t size,                  //size of allocation
+    intptr_t size,                  //size of allocation
     foreach_t layout);              //layout of allocation
 
 //allocate GC managed array of refs
-uintptr_t *gc_alloc_ref_array(
+intptr_t *gc_alloc_ref_array(
     struct gc *self,                //instance
     foreach_t root_iter,            //root iterator
     void *root_iter_ctx,            //root iterator context
-    uintptr_t size);                 //number of refs
+    intptr_t size);                 //number of refs
 
 //allocate GC managed array of ints (not set to zero)
-uintptr_t *gc_alloc_int_array(
+intptr_t *gc_alloc_int_array(
     struct gc *self,                //instance
     foreach_t root_iter,            //root iterator
     void *root_iter_ctx,            //root iterator context
-    uintptr_t size);                 //number of ints
+    intptr_t size);                 //number of ints
 
 //gets the size of an allocation returned from gc_alloc_*
-uintptr_t gc_get_size(uintptr_t *);
+intptr_t gc_get_size(intptr_t *);
 
 //to call on pointers that are read from memory
 //may change the pointer
-void gc_read_barrier(struct gc *, uintptr_t **);
+void gc_read_barrier(struct gc *, intptr_t **);
 
 //to call on objects that have had 
 //managed pointers written to them
-void gc_write_barrier(struct gc *, uintptr_t *);
+void gc_write_barrier(struct gc *, intptr_t *);
 
 //example layout for dynamic language with tagged ints
 static inline void gc_layout_example_tagged_ints(
-    void (*cb)(uintptr_t**, void*), 
+    void (*cb)(intptr_t**, void*), 
     void *cb_ctx, 
     void *layout_ctx) 
 {
     //call callback for each element if it's a reference
-    uintptr_t *user_ptr = layout_ctx;
-    for (uintptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
+    intptr_t *user_ptr = layout_ctx;
+    for (intptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
         //check tag
         if ((user_ptr[i] & 1) == 0) {
             //it's a pointer
-            cb((uintptr_t**)&user_ptr[i], cb_ctx);
+            cb((intptr_t**)&user_ptr[i], cb_ctx);
         }
     }
 }
 
 //builtin layout for array of references
 static inline void gc_layout_ref_array(
-    void (*cb)(uintptr_t**, void*), 
+    void (*cb)(intptr_t**, void*), 
     void *cb_ctx, 
     void *layout_ctx) 
 {
     //call callback for each element
-    uintptr_t *user_ptr = layout_ctx;
-    for (uintptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
-        cb((uintptr_t**)&user_ptr[i], cb_ctx);
+    intptr_t *user_ptr = layout_ctx;
+    for (intptr_t i = 0; i < gc_get_size(user_ptr); ++i) {
+        cb((intptr_t**)&user_ptr[i], cb_ctx);
     }
 }
 
 //builtin layout for integer arrays
 static inline void gc_layout_int_array(
-    void (*cb)(uintptr_t**, void*), 
+    void (*cb)(intptr_t**, void*), 
     void *cb_ctx, 
     void *layout_ctx) 
 {

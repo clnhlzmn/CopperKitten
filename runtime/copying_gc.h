@@ -14,16 +14,16 @@ extern "C" {
 struct gc {
     //PRIVATE
     //pointers to semispaces
-    uintptr_t *a_space;
-    uintptr_t *b_space;
+    intptr_t *a_space;
+    intptr_t *b_space;
     //size of each space (equal)
     size_t size;
     //to keep track of allocation and 
     //collection
-    uintptr_t *alloc_ptr;
-    uintptr_t *scan_ptr;
-    uintptr_t *alloc_begin;
-    uintptr_t *alloc_end;
+    intptr_t *alloc_ptr;
+    intptr_t *scan_ptr;
+    intptr_t *alloc_begin;
+    intptr_t *alloc_end;
     //PRIVATE
 };
 
