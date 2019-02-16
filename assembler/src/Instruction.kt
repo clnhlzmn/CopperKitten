@@ -52,7 +52,7 @@ data class LiteralLabelInstruction(val name: String, val label: String) : Instru
             pc.instructions
                 .slice(0 until targetIndex)
                 .map { inst -> inst.size(tc) }
-                .reduce { acc, i -> acc + i }
+                .fold(0) { acc, i -> acc + i }
         if (!checkSize(adjustedTargetIndex, tc)) {
             //TODO handle this better
             throw RuntimeException("label index too large")
@@ -71,7 +71,7 @@ data class LayoutInstruction(val layout: List<Int>) : Instruction {
     }
 
     override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
-        oc.layoutFunctions.add(LayoutFunction(layout))
+        oc.frameLayouts.add(FrameLayout(layout))
         //todo: emit code
     }
 }

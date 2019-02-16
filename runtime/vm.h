@@ -49,7 +49,7 @@ enum vm_op_code {
     CMP,        //[...|lhs|rhs]->[...|lhs<rhs?-1:lhs>rhs?1:0]
     CALL,       //jump to the address on the stack and push current address
     RET,        //pop address from the stack and jump to it
-    JUMP,       //jump to the address formed from pc+offset where offset is the word following JMP
+    JUMP,       //jump to the address following JMP
     JUMPZ,      //same as JMP if tos is zero
     JUMPNZ,     //same as JMP if toz is not zero
     PUSH,       //push the next word in the instruction stream
