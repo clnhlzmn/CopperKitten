@@ -165,6 +165,18 @@ public interface ckaListener extends ParseTreeListener {
 	 */
 	void exitRefArrayLayout(ckaParser.RefArrayLayoutContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code emptyCustomLayout}
+	 * labeled alternative in {@link ckaParser#allocLayout}.
+	 * @param ctx the parse tree
+	 */
+	void enterEmptyCustomLayout(ckaParser.EmptyCustomLayoutContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code emptyCustomLayout}
+	 * labeled alternative in {@link ckaParser#allocLayout}.
+	 * @param ctx the parse tree
+	 */
+	void exitEmptyCustomLayout(ckaParser.EmptyCustomLayoutContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code customLayout}
 	 * labeled alternative in {@link ckaParser#allocLayout}.
 	 * @param ctx the parse tree

@@ -1,3 +1,4 @@
+
 class FileVisitor : ckaBaseVisitor<ParseContext>() {
 
     override fun visitFile(ctx: ckaParser.FileContext?): ParseContext {
@@ -35,34 +36,35 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
     }
 
     override fun visitLayoutInst(ctx: ckaParser.LayoutInstContext?) {
-        pc.instructions.add(LayoutInstruction(FrameLayoutVisitor().visit(ctx!!.frameLayout())))
+        pc.instructions.add(LayoutInstruction("layout", FrameLayoutVisitor().visit(ctx!!.frameLayout())))
     }
 
     override fun visitAllocInst(ctx: ckaParser.AllocInstContext?) {
-        pc.instructions.add(AllocInstruction(AllocLayoutVisitor().visit(ctx!!.allocLayout())))
+        pc.instructions.add(LayoutInstruction("alloc", AllocLayoutVisitor().visit(ctx!!.allocLayout())))
     }
 
 }
 
-class FrameLayoutVisitor : ckaBaseVisitor<List<Int>>() {
-    override fun visitEmptyFrameLayout(ctx: ckaParser.EmptyFrameLayoutContext?): List<Int> {
-        return ArrayList()
+open class FrameLayoutVisitor : ckaBaseVisitor<LayoutFunction>() {
+    override fun visitEmptyFrameLayout(ctx: ckaParser.EmptyFrameLayoutContext?): LayoutFunction {
+        return CustomLayoutFunction(ArrayList())
     }
 
-    override fun visitNonEmptyFrameLayout(ctx: ckaParser.NonEmptyFrameLayoutContext?): List<Int> {
-        return ctx!!.NATURAL().map { node -> node.text.toInt() }
+    override fun visitNonEmptyFrameLayout(ctx: ckaParser.NonEmptyFrameLayoutContext?): LayoutFunction {
+        return CustomLayoutFunction(ctx!!.NATURAL().map { node -> node.text.toInt() })
     }
 }
 
-class AllocLayoutVisitor : ckaBaseVisitor<AllocLayout>() {
-    override fun visitRefArrayLayout(ctx: ckaParser.RefArrayLayoutContext?): AllocLayout {
-        return RefArrayLayout(ctx!!.NATURAL().text.toInt())
+class AllocLayoutVisitor : FrameLayoutVisitor() {
+    override fun visitRefArrayLayout(ctx: ckaParser.RefArrayLayoutContext?): LayoutFunction {
+        return RefArrayLayoutFunction
     }
 
-    override fun visitCustomLayout(ctx: ckaParser.CustomLayoutContext?): AllocLayout {
-        return CustomLayout(
-            ctx!!.NATURAL().first().text.toInt(),
-            ctx.NATURAL().subList(1, ctx.NATURAL().size).map { node -> node.text.toInt() }
-        )
+    override fun visitEmptyCustomLayout(ctx: ckaParser.EmptyCustomLayoutContext?): LayoutFunction {
+        return CustomLayoutFunction(ArrayList())
+    }
+
+    override fun visitCustomLayout(ctx: ckaParser.CustomLayoutContext?): LayoutFunction {
+        return CustomLayoutFunction(ctx!!.NATURAL().map { n -> n.text.toInt() })
     }
 }

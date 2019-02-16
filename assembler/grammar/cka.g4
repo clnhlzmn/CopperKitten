@@ -63,7 +63,8 @@ frameLayout
     ;
 
 allocLayout
-    : '[' NATURAL ',' '*' ']'               #refArrayLayout
+    : '[' '*' ']'                           #refArrayLayout
+    | '[' ']'                               #emptyCustomLayout
     | '[' NATURAL ( ',' NATURAL )* ']'      #customLayout
     ;
 

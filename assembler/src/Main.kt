@@ -4,6 +4,8 @@ val stream = CharStreams.fromString(
     "Main:\n" +
         "enter\n" +
         "layout [ 0, 1, 10 ]\n" +
+        "alloc [1, 2]\n" +
+        "alloc [*]\n" +
         "leave\n" +
         "jump Main"
 )

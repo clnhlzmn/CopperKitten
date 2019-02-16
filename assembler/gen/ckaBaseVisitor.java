@@ -114,6 +114,13 @@ public class ckaBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements ck
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitEmptyCustomLayout(ckaParser.EmptyCustomLayoutContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitCustomLayout(ckaParser.CustomLayoutContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

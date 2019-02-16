@@ -103,6 +103,13 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRefArrayLayout(ckaParser.RefArrayLayoutContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code emptyCustomLayout}
+	 * labeled alternative in {@link ckaParser#allocLayout}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEmptyCustomLayout(ckaParser.EmptyCustomLayoutContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code customLayout}
 	 * labeled alternative in {@link ckaParser#allocLayout}.
 	 * @param ctx the parse tree

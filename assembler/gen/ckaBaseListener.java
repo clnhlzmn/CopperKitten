@@ -183,6 +183,18 @@ public class ckaBaseListener implements ckaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterEmptyCustomLayout(ckaParser.EmptyCustomLayoutContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEmptyCustomLayout(ckaParser.EmptyCustomLayoutContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterCustomLayout(ckaParser.CustomLayoutContext ctx) { }
 	/**
 	 * {@inheritDoc}

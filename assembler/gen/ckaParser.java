@@ -752,7 +752,6 @@ public class ckaParser extends Parser {
 		}
 	}
 	public static class RefArrayLayoutContext extends AllocLayoutContext {
-		public TerminalNode NATURAL() { return getToken(ckaParser.NATURAL, 0); }
 		public RefArrayLayoutContext(AllocLayoutContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -765,6 +764,22 @@ public class ckaParser extends Parser {
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof ckaVisitor ) return ((ckaVisitor<? extends T>)visitor).visitRefArrayLayout(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class EmptyCustomLayoutContext extends AllocLayoutContext {
+		public EmptyCustomLayoutContext(AllocLayoutContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof ckaListener ) ((ckaListener)listener).enterEmptyCustomLayout(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof ckaListener ) ((ckaListener)listener).exitEmptyCustomLayout(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ckaVisitor ) return ((ckaVisitor<? extends T>)visitor).visitEmptyCustomLayout(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -804,18 +819,24 @@ public class ckaParser extends Parser {
 				setState(82);
 				match(T__29);
 				setState(83);
-				match(NATURAL);
-				setState(84);
-				match(T__31);
-				setState(85);
 				match(T__32);
-				setState(86);
+				setState(84);
 				match(T__30);
 				}
 				break;
 			case 2:
-				_localctx = new CustomLayoutContext(_localctx);
+				_localctx = new EmptyCustomLayoutContext(_localctx);
 				enterOuterAlt(_localctx, 2);
+				{
+				setState(85);
+				match(T__29);
+				setState(86);
+				match(T__30);
+				}
+				break;
+			case 3:
+				_localctx = new CustomLayoutContext(_localctx);
+				enterOuterAlt(_localctx, 3);
 				{
 				setState(87);
 				match(T__29);
@@ -916,7 +937,7 @@ public class ckaParser extends Parser {
 		"\3\7\3\7\3\b\3\b\3\b\3\b\3\b\3\b\7\bM\n\b\f\b\16\bP\13\b\3\b\5\bS\n\b"+
 		"\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\7\t^\n\t\f\t\16\ta\13\t\3\t\5\td"+
 		"\n\t\3\n\5\ng\n\n\3\n\3\n\3\n\2\2\13\2\4\6\b\n\f\16\20\22\2\5\3\2\6\t"+
-		"\4\2\6\6\n\r\3\2\16\37\2p\2\27\3\2\2\2\4%\3\2\2\2\6>\3\2\2\2\b@\3\2\2"+
+		"\4\2\6\6\n\r\3\2\16\37\2q\2\27\3\2\2\2\4%\3\2\2\2\6>\3\2\2\2\b@\3\2\2"+
 		"\2\nB\3\2\2\2\fD\3\2\2\2\16R\3\2\2\2\20c\3\2\2\2\22f\3\2\2\2\24\26\7\'"+
 		"\2\2\25\24\3\2\2\2\26\31\3\2\2\2\27\25\3\2\2\2\27\30\3\2\2\2\30\33\3\2"+
 		"\2\2\31\27\3\2\2\2\32\34\5\4\3\2\33\32\3\2\2\2\33\34\3\2\2\2\34 \3\2\2"+
@@ -930,10 +951,11 @@ public class ckaParser extends Parser {
 		"@A\t\2\2\2A\t\3\2\2\2BC\t\3\2\2C\13\3\2\2\2DE\t\4\2\2E\r\3\2\2\2FG\7 "+
 		"\2\2GS\7!\2\2HI\7 \2\2IN\7%\2\2JK\7\"\2\2KM\7%\2\2LJ\3\2\2\2MP\3\2\2\2"+
 		"NL\3\2\2\2NO\3\2\2\2OQ\3\2\2\2PN\3\2\2\2QS\7!\2\2RF\3\2\2\2RH\3\2\2\2"+
-		"S\17\3\2\2\2TU\7 \2\2UV\7%\2\2VW\7\"\2\2WX\7#\2\2Xd\7!\2\2YZ\7 \2\2Z_"+
-		"\7%\2\2[\\\7\"\2\2\\^\7%\2\2][\3\2\2\2^a\3\2\2\2_]\3\2\2\2_`\3\2\2\2`"+
-		"b\3\2\2\2a_\3\2\2\2bd\7!\2\2cT\3\2\2\2cY\3\2\2\2d\21\3\2\2\2eg\7$\2\2"+
-		"fe\3\2\2\2fg\3\2\2\2gh\3\2\2\2hi\7%\2\2i\23\3\2\2\2\r\27\33 ).>NR_cf";
+		"S\17\3\2\2\2TU\7 \2\2UV\7#\2\2Vd\7!\2\2WX\7 \2\2Xd\7!\2\2YZ\7 \2\2Z_\7"+
+		"%\2\2[\\\7\"\2\2\\^\7%\2\2][\3\2\2\2^a\3\2\2\2_]\3\2\2\2_`\3\2\2\2`b\3"+
+		"\2\2\2a_\3\2\2\2bd\7!\2\2cT\3\2\2\2cW\3\2\2\2cY\3\2\2\2d\21\3\2\2\2eg"+
+		"\7$\2\2fe\3\2\2\2fg\3\2\2\2gh\3\2\2\2hi\7%\2\2i\23\3\2\2\2\r\27\33 )."+
+		">NR_cf";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
