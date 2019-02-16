@@ -22,20 +22,16 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
         pc.labels[ctx!!.LABEL().text] = pc.instructions.count()
     }
 
-    override fun visitPushIntInst(ctx: ckaParser.PushIntInstContext?) {
-        pc.instructions.add(PushIntInstruction(ctx!!.integer().text.toInt()))
-    }
-
-    override fun visitPushLabelInst(ctx: ckaParser.PushLabelInstContext?) {
-        pc.instructions.add(LiteralLabelInstruction("push", ctx!!.LABEL().text))
-    }
-
     override fun visitSimpleInst(ctx: ckaParser.SimpleInstContext?) {
         pc.instructions.add(SimpleInstruction(ctx!!.simpleInstruction().text))
     }
 
-    override fun visitJumpInst(ctx: ckaParser.JumpInstContext?) {
-        pc.instructions.add(LiteralLabelInstruction(ctx!!.jumpMnemonic().text, ctx.LABEL().text))
+    override fun visitLiteralIntInst(ctx: ckaParser.LiteralIntInstContext?) {
+        pc.instructions.add(LiteralIntInstruction(ctx!!.literalIntMnemonic().text, ctx.integer().text.toInt()))
+    }
+
+    override fun visitLiteralLabelInst(ctx: ckaParser.LiteralLabelInstContext?) {
+        pc.instructions.add(LiteralLabelInstruction(ctx!!.literalLabelMnemonic().text, ctx.LABEL().text))
     }
 
     override fun visitLayoutInst(ctx: ckaParser.LayoutInstContext?) {

@@ -51,30 +51,6 @@ public class ckaBaseListener implements ckaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPushIntInst(ckaParser.PushIntInstContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPushIntInst(ckaParser.PushIntInstContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterPushLabelInst(ckaParser.PushLabelInstContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPushLabelInst(ckaParser.PushLabelInstContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterSimpleInst(ckaParser.SimpleInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -87,13 +63,25 @@ public class ckaBaseListener implements ckaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterJumpInst(ckaParser.JumpInstContext ctx) { }
+	@Override public void enterLiteralIntInst(ckaParser.LiteralIntInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitJumpInst(ckaParser.JumpInstContext ctx) { }
+	@Override public void exitLiteralIntInst(ckaParser.LiteralIntInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLiteralLabelInst(ckaParser.LiteralLabelInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLiteralLabelInst(ckaParser.LiteralLabelInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -123,13 +111,25 @@ public class ckaBaseListener implements ckaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterJumpMnemonic(ckaParser.JumpMnemonicContext ctx) { }
+	@Override public void enterLiteralLabelMnemonic(ckaParser.LiteralLabelMnemonicContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitJumpMnemonic(ckaParser.JumpMnemonicContext ctx) { }
+	@Override public void exitLiteralLabelMnemonic(ckaParser.LiteralLabelMnemonicContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLiteralIntMnemonic(ckaParser.LiteralIntMnemonicContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLiteralIntMnemonic(ckaParser.LiteralIntMnemonicContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

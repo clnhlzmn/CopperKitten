@@ -14,18 +14,26 @@ instructions
 
 instruction
     : LABEL ':'                     #labelInst
-    | 'push' integer                #pushIntInst
-    | 'push' LABEL                  #pushLabelInst
     | simpleInstruction             #simpleInst
-    | jumpMnemonic LABEL            #jumpInst
+    | literalIntMnemonic integer    #literalIntInst
+    | literalLabelMnemonic LABEL    #literalLabelInst
     | 'layout' frameLayout          #layoutInst
     | 'alloc' allocLayout           #allocInst
     ;
 
-jumpMnemonic
-    : 'jump'
+literalLabelMnemonic
+    : 'push'
+    | 'jump'
     | 'jumpz'
     | 'jumpnz'
+    ;
+
+literalIntMnemonic
+    : 'push'
+    | 'lload'
+    | 'lstore'
+    | 'rload'
+    | 'rstore'
     ;
 
 simpleInstruction
@@ -46,10 +54,6 @@ simpleInstruction
     | 'leave'
     | 'in'
     | 'out'
-    | 'fload'
-    | 'fstore'
-    | 'rload'
-    | 'rstore'
     | 'nop'
     ;
 

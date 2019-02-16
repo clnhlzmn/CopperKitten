@@ -5,8 +5,8 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  * This interface defines a complete generic visitor for a parse tree produced
  * by {@link ckaParser}.
  *
- * @param <T> The return name of the visit operation. Use {@link Void} for
- * operations with no return name.
+ * @param <T> The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
  */
 public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	/**
@@ -29,20 +29,6 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLabelInst(ckaParser.LabelInstContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code pushIntInst}
-	 * labeled alternative in {@link ckaParser#instruction}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPushIntInst(ckaParser.PushIntInstContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code pushLabelInst}
-	 * labeled alternative in {@link ckaParser#instruction}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPushLabelInst(ckaParser.PushLabelInstContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code simpleInst}
 	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
@@ -50,12 +36,19 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSimpleInst(ckaParser.SimpleInstContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code jumpInst}
+	 * Visit a parse tree produced by the {@code literalIntInst}
 	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitJumpInst(ckaParser.JumpInstContext ctx);
+	T visitLiteralIntInst(ckaParser.LiteralIntInstContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code literalLabelInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteralLabelInst(ckaParser.LiteralLabelInstContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code layoutInst}
 	 * labeled alternative in {@link ckaParser#instruction}.
@@ -71,11 +64,17 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAllocInst(ckaParser.AllocInstContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ckaParser#jumpMnemonic}.
+	 * Visit a parse tree produced by {@link ckaParser#literalLabelMnemonic}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitJumpMnemonic(ckaParser.JumpMnemonicContext ctx);
+	T visitLiteralLabelMnemonic(ckaParser.LiteralLabelMnemonicContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ckaParser#literalIntMnemonic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteralIntMnemonic(ckaParser.LiteralIntMnemonicContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ckaParser#simpleInstruction}.
 	 * @param ctx the parse tree

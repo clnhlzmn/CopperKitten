@@ -21,7 +21,7 @@ data class SimpleInstruction(val name: String) : Instruction {
     }
 }
 
-data class PushIntInstruction(val data: Int) : Instruction {
+data class LiteralIntInstruction(val mnemonic: String, val data: Int) : Instruction {
 
     override fun size(tc: TargetContext): Int {
         return 1 + tc.wordSize
@@ -32,7 +32,7 @@ data class PushIntInstruction(val data: Int) : Instruction {
             //TODO handle this better
             throw RuntimeException("literal too large")
         }
-        oc.program.append("${tc.convert("push")}, " +
+        oc.program.append("${tc.convert(mnemonic)}, " +
             (0 until tc.wordSize)
                 .map { i -> (data shr i * 8 and 0xFF).toString() }
                 .reduce { acc, s -> "$acc, $s" } + ",")
@@ -40,7 +40,7 @@ data class PushIntInstruction(val data: Int) : Instruction {
 }
 
 //to be used for push Label and jumpxx Label
-data class LiteralLabelInstruction(val name: String, val label: String) : Instruction {
+data class LiteralLabelInstruction(val mnemonic: String, val label: String) : Instruction {
     override fun size(tc: TargetContext): Int {
         return 1 + tc.wordSize
     }
@@ -57,7 +57,7 @@ data class LiteralLabelInstruction(val name: String, val label: String) : Instru
             //TODO handle this better
             throw RuntimeException("label index too large")
         }
-        oc.program.append("${tc.convert(name)}, " +
+        oc.program.append("${tc.convert(mnemonic)}, " +
             (0 until tc.wordSize)
                 .map { i -> "((${tc.programBaseAddress} + $adjustedTargetIndex) >> ($i * 8)) & 0xFF" }
                 .reduce { acc, s -> "$acc, $s" } + ", ")
