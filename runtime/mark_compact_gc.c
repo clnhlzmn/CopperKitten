@@ -1,6 +1,7 @@
 
 
 #include "mark_compact_gc.h"
+#include "c_static_assert.h"
 #include <stdio.h>
 #include <assert.h>
 #include <limits.h>
@@ -18,7 +19,7 @@ struct gc_object {
 
 #define META_SIZE (sizeof(struct gc_object) / sizeof(intptr_t))
 
-_Static_assert(META_SIZE == 3, "struct gc_object wrong size");
+C_STATIC_ASSERT(META_SIZE == 3, mark_compact_gc);
 
 //convert a user pointer to an allocation pointer
 static inline struct gc_object *get_gc_ptr(intptr_t *user) {

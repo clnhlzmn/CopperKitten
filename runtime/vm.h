@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "gc.h"
+#include "gc_interface.h"
 
 #ifndef VM_DEREF_IP
 #define VM_DEREF_IP(ip) (*(ip))
@@ -17,9 +17,8 @@ struct vm {
     struct gc *gc;
     uint8_t *ip;
     intptr_t *sp;
-    intptr_t *sb;
     size_t size;
-    intptr_t *frame;
+    intptr_t *fp;
 };
 
 static inline void vm_init(
@@ -33,9 +32,8 @@ static inline void vm_init(
     assert(stack);
     self->ip = NULL;
     self->gc = gc;
-    self->sb = self->sp = stack;
     self->size = size;
-    self->frame = NULL;
+    self->fp = NULL;
 }
 
 enum vm_op_code {
@@ -138,15 +136,6 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
                                                     : 0;
             self->sp--;
             break;
-        case IP:
-            printf("ip: %p\r\n", self->ip);
-            *self->sp = (intptr_t)self->ip;
-            self->sp++;
-            break;
-        case FP:
-            *self->sp = (intptr_t)self->frame;
-            self->sp++;
-            break;
         case JUMP: 
             self->ip = (uint8_t*)vm_get_word(self);
             break;
@@ -181,20 +170,20 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             *(self->sp - 2) = *(self->sp - 1);
             break;
         case ENTER:
-            *self->sp = (intptr_t)self->frame;
-            self->frame = self->sp;
+            *self->sp = (intptr_t)self->fp;
+            self->fp = self->sp;
             self->sp++;
             *self->sp = 0;
             self->sp++;
             break;
         case LEAVE:
             self->sp--;
-            self->frame = (intptr_t*)*(self->sp - 1);
+            self->fp = (intptr_t*)*(self->sp - 1);
             self->sp--;
             break;
         case IN: {
             char c;
-            scanf("%c", &c);
+            sscanf_s("%c", &c, 1);
             *self->sp = c;
             self->sp++;
             break;
@@ -205,7 +194,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case LAYOUT:
             //set the first cell in the frame to the layout function pointer following ip
-            *(self->frame + 1) = vm_get_word(self);
+            *(self->fp + 1) = vm_get_word(self);
             break;
         case ALLOC:
             //TODO: foreach_t funtion for this guy
