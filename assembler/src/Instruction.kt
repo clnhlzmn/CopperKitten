@@ -11,13 +11,13 @@ interface Instruction {
     fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext)
 }
 
-data class SimpleInstruction(val name: String) : Instruction {
+data class SimpleInstruction(val mnemonic: String) : Instruction {
     override fun size(tc: TargetContext): Int {
         return 1;
     }
 
     override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
-        oc.program.append(tc.convert(name) + ",")
+        oc.program.add(tc.convert(mnemonic))
     }
 }
 
@@ -32,10 +32,11 @@ data class LiteralIntInstruction(val mnemonic: String, val data: Int) : Instruct
             //TODO handle this better
             throw RuntimeException("literal too large")
         }
-        oc.program.append("${tc.convert(mnemonic)}, " +
+        oc.program.add(tc.convert(mnemonic))
+        oc.program.addAll(
             (0 until tc.wordSize)
                 .map { i -> (data shr i * 8 and 0xFF).toString() }
-                .reduce { acc, s -> "$acc, $s" } + ",")
+        )
     }
 }
 
@@ -57,10 +58,11 @@ data class LiteralLabelInstruction(val mnemonic: String, val label: String) : In
             //TODO handle this better
             throw RuntimeException("label index too large")
         }
-        oc.program.append("${tc.convert(mnemonic)}, " +
+        oc.program.add(tc.convert(mnemonic))
+        oc.program.addAll(
             (0 until tc.wordSize)
                 .map { i -> "((${tc.programBaseAddress} + $adjustedTargetIndex) >> ($i * 8)) & 0xFF" }
-                .reduce { acc, s -> "$acc, $s" } + ", ")
+        )
     }
 }
 
@@ -74,7 +76,11 @@ data class LayoutInstruction(val mnemonic: String, val layout: LayoutFunction) :
 
     override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
         oc.layoutFunctions.add(layout)
-        //todo: emit code
+        oc.program.add(tc.convert(mnemonic))
+        oc.program.addAll(
+            (0 until tc.wordSize)
+                .map { i -> "(${layout.name()} >> ($i * 8)) & 0xFF" }
+        )
     }
 }
 

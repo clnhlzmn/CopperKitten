@@ -24,6 +24,7 @@
 //when the gc calls a heap object layout function the heap object user address is passed as foreach_ctx
 interface LayoutFunction {
     fun name(): String
+    fun emit(): String
 }
 
 data class CustomLayoutFunction(val layout: List<Int>) : LayoutFunction {
@@ -31,7 +32,7 @@ data class CustomLayoutFunction(val layout: List<Int>) : LayoutFunction {
         return "gen_layout${layout.map { i -> i.toString() }.fold("") { acc, s -> "${acc}_$s" }}"
     }
 
-    override fun toString(): String {
+    override fun emit(): String {
         return "static inline void ${name()}(void (*cb)(intptr_t **it, void *ctx), void *cb_ctx, void *foreach_ctx) {\n" +
             "\tintptr_t **base_ptr = (intptr_t**)foreach_ctx;\n" +
             layout.map { i -> "\tcb(&base_ptr[${i}], cb_ctx);\n" }.fold(""){acc, s -> "$acc$s"} +
@@ -45,9 +46,8 @@ object RefArrayLayoutFunction : LayoutFunction {
         return "gc_layout_ref_array"
     }
 
-    override fun toString(): String {
+    override fun emit(): String {
         //don't have to implement this function it's implemented in gc_interface.h
-        //just provide declaration here
-        return "static inline void ${name()}(void (*)(intptr_t **, void *), void *, void *);\n"
+        return ""
     }
 }

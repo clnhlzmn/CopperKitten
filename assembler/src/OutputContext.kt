@@ -5,10 +5,12 @@ class OutputContext {
     //where layout functions are stored
     val layoutFunctions = HashSet<LayoutFunction>()
     //where the program array goes
-    val program = StringBuilder()
+    val program = ArrayList<String>()
 
     override fun toString(): String {
-        return "${layoutFunctions.map { lf -> lf.toString() }.fold("") { acc, s -> "$acc\n$s"}}\n" +
-                "uint8_t program[] = {$program};"
+        return "${layoutFunctions.map { lf -> lf.emit() }.fold("") { acc, s -> "$acc\n$s"}}\n" +
+            "uint8_t program[] = {\n" +
+            program.map { op -> "\t$op,\n" }.fold("") { acc, s -> acc + s } +
+            "};"
     }
 }
