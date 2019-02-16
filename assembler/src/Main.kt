@@ -21,5 +21,5 @@ fun main() {
     for (inst in pc.instructions) {
         inst.emit(pc, tc, oc)
     }
-    println(oc)
+    println(oc.emit())
 }
