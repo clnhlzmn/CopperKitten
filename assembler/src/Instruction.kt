@@ -1,6 +1,6 @@
 import java.lang.Math.pow
 
-fun checkSize(i: Int, tc: TargetContext):Boolean {
+fun checkSize(i: Long, tc: TargetContext):Boolean {
     val max = pow(2.0, (tc.wordSize.toDouble() * 8) - 1) - 1
     val min = -pow(2.0, (tc.wordSize.toDouble() * 8) - 1)
     return i >= min && i <= max
@@ -22,7 +22,7 @@ data class SimpleInstruction(val mnemonic: String) : Instruction {
 }
 
 //TODO: LiteralInt and LiteralLabel have to use an integer size that is at least as large as targetWordSize
-data class LiteralIntInstruction(val mnemonic: String, val data: Int) : Instruction {
+data class LiteralIntInstruction(val mnemonic: String, val data: Long) : Instruction {
 
     override fun size(tc: TargetContext): Int {
         return 1 + tc.wordSize
@@ -55,6 +55,7 @@ data class LiteralLabelInstruction(val mnemonic: String, val label: String) : In
                 .slice(0 until targetIndex)
                 .map { inst -> inst.size(tc) }
                 .fold(0) { acc, i -> acc + i }
+                .toLong()
         if (!checkSize(actualTargetIndex, tc)) {
             //TODO handle this better
             throw RuntimeException("label index too large")
@@ -80,7 +81,7 @@ data class LayoutInstruction(val mnemonic: String, val layout: LayoutFunction) :
         oc.program.add(tc.convert(mnemonic))
         oc.program.addAll(
             (0 until tc.wordSize)
-                .map { i -> "($layoutIndex >> ($i * 8)) & 0xFF" }
+                .map { i -> (layoutIndex shr i * 8 and 0xFF).toString() }
         )
     }
 }

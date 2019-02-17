@@ -28,7 +28,7 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
     }
 
     override fun visitLiteralIntInst(ctx: ckaParser.LiteralIntInstContext?) {
-        pc.instructions.add(LiteralIntInstruction(ctx!!.literalIntMnemonic().text, ctx.integer().text.toInt()))
+        pc.instructions.add(LiteralIntInstruction(ctx!!.literalIntMnemonic().text, ctx.integer().text.toLong()))
     }
 
     override fun visitLiteralLabelInst(ctx: ckaParser.LiteralLabelInstContext?) {
