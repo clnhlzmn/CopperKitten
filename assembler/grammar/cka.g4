@@ -55,6 +55,7 @@ simpleInstruction
     | 'in'
     | 'out'
     | 'nop'
+    | 'halt'
     ;
 
 frameLayout

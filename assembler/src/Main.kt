@@ -1,10 +1,21 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "Main:\n" +
+    "push -1\n" +   //start at -1
+        "Loop:\n" +     //begin loop here
+        "push 1\n" +
+        "add\n" +       //add 1
+        "dup\n" +
+        "push 26\n" +
+        "cmp\n" +       //cmp to 27
+        "jumpz End\n" + //if equal then end
+        "dup\n" +
         "push 65\n" +
-        "out\n" +
-        "jump Main"
+        "add\n" +       //else add 'A'
+        "out\n" +       //print
+        "jump Loop\n" +
+        "End:\n" +
+        "halt"
 )
 val lexer = ckaLexer(stream)
 val tokens = CommonTokenStream(lexer)

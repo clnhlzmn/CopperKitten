@@ -73,6 +73,7 @@ enum vm_op_code {
     CSTORE,
     NCALL,      //[...|N]->[...], call the native function N i.e. (void(*)(void))*(sp-1)();
     NOP,        //
+    HALT,       //halt execution
 };
 
 static inline void vm_dispatch(struct vm *self, uint8_t instruction);
@@ -144,10 +145,10 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->ip = self->program + vm_get_word(self);
             break;
         case JUMPZ:
-            if (!*(self->sp - 1)) {
-                self->ip = self->program + vm_get_word(self);
-            } else {
+            if (*(self->sp - 1)) {
                 vm_get_word(self);
+            } else {
+                self->ip = self->program + vm_get_word(self);
             }
             self->sp--;
             break;
@@ -228,6 +229,9 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         }
         case NOP:
+            break;
+        case HALT:
+            self->ip = NULL;
             break;
     }
 }
