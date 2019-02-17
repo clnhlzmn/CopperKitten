@@ -14,26 +14,29 @@
 #endif
 
 struct vm {
-    struct gc *gc;
-    uint8_t *ip;
-    intptr_t *sp;
-    size_t size;
-    intptr_t *fp;
+    struct gc *gc;      //pointer to gc instance
+    uint8_t *program;   //pointer to program
+    uint8_t *ip;        //pointer to next instruction
+    intptr_t *sp;       //pointer to one above tos
+    intptr_t *fp;       //pointer to stack frame
+    foreach_t *layouts; //pointer to array of layout functions
 };
 
 static inline void vm_init(
-    struct vm *self, 
-    struct gc *gc, 
-    intptr_t *stack, 
-    size_t size)
+    struct vm *self,
+    struct gc *gc,
+    intptr_t *stack,
+    foreach_t *layouts)
 {
     assert(self);
     assert(gc);
     assert(stack);
+    self->program = NULL;
     self->ip = NULL;
+    self->sp = stack;
     self->gc = gc;
-    self->size = size;
     self->fp = NULL;
+    self->layouts = layouts;
 }
 
 enum vm_op_code {
@@ -75,10 +78,11 @@ enum vm_op_code {
 static inline void vm_dispatch(struct vm *self, uint8_t instruction);
 
 static inline void vm_execute(struct vm *self, uint8_t *code) {
+    self->program = code;
     for (self->ip = code; self->ip; ) {
         uint8_t inst = VM_DEREF_IP(self->ip);
         //increment self->ip here so its before Dispatch gets it (where it might be modified)
-        printf("vm_execute %p\r\n", self->ip);
+        //printf("vm_execute %p\r\n", self->ip);
         self->ip++;
         vm_dispatch(self, inst);
     }
@@ -137,11 +141,11 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp--;
             break;
         case JUMP: 
-            self->ip = (uint8_t*)vm_get_word(self);
+            self->ip = self->program + vm_get_word(self);
             break;
         case JUMPZ:
             if (!*(self->sp - 1)) {
-                self->ip = (uint8_t*)vm_get_word(self);
+                self->ip = self->program + vm_get_word(self);
             } else {
                 vm_get_word(self);
             }
@@ -149,7 +153,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case JUMPNZ:
             if (*(self->sp - 1)) {
-                self->ip = (uint8_t*)vm_get_word(self);
+                self->ip = self->program + vm_get_word(self);
             } else {
                 vm_get_word(self);
             }
@@ -193,20 +197,19 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp--;
             break;
         case LAYOUT:
-            //set the first cell in the frame to the layout function pointer following ip
-            *(self->fp + 1) = vm_get_word(self);
+            //set the first cell in the frame to the layout function found using the index in the word following ip
+            *(self->fp + 1) = (intptr_t)self->layouts[vm_get_word(self)];
             break;
         case ALLOC:
-            //TODO: foreach_t funtion for this guy
-            *(self->sp - 2) = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 2), (void*)*(self->sp - 1));
-            self->sp--;
+            //TODO: foreach_t funtion for this guy: traverse frames and call frame layout function for each
+            *(self->sp - 1) = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 1), self->layouts[vm_get_word(self)]);
             break;
         case LLOAD:
-            *self->sp = *(self->fp + vm_get_word(self) + 1);
+            *self->sp = *(self->fp + vm_get_word(self) + 2);
             self->sp++;
             break;
         case LSTORE:
-            *(self->fp + vm_get_word(self) + 1) = *(self->sp - 1);
+            *(self->fp + vm_get_word(self) + 2) = *(self->sp - 1);
             self->sp--;
             break;
         case RLOAD:

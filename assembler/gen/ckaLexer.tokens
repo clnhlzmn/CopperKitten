@@ -36,7 +36,6 @@ NATURAL=35
 LABEL=36
 NL=37
 WHITESPACE=38
-COMMENT=39
 ':'=1
 'layout'=2
 'alloc'=3

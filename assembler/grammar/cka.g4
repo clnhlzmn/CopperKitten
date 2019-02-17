@@ -78,4 +78,3 @@ LABEL : ('A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 NL : '\n'|'\r\n' ;
 
 WHITESPACE : (' '|'\t'|'\u000C') -> skip ;
-COMMENT : '//' ~('\n'|'\r')* '\r'? '\n' -> skip ;
