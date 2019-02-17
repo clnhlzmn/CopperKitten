@@ -49,19 +49,19 @@ data class LiteralLabelInstruction(val mnemonic: String, val label: String) : In
     override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
         val targetIndex = pc.labels[label]!!
         //add the sizes of all the instructions from 0 until targetIndex
-        val adjustedTargetIndex =
+        val actualTargetIndex =
             pc.instructions
                 .slice(0 until targetIndex)
                 .map { inst -> inst.size(tc) }
                 .fold(0) { acc, i -> acc + i }
-        if (!checkSize(adjustedTargetIndex, tc)) {
+        if (!checkSize(actualTargetIndex, tc)) {
             //TODO handle this better
             throw RuntimeException("label index too large")
         }
         oc.program.add(tc.convert(mnemonic))
         oc.program.addAll(
             (0 until tc.wordSize)
-                .map { i -> "((${tc.programBaseAddress} + $adjustedTargetIndex) >> ($i * 8)) & 0xFF" }
+                .map { i -> "($actualTargetIndex >> ($i * 8)) & 0xFF" }
         )
     }
 }
@@ -75,11 +75,11 @@ data class LayoutInstruction(val mnemonic: String, val layout: LayoutFunction) :
     }
 
     override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
-        oc.layoutFunctions.add(layout)
+        val layoutIndex = oc.addLayout(layout)
         oc.program.add(tc.convert(mnemonic))
         oc.program.addAll(
             (0 until tc.wordSize)
-                .map { i -> "(${layout.name()} >> ($i * 8)) & 0xFF" }
+                .map { i -> "($layoutIndex >> ($i * 8)) & 0xFF" }
         )
     }
 }

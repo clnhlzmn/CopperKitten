@@ -15,7 +15,7 @@ val parser = ckaParser(tokens)
 val context = parser.file()
 
 fun main() {
-    val tc = TargetContext("program", { mnemonic -> "(enum vm_op_code)${mnemonic.toUpperCase()}" }, 2)
+    val tc = TargetContext({ mnemonic -> "(enum vm_op_code)${mnemonic.toUpperCase()}" }, 4)
     val pc = FileVisitor().visit(context)
     val oc = OutputContext()
     for (inst in pc.instructions) {
