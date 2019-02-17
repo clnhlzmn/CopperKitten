@@ -20,7 +20,8 @@ public class ckaParser extends Parser {
 		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
 		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
 		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
-		T__31=32, T__32=33, T__33=34, T__34=35, NATURAL=36, LABEL=37, NL=38, WHITESPACE=39;
+		T__31=32, T__32=33, T__33=34, T__34=35, NATURAL=36, LABEL=37, WHITESPACE=38, 
+		COMMENT=39;
 	public static final int
 		RULE_file = 0, RULE_instructions = 1, RULE_instruction = 2, RULE_literalLabelMnemonic = 3, 
 		RULE_literalIntMnemonic = 4, RULE_simpleInstruction = 5, RULE_frameLayout = 6, 
@@ -48,7 +49,7 @@ public class ckaParser extends Parser {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
-			"NATURAL", "LABEL", "NL", "WHITESPACE"
+			"NATURAL", "LABEL", "WHITESPACE", "COMMENT"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -104,10 +105,6 @@ public class ckaParser extends Parser {
 
 	public static class FileContext extends ParserRuleContext {
 		public TerminalNode EOF() { return getToken(ckaParser.EOF, 0); }
-		public List<TerminalNode> NL() { return getTokens(ckaParser.NL); }
-		public TerminalNode NL(int i) {
-			return getToken(ckaParser.NL, i);
-		}
 		public InstructionsContext instructions() {
 			return getRuleContext(InstructionsContext.class,0);
 		}
@@ -135,50 +132,19 @@ public class ckaParser extends Parser {
 		enterRule(_localctx, 0, RULE_file);
 		int _la;
 		try {
-			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(21);
-			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,0,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
-				if ( _alt==1 ) {
-					{
-					{
-					setState(18);
-					match(NL);
-					}
-					} 
-				}
-				setState(23);
-				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,0,_ctx);
-			}
-			setState(25);
+			setState(19);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << LABEL))) != 0)) {
 				{
-				setState(24);
+				setState(18);
 				instructions();
 				}
 			}
 
-			setState(30);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==NL) {
-				{
-				{
-				setState(27);
-				match(NL);
-				}
-				}
-				setState(32);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-			}
-			setState(33);
+			setState(21);
 			match(EOF);
 			}
 		}
@@ -199,10 +165,6 @@ public class ckaParser extends Parser {
 		}
 		public InstructionContext instruction(int i) {
 			return getRuleContext(InstructionContext.class,i);
-		}
-		public List<TerminalNode> NL() { return getTokens(ckaParser.NL); }
-		public TerminalNode NL(int i) {
-			return getToken(ckaParser.NL, i);
 		}
 		public InstructionsContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -228,40 +190,23 @@ public class ckaParser extends Parser {
 		enterRule(_localctx, 2, RULE_instructions);
 		int _la;
 		try {
-			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(35);
+			setState(23);
 			instruction();
-			setState(44);
+			setState(27);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
-				if ( _alt==1 ) {
-					{
-					{
-					setState(37); 
-					_errHandler.sync(this);
-					_la = _input.LA(1);
-					do {
-						{
-						{
-						setState(36);
-						match(NL);
-						}
-						}
-						setState(39); 
-						_errHandler.sync(this);
-						_la = _input.LA(1);
-					} while ( _la==NL );
-					setState(41);
-					instruction();
-					}
-					} 
+			_la = _input.LA(1);
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << LABEL))) != 0)) {
+				{
+				{
+				setState(24);
+				instruction();
 				}
-				setState(46);
+				}
+				setState(29);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
+				_la = _input.LA(1);
 			}
 			}
 		}
@@ -408,16 +353,16 @@ public class ckaParser extends Parser {
 		InstructionContext _localctx = new InstructionContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_instruction);
 		try {
-			setState(60);
+			setState(43);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,5,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,2,_ctx) ) {
 			case 1:
 				_localctx = new LabelInstContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(47);
+				setState(30);
 				match(LABEL);
-				setState(48);
+				setState(31);
 				match(T__0);
 				}
 				break;
@@ -425,7 +370,7 @@ public class ckaParser extends Parser {
 				_localctx = new SimpleInstContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(49);
+				setState(32);
 				simpleInstruction();
 				}
 				break;
@@ -433,9 +378,9 @@ public class ckaParser extends Parser {
 				_localctx = new LiteralIntInstContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(50);
+				setState(33);
 				literalIntMnemonic();
-				setState(51);
+				setState(34);
 				integer();
 				}
 				break;
@@ -443,9 +388,9 @@ public class ckaParser extends Parser {
 				_localctx = new LiteralLabelInstContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(53);
+				setState(36);
 				literalLabelMnemonic();
-				setState(54);
+				setState(37);
 				match(LABEL);
 				}
 				break;
@@ -453,9 +398,9 @@ public class ckaParser extends Parser {
 				_localctx = new LayoutInstContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(56);
+				setState(39);
 				match(T__1);
-				setState(57);
+				setState(40);
 				frameLayout();
 				}
 				break;
@@ -463,9 +408,9 @@ public class ckaParser extends Parser {
 				_localctx = new AllocInstContext(_localctx);
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(58);
+				setState(41);
 				match(T__2);
-				setState(59);
+				setState(42);
 				allocLayout();
 				}
 				break;
@@ -509,7 +454,7 @@ public class ckaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(62);
+			setState(45);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -559,7 +504,7 @@ public class ckaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(64);
+			setState(47);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -609,7 +554,7 @@ public class ckaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(66);
+			setState(49);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -685,16 +630,16 @@ public class ckaParser extends Parser {
 		enterRule(_localctx, 12, RULE_frameLayout);
 		int _la;
 		try {
-			setState(80);
+			setState(63);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,7,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,4,_ctx) ) {
 			case 1:
 				_localctx = new EmptyFrameLayoutContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(68);
+				setState(51);
 				match(T__30);
-				setState(69);
+				setState(52);
 				match(T__31);
 				}
 				break;
@@ -702,27 +647,27 @@ public class ckaParser extends Parser {
 				_localctx = new NonEmptyFrameLayoutContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(70);
+				setState(53);
 				match(T__30);
-				setState(71);
+				setState(54);
 				match(NATURAL);
-				setState(76);
+				setState(59);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T__32) {
 					{
 					{
-					setState(72);
+					setState(55);
 					match(T__32);
-					setState(73);
+					setState(56);
 					match(NATURAL);
 					}
 					}
-					setState(78);
+					setState(61);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(79);
+				setState(62);
 				match(T__31);
 				}
 				break;
@@ -808,18 +753,18 @@ public class ckaParser extends Parser {
 		enterRule(_localctx, 14, RULE_allocLayout);
 		int _la;
 		try {
-			setState(97);
+			setState(80);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,9,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,6,_ctx) ) {
 			case 1:
 				_localctx = new RefArrayLayoutContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(82);
+				setState(65);
 				match(T__30);
-				setState(83);
+				setState(66);
 				match(T__33);
-				setState(84);
+				setState(67);
 				match(T__31);
 				}
 				break;
@@ -827,9 +772,9 @@ public class ckaParser extends Parser {
 				_localctx = new EmptyCustomLayoutContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(85);
+				setState(68);
 				match(T__30);
-				setState(86);
+				setState(69);
 				match(T__31);
 				}
 				break;
@@ -837,27 +782,27 @@ public class ckaParser extends Parser {
 				_localctx = new CustomLayoutContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(87);
+				setState(70);
 				match(T__30);
-				setState(88);
+				setState(71);
 				match(NATURAL);
-				setState(93);
+				setState(76);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T__32) {
 					{
 					{
-					setState(89);
+					setState(72);
 					match(T__32);
-					setState(90);
+					setState(73);
 					match(NATURAL);
 					}
 					}
-					setState(95);
+					setState(78);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(96);
+				setState(79);
 				match(T__31);
 				}
 				break;
@@ -902,17 +847,17 @@ public class ckaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(100);
+			setState(83);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==T__34) {
 				{
-				setState(99);
+				setState(82);
 				match(T__34);
 				}
 			}
 
-			setState(102);
+			setState(85);
 			match(NATURAL);
 			}
 		}
@@ -928,33 +873,28 @@ public class ckaParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3)k\4\2\t\2\4\3\t\3"+
-		"\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\3\2\7\2\26\n"+
-		"\2\f\2\16\2\31\13\2\3\2\5\2\34\n\2\3\2\7\2\37\n\2\f\2\16\2\"\13\2\3\2"+
-		"\3\2\3\3\3\3\6\3(\n\3\r\3\16\3)\3\3\7\3-\n\3\f\3\16\3\60\13\3\3\4\3\4"+
-		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4?\n\4\3\5\3\5\3\6\3\6"+
-		"\3\7\3\7\3\b\3\b\3\b\3\b\3\b\3\b\7\bM\n\b\f\b\16\bP\13\b\3\b\5\bS\n\b"+
-		"\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\7\t^\n\t\f\t\16\ta\13\t\3\t\5\td"+
-		"\n\t\3\n\5\ng\n\n\3\n\3\n\3\n\2\2\13\2\4\6\b\n\f\16\20\22\2\5\3\2\6\t"+
-		"\4\2\6\6\n\r\3\2\16 \2q\2\27\3\2\2\2\4%\3\2\2\2\6>\3\2\2\2\b@\3\2\2\2"+
-		"\nB\3\2\2\2\fD\3\2\2\2\16R\3\2\2\2\20c\3\2\2\2\22f\3\2\2\2\24\26\7(\2"+
-		"\2\25\24\3\2\2\2\26\31\3\2\2\2\27\25\3\2\2\2\27\30\3\2\2\2\30\33\3\2\2"+
-		"\2\31\27\3\2\2\2\32\34\5\4\3\2\33\32\3\2\2\2\33\34\3\2\2\2\34 \3\2\2\2"+
-		"\35\37\7(\2\2\36\35\3\2\2\2\37\"\3\2\2\2 \36\3\2\2\2 !\3\2\2\2!#\3\2\2"+
-		"\2\" \3\2\2\2#$\7\2\2\3$\3\3\2\2\2%.\5\6\4\2&(\7(\2\2\'&\3\2\2\2()\3\2"+
-		"\2\2)\'\3\2\2\2)*\3\2\2\2*+\3\2\2\2+-\5\6\4\2,\'\3\2\2\2-\60\3\2\2\2."+
-		",\3\2\2\2./\3\2\2\2/\5\3\2\2\2\60.\3\2\2\2\61\62\7\'\2\2\62?\7\3\2\2\63"+
-		"?\5\f\7\2\64\65\5\n\6\2\65\66\5\22\n\2\66?\3\2\2\2\678\5\b\5\289\7\'\2"+
-		"\29?\3\2\2\2:;\7\4\2\2;?\5\16\b\2<=\7\5\2\2=?\5\20\t\2>\61\3\2\2\2>\63"+
-		"\3\2\2\2>\64\3\2\2\2>\67\3\2\2\2>:\3\2\2\2><\3\2\2\2?\7\3\2\2\2@A\t\2"+
-		"\2\2A\t\3\2\2\2BC\t\3\2\2C\13\3\2\2\2DE\t\4\2\2E\r\3\2\2\2FG\7!\2\2GS"+
-		"\7\"\2\2HI\7!\2\2IN\7&\2\2JK\7#\2\2KM\7&\2\2LJ\3\2\2\2MP\3\2\2\2NL\3\2"+
-		"\2\2NO\3\2\2\2OQ\3\2\2\2PN\3\2\2\2QS\7\"\2\2RF\3\2\2\2RH\3\2\2\2S\17\3"+
-		"\2\2\2TU\7!\2\2UV\7$\2\2Vd\7\"\2\2WX\7!\2\2Xd\7\"\2\2YZ\7!\2\2Z_\7&\2"+
-		"\2[\\\7#\2\2\\^\7&\2\2][\3\2\2\2^a\3\2\2\2_]\3\2\2\2_`\3\2\2\2`b\3\2\2"+
-		"\2a_\3\2\2\2bd\7\"\2\2cT\3\2\2\2cW\3\2\2\2cY\3\2\2\2d\21\3\2\2\2eg\7%"+
-		"\2\2fe\3\2\2\2fg\3\2\2\2gh\3\2\2\2hi\7&\2\2i\23\3\2\2\2\r\27\33 ).>NR"+
-		"_cf";
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3)Z\4\2\t\2\4\3\t\3"+
+		"\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\3\2\5\2\26\n"+
+		"\2\3\2\3\2\3\3\3\3\7\3\34\n\3\f\3\16\3\37\13\3\3\4\3\4\3\4\3\4\3\4\3\4"+
+		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4.\n\4\3\5\3\5\3\6\3\6\3\7\3\7\3\b\3\b"+
+		"\3\b\3\b\3\b\3\b\7\b<\n\b\f\b\16\b?\13\b\3\b\5\bB\n\b\3\t\3\t\3\t\3\t"+
+		"\3\t\3\t\3\t\3\t\3\t\7\tM\n\t\f\t\16\tP\13\t\3\t\5\tS\n\t\3\n\5\nV\n\n"+
+		"\3\n\3\n\3\n\2\2\13\2\4\6\b\n\f\16\20\22\2\5\3\2\6\t\4\2\6\6\n\r\3\2\16"+
+		" \2]\2\25\3\2\2\2\4\31\3\2\2\2\6-\3\2\2\2\b/\3\2\2\2\n\61\3\2\2\2\f\63"+
+		"\3\2\2\2\16A\3\2\2\2\20R\3\2\2\2\22U\3\2\2\2\24\26\5\4\3\2\25\24\3\2\2"+
+		"\2\25\26\3\2\2\2\26\27\3\2\2\2\27\30\7\2\2\3\30\3\3\2\2\2\31\35\5\6\4"+
+		"\2\32\34\5\6\4\2\33\32\3\2\2\2\34\37\3\2\2\2\35\33\3\2\2\2\35\36\3\2\2"+
+		"\2\36\5\3\2\2\2\37\35\3\2\2\2 !\7\'\2\2!.\7\3\2\2\".\5\f\7\2#$\5\n\6\2"+
+		"$%\5\22\n\2%.\3\2\2\2&\'\5\b\5\2\'(\7\'\2\2(.\3\2\2\2)*\7\4\2\2*.\5\16"+
+		"\b\2+,\7\5\2\2,.\5\20\t\2- \3\2\2\2-\"\3\2\2\2-#\3\2\2\2-&\3\2\2\2-)\3"+
+		"\2\2\2-+\3\2\2\2.\7\3\2\2\2/\60\t\2\2\2\60\t\3\2\2\2\61\62\t\3\2\2\62"+
+		"\13\3\2\2\2\63\64\t\4\2\2\64\r\3\2\2\2\65\66\7!\2\2\66B\7\"\2\2\678\7"+
+		"!\2\28=\7&\2\29:\7#\2\2:<\7&\2\2;9\3\2\2\2<?\3\2\2\2=;\3\2\2\2=>\3\2\2"+
+		"\2>@\3\2\2\2?=\3\2\2\2@B\7\"\2\2A\65\3\2\2\2A\67\3\2\2\2B\17\3\2\2\2C"+
+		"D\7!\2\2DE\7$\2\2ES\7\"\2\2FG\7!\2\2GS\7\"\2\2HI\7!\2\2IN\7&\2\2JK\7#"+
+		"\2\2KM\7&\2\2LJ\3\2\2\2MP\3\2\2\2NL\3\2\2\2NO\3\2\2\2OQ\3\2\2\2PN\3\2"+
+		"\2\2QS\7\"\2\2RC\3\2\2\2RF\3\2\2\2RH\3\2\2\2S\21\3\2\2\2TV\7%\2\2UT\3"+
+		"\2\2\2UV\3\2\2\2VW\3\2\2\2WX\7&\2\2X\23\3\2\2\2\n\25\35-=ANRU";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

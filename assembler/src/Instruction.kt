@@ -21,6 +21,7 @@ data class SimpleInstruction(val mnemonic: String) : Instruction {
     }
 }
 
+//TODO: LiteralInt and LiteralLabel have to use an integer size that is at least as large as targetWordSize
 data class LiteralIntInstruction(val mnemonic: String, val data: Int) : Instruction {
 
     override fun size(tc: TargetContext): Int {
@@ -61,7 +62,7 @@ data class LiteralLabelInstruction(val mnemonic: String, val label: String) : In
         oc.program.add(tc.convert(mnemonic))
         oc.program.addAll(
             (0 until tc.wordSize)
-                .map { i -> "($actualTargetIndex >> ($i * 8)) & 0xFF" }
+                .map { i -> (actualTargetIndex shr i * 8 and 0xFF).toString() }
         )
     }
 }

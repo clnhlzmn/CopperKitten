@@ -1,18 +1,18 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "push -1\n" +   //start at -1
-        "Loop:\n" +     //begin loop here
+    "push -1    //start at -1\n" +
+        "Loop:      //begin loop here\n" +
         "push 1\n" +
-        "add\n" +       //add 1
+        "add       //add 1\n" +
         "dup\n" +
         "push 26\n" +
-        "cmp\n" +       //cmp to 27
-        "jumpz End\n" + //if equal then end
+        "cmp       //cmp to 27\n" +
+        "jumpz End //if equal then end\n" +
         "dup\n" +
         "push 65\n" +
-        "add\n" +       //else add 'A'
-        "out\n" +       //print
+        "add       //else add 'A'\n" +
+        "out       //print\n" +
         "jump Loop\n" +
         "End:\n" +
         "halt"

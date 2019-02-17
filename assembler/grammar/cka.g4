@@ -5,11 +5,11 @@ grammar cka;
 //basic CK
 
 file 
-    : NL* instructions? NL* EOF
+    : instructions? EOF
     ;
 
 instructions
-    : instruction ( NL+ instruction )*
+    : instruction ( instruction )*
     ;
 
 instruction
@@ -76,6 +76,7 @@ NATURAL : ('0'..'9')+ ;
 //ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 LABEL : ('A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 
-NL : '\n'|'\r\n' ;
+//NL : '\n'|'\r\n' ;
 
-WHITESPACE : (' '|'\t'|'\u000C') -> skip ;
+WHITESPACE : (' '|'\t'|'\u000C'|'\n'|'\r\n') -> skip ;
+COMMENT : '//' ~('\n'|'\r')* '\r'? '\n' -> skip ;
