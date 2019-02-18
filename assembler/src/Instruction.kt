@@ -21,7 +21,6 @@ data class SimpleInstruction(val mnemonic: String) : Instruction {
     }
 }
 
-//TODO: LiteralInt and LiteralLabel have to use an integer size that is at least as large as targetWordSize
 data class LiteralIntInstruction(val mnemonic: String, val data: Long) : Instruction {
 
     override fun size(tc: TargetContext): Int {
