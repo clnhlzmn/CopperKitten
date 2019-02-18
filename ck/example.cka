@@ -1,0 +1,15 @@
+push -1    //start at -1 
+Loop:      //begin loop here 
+push 1 
+add       //add 1 
+dup 
+push 26 
+cmp       //cmp to 27 
+jumpz End //if equal then end 
+dup 
+push 65 
+add       //else add 'A' 
+out       //print 
+jump Loop 
+End: 
+halt

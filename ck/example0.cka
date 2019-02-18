@@ -1,4 +1,0 @@
-Main:
-push 10
-pop
-jump Main
