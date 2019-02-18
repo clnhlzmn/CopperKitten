@@ -2,13 +2,7 @@
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.commons.cli.*;
-import java.util.Collections.addAll
-import java.util.ArrayList
-import java.io.File
 import org.antlr.v4.runtime.BailErrorStrategy
-
-
-
 
 class Cli(val args: Array<String>) {
 

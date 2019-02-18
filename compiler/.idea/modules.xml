@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/compiler.iml" filepath="$PROJECT_DIR$/compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cka/cka.iml" filepath="$PROJECT_DIR$/cka/cka.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ckc/ckc.iml" filepath="$PROJECT_DIR$/ckc/ckc.iml" />
     </modules>
   </component>
 </project>
