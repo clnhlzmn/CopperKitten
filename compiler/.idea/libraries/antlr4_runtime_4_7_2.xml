@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="antlr4-runtime-4.7.2">
+    <CLASSES>
+      <root url="jar://$APPLICATION_PLUGINS_DIR$/antlr-intellij-plugin-v4/lib/antlr4-runtime-4.7.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
