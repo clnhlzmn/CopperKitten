@@ -18,7 +18,7 @@ class Cli(val args: Array<String>) {
 
         val parser = DefaultParser()
 
-        var cmd: CommandLine? = null
+        var cmd: CommandLine?
         try {
             cmd = parser.parse(options, args)
 
