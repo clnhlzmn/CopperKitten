@@ -1,5 +1,3 @@
-
-
 //LayoutFunction represents a generated function that the ck garbage collector
 //will use to find object references either in the runtime stack or in gc managed objects
 //on the heap.
@@ -35,7 +33,7 @@ data class CustomLayoutFunction(val layout: List<Int>) : LayoutFunction {
     override fun emit(): String {
         return "static inline void ${name()}(void (*cb)(intptr_t **it, void *ctx), void *cb_ctx, void *foreach_ctx) {\n" +
             "\tintptr_t **base_ptr = (intptr_t**)foreach_ctx;\n" +
-            layout.map { i -> "\tcb(&base_ptr[${i}], cb_ctx);\n" }.fold(""){acc, s -> "$acc$s"} +
+            layout.map { i -> "\tcb(&base_ptr[${i}], cb_ctx);\n" }.fold("") { acc, s -> "$acc$s" } +
             "}\n"
     }
 }

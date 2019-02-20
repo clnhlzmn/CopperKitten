@@ -13,7 +13,8 @@ data class LetStatement(val id: String, val value: Expr) : Statement() {
 }
 
 data class ForStatement(
-    val init: Statement?, val cond: Expr, val fin: Expr?, val statement: Statement) : Statement() {
+    val init: Statement?, val cond: Expr, val fin: Expr?, val statement: Statement
+) : Statement() {
     override fun toString(): String =
         "for (${init?.toString() ?: ""}; $cond; ${fin?.toString() ?: ""}) $statement"
 }

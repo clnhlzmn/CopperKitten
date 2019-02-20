@@ -1,4 +1,3 @@
-
 //represents areas of output c file in which to
 //emit various parts of the compiled program
 class OutputContext(private val memSize: Int, private val stackSize: Int) {
@@ -30,7 +29,7 @@ class OutputContext(private val memSize: Int, private val stackSize: Int) {
             "intptr_t stack_mem[STACK_SIZE];\n" +
             "struct vm vm_instance;\n" +
             "\n" +
-            layoutFunctions.map { lf -> lf.emit() }.fold("") { acc, s -> "$acc\n$s"} +
+            layoutFunctions.map { lf -> lf.emit() }.fold("") { acc, s -> "$acc\n$s" } +
             "foreach_t layouts[] = {\n" +
             layoutFunctions.map { lf -> "\t${lf.name()},\n" }.fold("") { acc, s -> acc + s } +
             "\tNULL,\n" +

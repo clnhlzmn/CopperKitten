@@ -1,6 +1,6 @@
 import java.lang.Math.pow
 
-fun checkSize(i: Long, tc: TargetContext):Boolean {
+fun checkSize(i: Long, tc: TargetContext): Boolean {
     val max = pow(2.0, (tc.wordSize.toDouble() * 8) - 1) - 1
     val min = -pow(2.0, (tc.wordSize.toDouble() * 8) - 1)
     return i >= min && i <= max

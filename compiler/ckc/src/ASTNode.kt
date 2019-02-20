@@ -1,3 +1,1 @@
-
-
 open class ASTNode

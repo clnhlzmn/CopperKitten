@@ -1,4 +1,3 @@
-
 class FileVisitor : ckaBaseVisitor<ParseContext>() {
 
     override fun visitFile(ctx: ckaParser.FileContext?): ParseContext {

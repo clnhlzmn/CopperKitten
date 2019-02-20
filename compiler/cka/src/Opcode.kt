@@ -1,3 +1,2 @@
-
-data class Opcode(val value:String)
+data class Opcode(val value: String)
 
