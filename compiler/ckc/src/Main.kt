@@ -5,7 +5,7 @@ val stream = CharStreams.fromString(
         "baz(); " +
         "for (;1;) {} ; " +
         "if(1) doThis() else doThat() ; " +
-        "foo = (a:Int)->Unit{}"
+        "foo = (a:Int):Unit{}"
 )
 val lexer = ckLexer(stream)
 val tokens = CommonTokenStream(lexer)
