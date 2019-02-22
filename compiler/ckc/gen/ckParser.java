@@ -1,4 +1,4 @@
-// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -20,8 +20,8 @@ public class ckParser extends Parser {
 		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
 		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
 		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
-		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, NATURAL=38, 
-		ID=39, TYPEID=40, WHITESPACE=41, COMMENT=42;
+		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, NATURAL=37, ID=38, TYPEID=39, 
+		WHITESPACE=40, COMMENT=41;
 	public static final int
 		RULE_file = 0, RULE_statement = 1, RULE_statements = 2, RULE_expr = 3, 
 		RULE_exprs = 4, RULE_param = 5, RULE_params = 6, RULE_type = 7, RULE_types = 8;
@@ -38,7 +38,7 @@ public class ckParser extends Parser {
 			null, "'{'", "'}'", "'let'", "'='", "'for'", "'('", "';'", "')'", "'if'", 
 			"'else'", "'return'", "'-'", "'!'", "'~'", "'*'", "'/'", "'%'", "'+'", 
 			"'<<'", "'>>'", "'<'", "'<='", "'>'", "'>='", "'<>'", "'=='", "'!='", 
-			"'&'", "'^'", "'|'", "'&&'", "'||'", "'?'", "':'", "'->'", "'in'", "','"
+			"'&'", "'^'", "'|'", "'&&'", "'||'", "'?'", "':'", "'in'", "','"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -47,7 +47,7 @@ public class ckParser extends Parser {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, "NATURAL", "ID", "TYPEID", "WHITESPACE", "COMMENT"
+			null, "NATURAL", "ID", "TYPEID", "WHITESPACE", "COMMENT"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -1054,7 +1054,7 @@ public class ckParser extends Parser {
 				setState(82);
 				match(T__7);
 				setState(83);
-				match(T__34);
+				match(T__33);
 				setState(84);
 				type();
 				setState(85);
@@ -1075,7 +1075,7 @@ public class ckParser extends Parser {
 				setState(90);
 				((LetExprContext)_localctx).value = expr(0);
 				setState(91);
-				match(T__35);
+				match(T__34);
 				setState(92);
 				((LetExprContext)_localctx).body = expr(1);
 				}
@@ -1378,11 +1378,11 @@ public class ckParser extends Parser {
 			setState(151);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__36) {
+			while (_la==T__35) {
 				{
 				{
 				setState(147);
-				match(T__36);
+				match(T__35);
 				setState(148);
 				expr(0);
 				}
@@ -1491,11 +1491,11 @@ public class ckParser extends Parser {
 			setState(163);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__36) {
+			while (_la==T__35) {
 				{
 				{
 				setState(159);
-				match(T__36);
+				match(T__35);
 				setState(160);
 				param();
 				}
@@ -1603,7 +1603,7 @@ public class ckParser extends Parser {
 				setState(171);
 				match(T__7);
 				setState(172);
-				match(T__34);
+				match(T__33);
 				setState(173);
 				type();
 				}
@@ -1661,11 +1661,11 @@ public class ckParser extends Parser {
 			setState(181);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__36) {
+			while (_la==T__35) {
 				{
 				{
 				setState(177);
-				match(T__36);
+				match(T__35);
 				setState(178);
 				type();
 				}
@@ -1727,7 +1727,7 @@ public class ckParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3,\u00bb\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3+\u00bb\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\3\2\5\2"+
 		"\26\n\2\3\2\3\2\3\3\3\3\5\3\34\n\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3"+
 		"&\n\3\3\3\3\3\3\3\3\3\5\3,\n\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
@@ -1745,7 +1745,7 @@ public class ckParser extends Parser {
 		"\3\2\2\2\f\u009c\3\2\2\2\16\u00a0\3\2\2\2\20\u00b0\3\2\2\2\22\u00b2\3"+
 		"\2\2\2\24\26\5\6\4\2\25\24\3\2\2\2\25\26\3\2\2\2\26\27\3\2\2\2\27\30\7"+
 		"\2\2\3\30\3\3\2\2\2\31\33\7\3\2\2\32\34\5\6\4\2\33\32\3\2\2\2\33\34\3"+
-		"\2\2\2\34\35\3\2\2\2\35>\7\4\2\2\36\37\7\5\2\2\37 \7)\2\2 !\7\6\2\2!>"+
+		"\2\2\2\34\35\3\2\2\2\35>\7\4\2\2\36\37\7\5\2\2\37 \7(\2\2 !\7\6\2\2!>"+
 		"\5\b\5\2\"#\7\7\2\2#%\7\b\2\2$&\5\4\3\2%$\3\2\2\2%&\3\2\2\2&\'\3\2\2\2"+
 		"\'(\7\t\2\2()\5\b\5\2)+\7\t\2\2*,\5\b\5\2+*\3\2\2\2+,\3\2\2\2,-\3\2\2"+
 		"\2-.\7\n\2\2./\5\4\3\2/>\3\2\2\2\60\61\7\13\2\2\61\62\7\b\2\2\62\63\5"+
@@ -1753,11 +1753,11 @@ public class ckParser extends Parser {
 		"\2\28:\7\r\2\29;\5\b\5\2:9\3\2\2\2:;\3\2\2\2;>\3\2\2\2<>\5\b\5\2=\31\3"+
 		"\2\2\2=\36\3\2\2\2=\"\3\2\2\2=\60\3\2\2\2=8\3\2\2\2=<\3\2\2\2>\5\3\2\2"+
 		"\2?D\5\4\3\2@A\7\t\2\2AC\5\4\3\2B@\3\2\2\2CF\3\2\2\2DB\3\2\2\2DE\3\2\2"+
-		"\2E\7\3\2\2\2FD\3\2\2\2GH\b\5\1\2Ha\7(\2\2IJ\7\b\2\2JK\5\b\5\2KL\7\n\2"+
-		"\2La\3\2\2\2Ma\7)\2\2NO\t\2\2\2Oa\5\b\5\21PR\7\b\2\2QS\5\16\b\2RQ\3\2"+
-		"\2\2RS\3\2\2\2ST\3\2\2\2TU\7\n\2\2UV\7%\2\2VW\5\20\t\2WX\5\4\3\2Xa\3\2"+
-		"\2\2YZ\7\5\2\2Z[\7)\2\2[\\\7\6\2\2\\]\5\b\5\2]^\7&\2\2^_\5\b\5\3_a\3\2"+
-		"\2\2`G\3\2\2\2`I\3\2\2\2`M\3\2\2\2`N\3\2\2\2`P\3\2\2\2`Y\3\2\2\2a\u0091"+
+		"\2E\7\3\2\2\2FD\3\2\2\2GH\b\5\1\2Ha\7\'\2\2IJ\7\b\2\2JK\5\b\5\2KL\7\n"+
+		"\2\2La\3\2\2\2Ma\7(\2\2NO\t\2\2\2Oa\5\b\5\21PR\7\b\2\2QS\5\16\b\2RQ\3"+
+		"\2\2\2RS\3\2\2\2ST\3\2\2\2TU\7\n\2\2UV\7$\2\2VW\5\20\t\2WX\5\4\3\2Xa\3"+
+		"\2\2\2YZ\7\5\2\2Z[\7(\2\2[\\\7\6\2\2\\]\5\b\5\2]^\7%\2\2^_\5\b\5\3_a\3"+
+		"\2\2\2`G\3\2\2\2`I\3\2\2\2`M\3\2\2\2`N\3\2\2\2`P\3\2\2\2`Y\3\2\2\2a\u0091"+
 		"\3\2\2\2bc\f\20\2\2cd\t\3\2\2d\u0090\5\b\5\21ef\f\17\2\2fg\t\4\2\2g\u0090"+
 		"\5\b\5\20hi\f\16\2\2ij\t\5\2\2j\u0090\5\b\5\17kl\f\r\2\2lm\t\6\2\2m\u0090"+
 		"\5\b\5\16no\f\f\2\2op\t\7\2\2p\u0090\5\b\5\rqr\f\13\2\2rs\7\36\2\2s\u0090"+
@@ -1772,16 +1772,16 @@ public class ckParser extends Parser {
 		"\2\2\2\u008ft\3\2\2\2\u008fw\3\2\2\2\u008fz\3\2\2\2\u008f}\3\2\2\2\u008f"+
 		"\u0080\3\2\2\2\u008f\u0086\3\2\2\2\u008f\u0089\3\2\2\2\u0090\u0093\3\2"+
 		"\2\2\u0091\u008f\3\2\2\2\u0091\u0092\3\2\2\2\u0092\t\3\2\2\2\u0093\u0091"+
-		"\3\2\2\2\u0094\u0099\5\b\5\2\u0095\u0096\7\'\2\2\u0096\u0098\5\b\5\2\u0097"+
+		"\3\2\2\2\u0094\u0099\5\b\5\2\u0095\u0096\7&\2\2\u0096\u0098\5\b\5\2\u0097"+
 		"\u0095\3\2\2\2\u0098\u009b\3\2\2\2\u0099\u0097\3\2\2\2\u0099\u009a\3\2"+
-		"\2\2\u009a\13\3\2\2\2\u009b\u0099\3\2\2\2\u009c\u009d\7)\2\2\u009d\u009e"+
+		"\2\2\u009a\13\3\2\2\2\u009b\u0099\3\2\2\2\u009c\u009d\7(\2\2\u009d\u009e"+
 		"\7$\2\2\u009e\u009f\5\20\t\2\u009f\r\3\2\2\2\u00a0\u00a5\5\f\7\2\u00a1"+
-		"\u00a2\7\'\2\2\u00a2\u00a4\5\f\7\2\u00a3\u00a1\3\2\2\2\u00a4\u00a7\3\2"+
+		"\u00a2\7&\2\2\u00a2\u00a4\5\f\7\2\u00a3\u00a1\3\2\2\2\u00a4\u00a7\3\2"+
 		"\2\2\u00a5\u00a3\3\2\2\2\u00a5\u00a6\3\2\2\2\u00a6\17\3\2\2\2\u00a7\u00a5"+
-		"\3\2\2\2\u00a8\u00b1\7*\2\2\u00a9\u00ab\7\b\2\2\u00aa\u00ac\5\22\n\2\u00ab"+
+		"\3\2\2\2\u00a8\u00b1\7)\2\2\u00a9\u00ab\7\b\2\2\u00aa\u00ac\5\22\n\2\u00ab"+
 		"\u00aa\3\2\2\2\u00ab\u00ac\3\2\2\2\u00ac\u00ad\3\2\2\2\u00ad\u00ae\7\n"+
-		"\2\2\u00ae\u00af\7%\2\2\u00af\u00b1\5\20\t\2\u00b0\u00a8\3\2\2\2\u00b0"+
-		"\u00a9\3\2\2\2\u00b1\21\3\2\2\2\u00b2\u00b7\5\20\t\2\u00b3\u00b4\7\'\2"+
+		"\2\2\u00ae\u00af\7$\2\2\u00af\u00b1\5\20\t\2\u00b0\u00a8\3\2\2\2\u00b0"+
+		"\u00a9\3\2\2\2\u00b1\21\3\2\2\2\u00b2\u00b7\5\20\t\2\u00b3\u00b4\7&\2"+
 		"\2\u00b4\u00b6\5\20\t\2\u00b5\u00b3\3\2\2\2\u00b6\u00b9\3\2\2\2\u00b7"+
 		"\u00b5\3\2\2\2\u00b7\u00b8\3\2\2\2\u00b8\23\3\2\2\2\u00b9\u00b7\3\2\2"+
 		"\2\23\25\33%+:=DR`\u008c\u008f\u0091\u0099\u00a5\u00ab\u00b0\u00b7";

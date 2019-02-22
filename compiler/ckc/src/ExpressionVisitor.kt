@@ -13,8 +13,8 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
         ApplyExpr(
             target = ExprVisitor().visit(ctx!!.expr()),
             args =
-            if (ctx.exprs() != null) ExprsVisitor().visit(ctx.exprs())
-            else ArrayList()
+                if (ctx.exprs() != null) ExprsVisitor().visit(ctx.exprs())
+                else ArrayList()
         )
 
     override fun visitUnaryExpr(ctx: ckParser.UnaryExprContext?): Expr =
@@ -100,14 +100,18 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             alt = ExprVisitor().visit(ctx.alt)
         )
 
+    override fun visitAssignExpr(ctx: ckParser.AssignExprContext?): Expr =
+        AssignExpr(
+            target = ExprVisitor().visit(ctx!!.target),
+            value = ExprVisitor().visit(ctx.value)
+        )
+
     override fun visitFunExpr(ctx: ckParser.FunExprContext?): Expr =
         FunExpr(
             params =
             if (ctx!!.params() != null) ParamsVisitor().visit(ctx.params())
             else ArrayList(),
-            type =
-            if (ctx.type() != null) TypeVisitor().visit(ctx.type())
-            else null,
+            type = TypeVisitor().visit(ctx.type()),
             body = StatementVisitor().visit(ctx.statement())
         )
 
@@ -116,12 +120,6 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             id = ctx!!.ID().text,
             value = ExprVisitor().visit(ctx.value),
             body = ExprVisitor().visit(ctx.body)
-        )
-
-    override fun visitAssignExpr(ctx: ckParser.AssignExprContext?): Expr =
-        AssignExpr(
-            target = ExprVisitor().visit(ctx!!.target),
-            value = ExprVisitor().visit(ctx.value)
         )
 }
 
