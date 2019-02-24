@@ -1,19 +1,21 @@
 import java.util.*
 import kotlin.math.max
 
-class StackFrame(val statements: List<Statement>) : ASTNode {
+//represents a stack frame that has a parent frame and a list of statements to execute in it's context
+//it also has local variables, arguments, and captures
+class StackFrame(val parent: StackFrame?) : ASTNode {
 
     //keep track of local variables
-    private val locals: Deque<Pair<String, ASTNode>> = ArrayDeque()
+    private val locals = ArrayDeque<Pair<String, ASTNode>>()
 
     //maximum number of locals seen in this frame
     private var maxLocals = 0
 
     //arguments to this function
-    private val arguments: Deque<Pair<String, ASTNode>> = ArrayDeque()
+    private val arguments = ArrayDeque<Pair<String, ASTNode>>()
 
     //captures for this function
-    private val captures: Deque<Pair<String, ASTNode>> = ArrayDeque()
+    private val captures = ArrayDeque<Pair<String, ASTNode>>()
 
     fun lookupLocal(id: String): Int =
         locals.indexOfLast { p -> p.first == id }
