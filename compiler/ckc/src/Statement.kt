@@ -48,5 +48,5 @@ data class ExprStatement(val expr: Expr) : Statement {
         visitor.visit(this)
 
     override fun toString(): String =
-        "$expr"
+        expr.toString()
 }

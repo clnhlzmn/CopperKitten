@@ -4,18 +4,32 @@ data class Error(val what: String)
 
 class TypeCheckVisitor : ASTVisitor<List<Error>> {
 
-    var frame = StackFrame(null)
+    private val noError = ArrayList<Error>()
+
+    private val locals = ArrayDeque<Pair<String, ASTNode>>()
 
     override fun visit(s: BlockStatement): List<Error> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        for (statement in s.statements) {
+            val err = statement.accept(this)
+            if (err.isNotEmpty())
+                return err
+        }
+        return noError
     }
 
     override fun visit(s: LetStatement): List<Error> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        locals.add(Pair(s.id, s))
+        return noError
     }
 
     override fun visit(s: ForStatement): List<Error> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (s.init != null) {
+            val ret = s.init.accept(this)
+            if (ret.isNotEmpty())
+                return ret
+        }
+        //TODO: rest
+        return noError
     }
 
     override fun visit(s: IfStatement): List<Error> {
