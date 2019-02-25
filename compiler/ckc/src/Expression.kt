@@ -1,8 +1,8 @@
 //Expressions
 
-open class Expr
+interface Expr : ASTNode
 
-data class NaturalExpr(val value: Int) : Expr(), ASTNode {
+data class NaturalExpr(val value: Int) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -11,12 +11,16 @@ data class NaturalExpr(val value: Int) : Expr(), ASTNode {
         value.toString()
 }
 
-data class RefExpr(val id: String) : Expr() {
+data class RefExpr(val id: String) : Expr {
+
+    override fun <T> accept(visitor: ASTVisitor<T>): T =
+        visitor.visit(this)
+
     override fun toString(): String =
         id
 }
 
-data class ApplyExpr(val target: Expr, val args: List<Expr>) : Expr(), ASTNode {
+data class ApplyExpr(val target: Expr, val args: List<Expr>) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -25,7 +29,7 @@ data class ApplyExpr(val target: Expr, val args: List<Expr>) : Expr(), ASTNode {
         "$target(${args.toString(", ")})"
 }
 
-data class UnaryExpr(val op: String, val expr: Expr) : Expr(), ASTNode {
+data class UnaryExpr(val op: String, val expr: Expr) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -34,7 +38,7 @@ data class UnaryExpr(val op: String, val expr: Expr) : Expr(), ASTNode {
         "($op $expr)"
 }
 
-data class BinaryExpr(val lhs: Expr, val op: String, val rhs: Expr) : Expr(), ASTNode {
+data class BinaryExpr(val lhs: Expr, val op: String, val rhs: Expr) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -43,7 +47,7 @@ data class BinaryExpr(val lhs: Expr, val op: String, val rhs: Expr) : Expr(), AS
         "($lhs $op $rhs)"
 }
 
-data class CondExpr(val cond: Expr, val con: Expr, val alt: Expr) : Expr(), ASTNode {
+data class CondExpr(val cond: Expr, val con: Expr, val alt: Expr) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -52,7 +56,7 @@ data class CondExpr(val cond: Expr, val con: Expr, val alt: Expr) : Expr(), ASTN
         "($cond ? $con : $alt)"
 }
 
-data class AssignExpr(val target: Expr, val value: Expr) : Expr(), ASTNode {
+data class AssignExpr(val target: Expr, val value: Expr) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -66,7 +70,7 @@ data class Param(val id: String, val type: Type) {
         "$id: $type"
 }
 
-data class FunExpr(val params: List<Param>, val type: Type, val body: Statement) : Expr(), ASTNode {
+data class FunExpr(val params: List<Param>, val type: Type, val body: Statement) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -75,7 +79,7 @@ data class FunExpr(val params: List<Param>, val type: Type, val body: Statement)
         "(${params.toString(", ")}) :$type $body"
 }
 
-data class LetExpr(val id: String, val value: Expr, val body: Expr) : Expr(), ASTNode {
+data class LetExpr(val id: String, val value: Expr, val body: Expr) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)

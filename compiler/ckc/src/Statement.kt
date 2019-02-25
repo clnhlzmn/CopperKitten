@@ -2,7 +2,7 @@
 
 interface Statement : ASTNode
 
-data class BlockStatement(val statements: List<ASTNode>) : Statement {
+data class BlockStatement(val statements: List<Statement>) : Statement {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         //just visit this, implementations of ASTVisitor can visit children if they want
         visitor.visit(this)
@@ -19,7 +19,7 @@ data class LetStatement(val id: String, val value: Expr) : Statement {
         "let $id = $value"
 }
 
-data class ForStatement(val init: ASTNode?, val cond: Expr, val fin: Expr?, val statement: ASTNode) : Statement {
+data class ForStatement(val init: Statement?, val cond: Expr, val fin: Expr?, val statement: Statement) : Statement {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
