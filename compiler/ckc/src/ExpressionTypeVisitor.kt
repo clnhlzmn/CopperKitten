@@ -1,6 +1,6 @@
 import java.util.*
 
-class ExpressionTypeVisitor(val env: Environment<Type>, val error: MutableList<Error>) : ckBaseVisitor<Type>() {
+class ExpressionTypeVisitor(val frame: StackFrame, val error: MutableList<Error>) : ckBaseVisitor<Type>() {
 
     override fun visitNaturalExpr(ctx: ckParser.NaturalExprContext?): Type =
         SimpleType("Int")
@@ -9,7 +9,7 @@ class ExpressionTypeVisitor(val env: Environment<Type>, val error: MutableList<E
         visit(ctx!!.expr())
 
     override fun visitRefExpr(ctx: ckParser.RefExprContext?): Type {
-        val type = env.lookup(ctx!!.ID().toString())
+        val type = frame.lookupType(ctx!!.ID().toString())
         if (type == null) {
             val what = "undefined symbol"
             error.add(Error(what))

@@ -8,5 +8,4 @@ interface ASTVisitor<T> {
     fun visit(s: ReturnStatement): T
     fun visit(s: ExprStatement): T
     fun visit(e: Expr): T
-    fun visit(s: StackFrame): T
 }

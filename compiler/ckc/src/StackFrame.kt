@@ -3,7 +3,7 @@ import kotlin.math.max
 
 //represents a stack frame that has a parent frame and a list of statements to execute in it's context
 //it also has local variables, arguments, and captures
-class StackFrame(val parent: StackFrame?) : ASTNode {
+class StackFrame(val parent: StackFrame?) {
 
     //keep track of local variables
     private val locals = ArrayDeque<Pair<String, ASTNode>>()
@@ -16,6 +16,10 @@ class StackFrame(val parent: StackFrame?) : ASTNode {
 
     //captures for this function
     private val captures = ArrayDeque<Pair<String, ASTNode>>()
+
+    fun lookupType(id: String): Type? {
+        TODO("not implemented")
+    }
 
     fun lookupLocal(id: String): Int =
         locals.indexOfLast { p -> p.first == id }
@@ -57,9 +61,6 @@ class StackFrame(val parent: StackFrame?) : ASTNode {
 
     fun capturesSize(): Int =
         captures.size
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
 
 }
 
