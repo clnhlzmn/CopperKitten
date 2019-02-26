@@ -230,7 +230,7 @@ public class ckParser extends Parser {
 		public StatementContext init;
 		public ExprContext cond;
 		public ExprContext fin;
-		public StatementContext block;
+		public StatementContext body;
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -384,7 +384,7 @@ public class ckParser extends Parser {
 				setState(43);
 				match(T__7);
 				setState(44);
-				((ForStatementContext)_localctx).block = statement();
+				((ForStatementContext)_localctx).body = statement();
 				}
 				break;
 			case 4:

@@ -11,7 +11,7 @@ file
 statement
     : '{' statements? '}'                                                               #blockStatement
     | 'let' ID '=' expr                                                                 #letStatement
-    | 'for' '(' init=statement? ';' cond=expr ';' fin=expr? ')' block=statement         #forStatement
+    | 'for' '(' init=statement? ';' cond=expr ';' fin=expr? ')' body=statement          #forStatement
     | 'if' '(' expr ')' con=statement ( 'else' alt=statement )                          #ifStatement
     | 'return' expr?                                                                    #returnStatement
     | expr                                                                              #exprStatement

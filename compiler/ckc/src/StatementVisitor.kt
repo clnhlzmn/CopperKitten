@@ -28,7 +28,7 @@ class StatementVisitor : ckBaseVisitor<Statement>() {
             init = if (ctx!!.init == null) null else StatementVisitor().visit(ctx.init),
             cond = ExprVisitor().visit(ctx.cond),
             fin = if (ctx.fin == null) null else ExprVisitor().visit(ctx.fin),
-            statement = StatementVisitor().visit(ctx.block)
+            statement = StatementVisitor().visit(ctx.body)
         )
 }
 
