@@ -2,8 +2,6 @@
 
 interface ASTVisitor<T> {
 
-    fun visit(e: Environment): T
-
     fun visit(s: BlockStatement): T
     fun visit(s: LetStatement): T
     fun visit(s: ForStatement): T
