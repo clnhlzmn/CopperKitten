@@ -10,7 +10,6 @@ file
 
 expr
     : '{' sequence '}'                                                  #sequenceExpr
-    | '(' params? ')' ':' type expr                                     #funExpr
     | '(' expr ')'                                                      #subExpr
     | NATURAL                                                           #naturalExpr
     | ID                                                                #refExpr
@@ -28,6 +27,7 @@ expr
     | lhs=expr '||' rhs=expr                                            #orExpr
     | <assoc=right> cond=expr '?' con=expr ':' alt=expr                 #condExpr
     | <assoc=right> target=expr '=' value=expr                          #assignExpr
+    | '(' params? ')' ':' type expr                                     #funExpr
     | 'let' ID '=' value=expr                                           #letExpr
     | 'if' '(' expr ')' csq=expr ( 'else' alt=expr )?                   #ifExpr
     | 'for' '(' init=expr? ';' cond=expr ';' fin=expr? ')' body=expr    #forExpr

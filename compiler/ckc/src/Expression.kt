@@ -2,6 +2,21 @@
 
 interface Expr : ASTNode
 
+class EmptyExpr : Expr {
+    override fun <T> accept(visitor: ASTVisitor<T>): T =
+        visitor.visit(this)
+}
+
+data class SequenceExpr(val expr: Expr, val next: Expr?) : Expr {
+    override fun <T> accept(visitor: ASTVisitor<T>): T =
+        visitor.visit(this)
+
+    override fun toString(): String {
+        return "{$expr${if (next != null) "; $next" else ""}}"
+    }
+
+}
+
 data class NaturalExpr(val value: Int) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
@@ -70,7 +85,7 @@ data class Param(val id: String, val type: Type) {
         "$id: $type"
 }
 
-data class FunExpr(val params: List<Param>, val type: Type, val body: Statement) : Expr {
+data class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -79,13 +94,49 @@ data class FunExpr(val params: List<Param>, val type: Type, val body: Statement)
         "(${params.toString(", ")}) :$type $body"
 }
 
-data class LetExpr(val id: String, val value: Expr, val body: Expr) : Expr {
+data class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
     override fun toString(): String =
-        "($id = $value in $body)"
+        "($id = $value${if (body == null) "" else " in $body"})"
+
+}
+
+data class IfExpr(val cond: Expr, val csq: Expr, val alt: Expr?) : Expr {
+    override fun <T> accept(visitor: ASTVisitor<T>): T =
+        visitor.visit(this)
+
+    //TODO: toString
+
+}
+
+data class ForExpr(val init: Expr?, val cond: Expr, val fin: Expr?, val body: Expr) : Expr {
+
+    override fun <T> accept(visitor: ASTVisitor<T>): T =
+        visitor.visit(this)
+
+    //TODO: toString
+
+
+}
+
+data class ReturnExpr(val value: Expr?) : Expr {
+
+    override fun <T> accept(visitor: ASTVisitor<T>): T =
+        visitor.visit(this)
+
+
+
+}
+
+data class BreakExpr(val value: Expr?) : Expr {
+
+    override fun <T> accept(visitor: ASTVisitor<T>): T =
+        visitor.visit(this)
+
+
 
 }
 

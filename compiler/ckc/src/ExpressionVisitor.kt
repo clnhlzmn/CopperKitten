@@ -3,6 +3,9 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     override fun visitNaturalExpr(ctx: ckParser.NaturalExprContext?): Expr =
         NaturalExpr(Integer.valueOf(ctx!!.text))
 
+    override fun visitSequenceExpr(ctx: ckParser.SequenceExprContext?): Expr =
+        SequenceVisitor().visit(ctx!!.sequence())
+
     override fun visitSubExpr(ctx: ckParser.SubExprContext?): Expr =
         ExprVisitor().visit(ctx!!.expr())
 
@@ -13,7 +16,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
         ApplyExpr(
             target = ExprVisitor().visit(ctx!!.expr()),
             args =
-                if (ctx.exprs() != null) ExprsVisitor().visit(ctx.exprs())
+                if (ctx.args() != null) ArgsVisitor().visit(ctx.args())
                 else ArrayList()
         )
 
@@ -112,20 +115,35 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             if (ctx!!.params() != null) ParamsVisitor().visit(ctx.params())
             else ArrayList(),
             type = TypeVisitor().visit(ctx.type()),
-            body = StatementVisitor().visit(ctx.statement())
+            body = ExprVisitor().visit(ctx.expr())
         )
 
-    override fun visitLetExpr(ctx: ckParser.LetExprContext?): Expr =
-        LetExpr(
-            id = ctx!!.ID().text,
-            value = ExprVisitor().visit(ctx.value),
-            body = ExprVisitor().visit(ctx.body)
-        )
 }
 
-class ExprsVisitor : ckBaseVisitor<List<Expr>>() {
-    override fun visitExprs(ctx: ckParser.ExprsContext?): List<Expr> =
-        ctx!!.expr().map { e -> ExprVisitor().visit(e) }
+class SequenceVisitor : ckBaseVisitor<Expr>() {
+    override fun visitSequence(ctx: ckParser.SequenceContext?): Expr {
+        val expr = ctx!!.expr()
+        return when (expr) {
+            is ckParser.LetExprContext ->
+                LetExpr(
+                    expr.ID().text,
+                    ExprVisitor().visit(expr.value),
+                    if (ctx.sequence() == null) null
+                    else SequenceVisitor().visit(ctx.sequence())
+                )
+            else ->
+                SequenceExpr(
+                    ExprVisitor().visit(ctx.expr()),
+                    if (ctx.sequence() == null) null
+                    else SequenceVisitor().visit(ctx.sequence())
+                )
+        }
+    }
+}
+
+class ArgsVisitor : ckBaseVisitor<List<Expr>>() {
+    override fun visitArgs(ctx: ckParser.ArgsContext?): List<Expr> =
+        ctx!!.expr().map { ectx -> ExprVisitor().visit(ectx) }
 }
 
 class ParamVisitor : ckBaseVisitor<Param>() {
