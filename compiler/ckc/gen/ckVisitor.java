@@ -58,13 +58,6 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSequenceExpr(ckParser.SequenceExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code subExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSubExpr(ckParser.SubExprContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code breakExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -169,6 +162,13 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitAssignExpr(ckParser.AssignExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code unitExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUnitExpr(ckParser.UnitExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code equalityExpr}
 	 * labeled alternative in {@link ckParser#expr}.

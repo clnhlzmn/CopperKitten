@@ -6,7 +6,7 @@ val stream = CharStreams.fromString(
         "baz(); " +
         "for (let qux = 42;1;) { 1 + 2 / 3 % 4 - 1 } ; " +
         "if(1) doThis() else doThat() ; " +
-        "foo = (a:Int):Unit { unit }" +
+        "foo = (a:Int):Unit ()" +
     "}"
 )
 val lexer = ckLexer(stream)

@@ -6,8 +6,8 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     override fun visitSequenceExpr(ctx: ckParser.SequenceExprContext?): Expr =
         SequenceVisitor().visit(ctx!!.sequence())
 
-    override fun visitSubExpr(ctx: ckParser.SubExprContext?): Expr =
-        ExprVisitor().visit(ctx!!.expr())
+    override fun visitUnitExpr(ctx: ckParser.UnitExprContext?): Expr =
+        UnitExpr()
 
     override fun visitRefExpr(ctx: ckParser.RefExprContext?): Expr =
         RefExpr(ctx!!.text)

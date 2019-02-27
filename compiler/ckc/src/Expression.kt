@@ -2,9 +2,13 @@
 
 interface Expr : ASTNode
 
-class EmptyExpr : Expr {
+class UnitExpr : Expr {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
+
+    override fun toString(): String {
+        return "()"
+    }
 }
 
 data class SequenceExpr(val expr: Expr, val next: Expr?) : Expr {
@@ -100,7 +104,7 @@ data class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr {
         visitor.visit(this)
 
     override fun toString(): String =
-        "($id = $value${if (body == null) "" else " in $body"})"
+        "{let $id = $value${if (body == null) "" else " in $body"}}"
 
 }
 
@@ -127,7 +131,7 @@ data class ReturnExpr(val value: Expr?) : Expr {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
-
+    //TODO: toString
 
 }
 
@@ -136,7 +140,7 @@ data class BreakExpr(val value: Expr?) : Expr {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
-
+    //TODO: toString
 
 }
 

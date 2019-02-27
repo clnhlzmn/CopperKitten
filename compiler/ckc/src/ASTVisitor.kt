@@ -1,7 +1,7 @@
 
 
 interface ASTVisitor<T> {
-    fun visit(e: EmptyExpr): T
+    fun visit(e: UnitExpr): T
     fun visit(e: SequenceExpr): T
     fun visit(e: NaturalExpr): T
     fun visit(e: RefExpr): T

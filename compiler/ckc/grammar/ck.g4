@@ -10,7 +10,7 @@ file
 
 expr
     : '{' sequence '}'                                                  #sequenceExpr
-    | '(' expr ')'                                                      #subExpr
+    | '(' ')'                                                           #unitExpr
     | NATURAL                                                           #naturalExpr
     | ID                                                                #refExpr
     | expr '(' args? ')'                                                #applyExpr
