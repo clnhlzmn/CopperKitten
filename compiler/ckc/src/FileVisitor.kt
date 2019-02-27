@@ -1,13 +1,13 @@
 //ck File visitor
 
-class FileVisitor : ckBaseVisitor<BlockStatement>() {
-    override fun visitFile(ctx: ckParser.FileContext?): BlockStatement {
-        if (ctx!!.statements() != null) {
-            return BlockStatement(StatementsVisitor().visit(ctx.statements()))
-        }
-        return BlockStatement(ArrayList());
-    }
-}
+//class FileVisitor : ckBaseVisitor<StackFrame>() {
+//    override fun visitFile(ctx: ckParser.FileContext?): StackFrame {
+//        if (ctx!!.statements() != null) {
+//            return StackFrame(StatementsVisitor().visit(ctx.statements()))
+//        }
+//        return StackFrame(ArrayList());
+//    }
+//}
 
 
 

@@ -2,7 +2,11 @@
 
 class LetStatementVisitor(val properties: ASTProperties) : ASTVisitor<Unit> {
 
-    var locals = HashMap<String, ASTNode>()
+    var locals = StackFrame()
+
+    override fun visit(f: StackFrame) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     override fun visit(s: BlockStatement) {
         for (statement in s.statements) {
@@ -11,7 +15,7 @@ class LetStatementVisitor(val properties: ASTProperties) : ASTVisitor<Unit> {
     }
 
     override fun visit(s: LetStatement) {
-        locals.put(s.id, s.value)
+        locals.pushLocal(s.id, s.value)
     }
 
     override fun visit(s: ForStatement) {

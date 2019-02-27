@@ -2,6 +2,10 @@
 
 interface ASTVisitor<T> {
 
+    fun visit(f: StackFrame): T
+
+    fun visit(l: LocalScope): T
+
     fun visit(s: BlockStatement): T
     fun visit(s: LetStatement): T
     fun visit(s: ForStatement): T
