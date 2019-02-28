@@ -2,8 +2,6 @@
 
 class ScopeVisitor : ASTVisitor<Unit> {
 
-    var scope = Scope()
-
     override fun visit(e: UnitExpr) {
         //nothing
     }
@@ -18,10 +16,10 @@ class ScopeVisitor : ASTVisitor<Unit> {
     }
 
     override fun visit(e: RefExpr) {
-        val found = scope.lookupLocal(e.id)
-        if (found == -1) {
-            scope.pushCapture(e.id, e)
-        }
+//        val found = scope.lookupLocal(e.id)
+//        if (found == -1) {
+//            scope.pushCapture(e.id, e)
+//        }
     }
 
     override fun visit(e: ApplyExpr) {
@@ -50,19 +48,22 @@ class ScopeVisitor : ASTVisitor<Unit> {
     }
 
     override fun visit(e: FunExpr) {
-        //TODO: is this right?
-        val savedScope = scope
-        scope = Scope()
-        e.body.accept(this)
-        e.scope = scope
-        //TODO: treat non locals from the function body as refExprs here
-        scope = savedScope
+//        val savedScope = scope
+//        scope = Scope()
+//        e.body.accept(this)
+//        //TODO: treat non locals from the function body as refExprs here
+//        e.scope = scope
+//        scope = savedScope
     }
 
     override fun visit(e: LetExpr) {
-        //TODO: is this right?
-        scope.pushLocal(e.id, e)
-        e.body?.accept(this)
+//        //add the local to scope
+//        scope.pushLocal(e.id, e)
+//        //visit body
+//        e.body?.accept(this)
+//        //remove the local from scope
+//        //TODO: save this state in e, instead of just throwing it away here
+//        scope.popLocal()
     }
 
     override fun visit(e: IfExpr) {
