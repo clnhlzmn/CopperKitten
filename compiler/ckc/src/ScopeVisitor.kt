@@ -2,8 +2,7 @@
 
 class ScopeVisitor : ASTVisitor<Unit> {
 
-    var localScope = ArrayList<Pair<String, ASTNode>>()
-    var nonLocalScope = ArrayList<String>()
+    var scope = Scope()
 
     override fun visit(e: UnitExpr) {
         //nothing
@@ -19,9 +18,9 @@ class ScopeVisitor : ASTVisitor<Unit> {
     }
 
     override fun visit(e: RefExpr) {
-        val found = localScope.findLast { p -> p.first == e.id }
-        if (found == null) {
-            nonLocalScope.add(e.id)
+        val found = scope.lookupLocal(e.id)
+        if (found == -1) {
+            scope.pushCapture(e.id, e)
         }
     }
 
@@ -51,17 +50,18 @@ class ScopeVisitor : ASTVisitor<Unit> {
     }
 
     override fun visit(e: FunExpr) {
-        //TODO: what to do here?
-        //TODO: save current scope
-        //TODO: make new scope
-        //TODO: visit body
-        //TODO: save that function's scope somewhere
+        //TODO: is this right?
+        val savedScope = scope
+        scope = Scope()
+        e.body.accept(this)
+        e.scope = scope
         //TODO: treat non locals from the function body as refExprs here
+        scope = savedScope
     }
 
     override fun visit(e: LetExpr) {
         //TODO: is this right?
-        localScope.add(Pair(e.id, e.value))
+        scope.pushLocal(e.id, e)
         e.body?.accept(this)
     }
 
