@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -528,6 +528,7 @@ public class ckParser extends Parser {
 		}
 	}
 	public static class IfExprContext extends ExprContext {
+		public ExprContext cond;
 		public ExprContext csq;
 		public ExprContext alt;
 		public List<ExprContext> expr() {
@@ -841,7 +842,7 @@ public class ckParser extends Parser {
 				setState(46);
 				match(T__2);
 				setState(47);
-				expr(0);
+				((IfExprContext)_localctx).cond = expr(0);
 				setState(48);
 				match(T__3);
 				setState(49);

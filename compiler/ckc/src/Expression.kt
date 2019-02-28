@@ -12,12 +12,15 @@ class UnitExpr : Expr {
 }
 
 data class SequenceExpr(val expr: Expr, val next: Expr?) : Expr {
+
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
-    override fun toString(): String {
-        return "{$expr${if (next != null) "; $next" else ""}}"
-    }
+    override fun toString(): String =
+        if (next == null)
+            "$expr"
+        else
+            "{$expr; $next}"
 
 }
 
@@ -54,7 +57,7 @@ data class UnaryExpr(val op: String, val expr: Expr) : Expr {
         visitor.visit(this)
 
     override fun toString(): String =
-        "($op $expr)"
+        "$op $expr"
 }
 
 data class BinaryExpr(val lhs: Expr, val op: String, val rhs: Expr) : Expr {
@@ -63,7 +66,7 @@ data class BinaryExpr(val lhs: Expr, val op: String, val rhs: Expr) : Expr {
         visitor.visit(this)
 
     override fun toString(): String =
-        "($lhs $op $rhs)"
+        "$lhs $op $rhs"
 }
 
 data class CondExpr(val cond: Expr, val con: Expr, val alt: Expr) : Expr {
@@ -72,7 +75,7 @@ data class CondExpr(val cond: Expr, val con: Expr, val alt: Expr) : Expr {
         visitor.visit(this)
 
     override fun toString(): String =
-        "($cond ? $con : $alt)"
+        "$cond ? $con : $alt"
 }
 
 data class AssignExpr(val target: Expr, val value: Expr) : Expr {
@@ -81,7 +84,7 @@ data class AssignExpr(val target: Expr, val value: Expr) : Expr {
         visitor.visit(this)
 
     override fun toString(): String =
-        "($target = $value)"
+        "$target = $value"
 }
 
 data class Param(val id: String, val type: Type) {
@@ -95,7 +98,7 @@ data class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Ex
         visitor.visit(this)
 
     override fun toString(): String =
-        "(${params.toString(", ")}) :$type $body"
+        "(${params.toString(", ")}):$type $body"
 }
 
 data class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr {
@@ -104,7 +107,10 @@ data class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr {
         visitor.visit(this)
 
     override fun toString(): String =
-        "{let $id = $value${if (body == null) "" else " in $body"}}"
+        if (body == null)
+            "let $id = $value"
+        else
+            "{let $id = $value; $body}"
 
 }
 
@@ -112,7 +118,11 @@ data class IfExpr(val cond: Expr, val csq: Expr, val alt: Expr?) : Expr {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
-    //TODO: toString
+    override fun toString(): String =
+        if (alt == null)
+            "if ($cond) $csq"
+        else
+            "if ($cond) $csq else $alt"
 
 }
 
@@ -121,8 +131,8 @@ data class ForExpr(val init: Expr?, val cond: Expr, val fin: Expr?, val body: Ex
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
-    //TODO: toString
-
+    override fun toString(): String =
+        "for (${if (init != null) "$init" else ""}; $cond; ${if (fin != null) "$fin" else ""}) $body"
 
 }
 
@@ -131,7 +141,11 @@ data class ReturnExpr(val value: Expr?) : Expr {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
-    //TODO: toString
+    override fun toString(): String =
+        if (value != null)
+            "return $value"
+        else
+            "return"
 
 }
 
@@ -140,7 +154,11 @@ data class BreakExpr(val value: Expr?) : Expr {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
-    //TODO: toString
+    override fun toString(): String =
+        if (value != null)
+            "break $value"
+        else
+            "break"
 
 }
 

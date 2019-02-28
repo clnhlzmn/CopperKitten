@@ -118,6 +118,31 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             body = ExprVisitor().visit(ctx.expr())
         )
 
+    override fun visitForExpr(ctx: ckParser.ForExprContext?): Expr =
+        //TODO: check for let expression as init and make transform
+        //TODO: or just always transform for(init;... into {init; for(;... }
+        ForExpr(
+            init =
+                if (ctx!!.init != null) ExprVisitor().visit(ctx.init)
+                else null,
+            cond = ExprVisitor().visit(ctx.cond),
+            fin =
+                if (ctx.fin != null) ExprVisitor().visit(ctx.fin)
+                else null,
+            body = ExprVisitor().visit(ctx.body)
+        )
+
+    override fun visitIfExpr(ctx: ckParser.IfExprContext?): Expr =
+        IfExpr(
+            cond = ExprVisitor().visit(ctx!!.cond),
+            csq = ExprVisitor().visit(ctx.csq),
+            alt =
+                if (ctx.alt != null) ExprVisitor().visit(ctx.alt)
+                else null
+        )
+
+    //TODO: return and break
+
 }
 
 class SequenceVisitor : ckBaseVisitor<Expr>() {

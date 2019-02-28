@@ -29,7 +29,7 @@ expr
     | <assoc=right> target=expr '=' value=expr                          #assignExpr
     | '(' params? ')' ':' type expr                                     #funExpr
     | 'let' ID '=' value=expr                                           #letExpr
-    | 'if' '(' expr ')' csq=expr ( 'else' alt=expr )?                   #ifExpr
+    | 'if' '(' cond=expr ')' csq=expr ( 'else' alt=expr )?              #ifExpr
     | 'for' '(' init=expr? ';' cond=expr ';' fin=expr? ')' body=expr    #forExpr
     | 'return' expr?                                                    #returnExpr
     | 'break' expr?                                                     #breakExpr
