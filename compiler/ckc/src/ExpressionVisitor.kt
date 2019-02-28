@@ -99,7 +99,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     override fun visitCondExpr(ctx: ckParser.CondExprContext?): Expr =
         CondExpr(
             cond = ExprVisitor().visit(ctx!!.cond),
-            con = ExprVisitor().visit(ctx.con),
+            csq = ExprVisitor().visit(ctx.con),
             alt = ExprVisitor().visit(ctx.alt)
         )
 

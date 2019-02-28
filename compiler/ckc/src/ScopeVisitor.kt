@@ -2,64 +2,82 @@
 
 class ScopeVisitor : ASTVisitor<Unit> {
 
+    var localScope = ArrayList<Pair<String, ASTNode>>()
+    var nonLocalScope = ArrayList<String>()
+
     override fun visit(e: UnitExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //nothing
     }
 
     override fun visit(e: SequenceExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        e.expr.accept(this)
+        e.next?.accept(this)
     }
 
     override fun visit(e: NaturalExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //nothing
     }
 
     override fun visit(e: RefExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val found = localScope.findLast { p -> p.first == e.id }
+        if (found == null) {
+            nonLocalScope.add(e.id)
+        }
     }
 
     override fun visit(e: ApplyExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        e.target.accept(this)
+        e.args.forEach{ a -> a.accept(this) }
     }
 
     override fun visit(e: UnaryExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        e.expr.accept(this)
     }
 
     override fun visit(e: BinaryExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        e.lhs.accept(this)
+        e.rhs.accept(this)
     }
 
     override fun visit(e: CondExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        e.cond.accept(this)
+        e.csq.accept(this)
+        e.alt.accept(this)
     }
 
     override fun visit(e: AssignExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        e.target.accept(this)
+        e.value.accept(this)
     }
 
     override fun visit(e: FunExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO: what to do here?
+        //TODO: save current scope
+        //TODO: make new scope
+        //TODO: visit body
+        //TODO: save that function's scope somewhere
+        //TODO: treat non locals from the function body as refExprs here
     }
 
     override fun visit(e: LetExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO: is this right?
+        localScope.add(Pair(e.id, e.value))
+        e.body?.accept(this)
     }
 
     override fun visit(e: IfExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        e.cond.accept(this)
+        e.csq.accept(this)
+        e.alt?.accept(this)
     }
 
     override fun visit(e: WhileExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun visit(e: ReturnExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        e.cond.accept(this)
+        e.body.accept(this)
     }
 
     override fun visit(e: BreakExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        e.value?.accept(this)
     }
 
 }

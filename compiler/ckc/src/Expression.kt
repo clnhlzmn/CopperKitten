@@ -69,13 +69,13 @@ data class BinaryExpr(val lhs: Expr, val op: String, val rhs: Expr) : Expr {
         "$lhs $op $rhs"
 }
 
-data class CondExpr(val cond: Expr, val con: Expr, val alt: Expr) : Expr {
+data class CondExpr(val cond: Expr, val csq: Expr, val alt: Expr) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
     override fun toString(): String =
-        "$cond ? $con : $alt"
+        "$cond ? $csq : $alt"
 }
 
 data class AssignExpr(val target: Expr, val value: Expr) : Expr {
@@ -133,19 +133,6 @@ data class WhileExpr(val cond: Expr, val body: Expr) : Expr {
 
     override fun toString(): String =
         "while ($cond) $body"
-
-}
-
-data class ReturnExpr(val value: Expr?) : Expr {
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
-
-    override fun toString(): String =
-        if (value != null)
-            "return $value"
-        else
-            "return"
 
 }
 
