@@ -50,7 +50,7 @@ class ScopeVisitor : ASTVisitor<Unit> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: ForExpr) {
+    override fun visit(e: WhileExpr) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

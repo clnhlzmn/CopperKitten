@@ -13,7 +13,7 @@ interface ASTVisitor<T> {
     fun visit(e: FunExpr): T
     fun visit(e: LetExpr): T
     fun visit(e: IfExpr): T
-    fun visit(e: ForExpr): T
+    fun visit(e: WhileExpr): T
     fun visit(e: ReturnExpr): T
     fun visit(e: BreakExpr): T
 }

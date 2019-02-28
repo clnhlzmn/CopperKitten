@@ -1,4 +1,4 @@
-// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -40,18 +40,6 @@ public interface ckListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunExpr(ckParser.FunExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code returnExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterReturnExpr(ckParser.ReturnExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code returnExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitReturnExpr(ckParser.ReturnExprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code condExpr}
 	 * labeled alternative in {@link ckParser#expr}.
@@ -173,17 +161,17 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitUnaryExpr(ckParser.UnaryExprContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code forExpr}
+	 * Enter a parse tree produced by the {@code whileExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterForExpr(ckParser.ForExprContext ctx);
+	void enterWhileExpr(ckParser.WhileExprContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code forExpr}
+	 * Exit a parse tree produced by the {@code whileExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitForExpr(ckParser.ForExprContext ctx);
+	void exitWhileExpr(ckParser.WhileExprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code addExpr}
 	 * labeled alternative in {@link ckParser#expr}.

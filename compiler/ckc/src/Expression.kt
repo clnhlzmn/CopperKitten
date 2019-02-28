@@ -126,13 +126,13 @@ data class IfExpr(val cond: Expr, val csq: Expr, val alt: Expr?) : Expr {
 
 }
 
-data class ForExpr(val init: Expr?, val cond: Expr, val fin: Expr?, val body: Expr) : Expr {
+data class WhileExpr(val cond: Expr, val body: Expr) : Expr {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
     override fun toString(): String =
-        "for (${if (init != null) "$init" else ""}; $cond; ${if (fin != null) "$fin" else ""}) $body"
+        "while ($cond) $body"
 
 }
 

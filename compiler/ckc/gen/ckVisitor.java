@@ -1,4 +1,4 @@
-// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -29,13 +29,6 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFunExpr(ckParser.FunExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code returnExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitReturnExpr(ckParser.ReturnExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code condExpr}
 	 * labeled alternative in {@link ckParser#expr}.
@@ -107,12 +100,12 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUnaryExpr(ckParser.UnaryExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code forExpr}
+	 * Visit a parse tree produced by the {@code whileExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitForExpr(ckParser.ForExprContext ctx);
+	T visitWhileExpr(ckParser.WhileExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code addExpr}
 	 * labeled alternative in {@link ckParser#expr}.

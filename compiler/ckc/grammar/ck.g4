@@ -30,8 +30,7 @@ expr
     | '(' params? ')' ':' type expr                                     #funExpr
     | 'let' ID '=' value=expr                                           #letExpr
     | 'if' '(' cond=expr ')' csq=expr ( 'else' alt=expr )?              #ifExpr
-    | 'for' '(' init=expr? ';' cond=expr ';' fin=expr? ')' body=expr    #forExpr
-    | 'return' expr?                                                    #returnExpr
+    | 'while' '(' cond=expr ')' body=expr                               #whileExpr
     | 'break' expr?                                                     #breakExpr
     ;
 

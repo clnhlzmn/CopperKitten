@@ -4,7 +4,7 @@ val stream = CharStreams.fromString(
     "{" +
         "let foo = bar(42, 43); " +
         "baz(); " +
-        "for (let qux = 42;1;) { 1 + 2 / 3 % 4 - 1 } ; " +
+        "while (1) { 1 + 2 / 3 % 4 - 1 } ; " +
         "if(1) doThis() else doThat() ; " +
         "foo = (a:Int):Unit ()" +
     "}"
