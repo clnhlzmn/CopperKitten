@@ -114,7 +114,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             if (ctx!!.params() != null) ParamsVisitor().visit(ctx.params())
             else ArrayList()
         if (params.distinctBy{p -> p.id}.count() != params.size) {
-            throw Error("parameters must have distinct names")
+            throw CKCError("parameters must have distinct names")
         }
         return FunExpr(
             params = params,
@@ -183,5 +183,26 @@ class ParamVisitor : ckBaseVisitor<Param>() {
 class ParamsVisitor : ckBaseVisitor<List<Param>>() {
     override fun visitParams(ctx: ckParser.ParamsContext?): List<Param> =
         ctx!!.param().map { p -> ParamVisitor().visit(p) }
+}
+
+class TypeVisitor : ckBaseVisitor<Type>() {
+
+    override fun visitSimpleType(ctx: ckParser.SimpleTypeContext?): Type =
+        SimpleType(ctx!!.TYPEID().text)
+
+    override fun visitFunType(ctx: ckParser.FunTypeContext?): Type =
+        FunType(
+            argTypes =
+            if (ctx!!.types() != null)
+                TypesVisitor().visit(ctx.types())
+            else
+                ArrayList(),
+            returnType = TypeVisitor().visit(ctx.type())
+        )
+}
+
+class TypesVisitor : ckBaseVisitor<List<Type>>() {
+    override fun visitTypes(ctx: ckParser.TypesContext?): List<Type> =
+        ctx!!.type().map { t -> TypeVisitor().visit(t) }
 }
 
