@@ -55,6 +55,11 @@ class ScopeBuildingVisitor : ASTVisitor<Unit> {
         e.value.accept(this)
     }
 
+    //nothing
+    override fun visit(p: Param) {
+        //nothing
+    }
+
     //FunExpr creates a new scope
     override fun visit(e: FunExpr) {
         //first save current scope as enclosing scope for e

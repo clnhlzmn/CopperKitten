@@ -109,14 +109,19 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             value = ExprVisitor().visit(ctx.value)
         )
 
-    override fun visitFunExpr(ctx: ckParser.FunExprContext?): Expr =
-        FunExpr(
-            params =
+    override fun visitFunExpr(ctx: ckParser.FunExprContext?): Expr {
+        val params =
             if (ctx!!.params() != null) ParamsVisitor().visit(ctx.params())
-            else ArrayList(),
+            else ArrayList()
+        if (params.distinctBy{p -> p.id}.count() != params.size) {
+            throw Error("parameters must have distinct names")
+        }
+        return FunExpr(
+            params = params,
             type = TypeVisitor().visit(ctx.type()),
             body = ExprVisitor().visit(ctx.expr())
         )
+    }
 
     override fun visitWhileExpr(ctx: ckParser.WhileExprContext?): Expr =
         WhileExpr(

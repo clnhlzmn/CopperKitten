@@ -10,6 +10,7 @@ interface ASTVisitor<T> {
     fun visit(e: BinaryExpr): T
     fun visit(e: CondExpr): T
     fun visit(e: AssignExpr): T
+    fun visit(p: Param): T
     fun visit(e: FunExpr): T
     fun visit(e: LetExpr): T
     fun visit(e: IfExpr): T

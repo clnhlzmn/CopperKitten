@@ -1,6 +1,6 @@
 //Expressions
 
-open class Expr(var enclosingScope: ASTNode? = null) : BaseASTNode()
+open class Expr : BaseASTNode()
 
 class UnitExpr() : Expr() {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
@@ -34,6 +34,8 @@ class NaturalExpr(val value: Int) : Expr() {
 }
 
 class RefExpr(val id: String) : Expr() {
+
+    var enclosingScope: ASTNode? = null
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -87,12 +89,18 @@ class AssignExpr(val target: Expr, val value: Expr) : Expr() {
         "$target = $value"
 }
 
-class Param(val id: String, val type: Type) {
+class Param(val id: String, val type: Type): ASTNode {
+
+    override fun <T> accept(visitor: ASTVisitor<T>): T =
+        visitor.visit(this)
+
     override fun toString(): String =
         "$id: $type"
 }
 
 class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
+
+    var enclosingScope: ASTNode? = null
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -102,6 +110,8 @@ class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() 
 }
 
 class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr() {
+
+    var enclosingScope: ASTNode? = null
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)

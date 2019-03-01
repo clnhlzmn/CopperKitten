@@ -6,7 +6,7 @@ val stream = CharStreams.fromString(
         "baz(); " +
         "while (1) { 1 + 2 / 3 % 4 - 1 } ; " +
         "if(1) doThis() else doThat() ; " +
-        "foo = (a:Int):Unit ()" +
+        "foo = (a:Int, b:String):Unit ()" +
     "}"
 )
 val lexer = ckLexer(stream)
@@ -16,6 +16,8 @@ val context = parser.file()
 
 fun main() {
     val res = context.accept(FileVisitor())
+    res.accept(ScopeBuildingVisitor())
+    
     println(res)
 }
 
