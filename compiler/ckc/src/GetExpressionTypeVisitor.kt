@@ -25,7 +25,7 @@ class GetExpressionTypeVisitor : ASTVisitor<Type> {
         return when (def) {
             is Param -> def.type
             is LetExpr -> def.value.accept(this)
-            else -> throw CKCError("unbound reference")
+            else -> ErrorType("unbound reference")
         }
     }
 
@@ -36,7 +36,7 @@ class GetExpressionTypeVisitor : ASTVisitor<Type> {
         val funType = e.target.accept(this)
         return when (funType) {
             is FunType -> funType.returnType
-            else -> throw CKCError("type of target of apply expression must be a function")
+            else -> ErrorType("type of target of apply expression must be a function")
         }
     }
 
@@ -67,7 +67,7 @@ class GetExpressionTypeVisitor : ASTVisitor<Type> {
 
     //this visitor shouldn't ever see a Param
     override fun visit(p: Param): Type {
-        throw CKCError("shouldn't happen")
+        return ErrorType("shouldn't happen")
     }
 
     //fun expr has function type

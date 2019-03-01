@@ -192,7 +192,7 @@ class TypeVisitor : ckBaseVisitor<Type>() {
 
     override fun visitFunType(ctx: ckParser.FunTypeContext?): Type =
         FunType(
-            argTypes =
+            paramTypes =
             if (ctx!!.types() != null)
                 TypesVisitor().visit(ctx.types())
             else

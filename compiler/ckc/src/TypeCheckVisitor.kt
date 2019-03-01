@@ -3,23 +3,72 @@
 class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
 
     override fun visit(e: UnitExpr): List<CKCError> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return ArrayList()
     }
 
     override fun visit(e: SequenceExpr): List<CKCError> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val ret = e.expr.accept(this)
+        return if (ret.isEmpty())
+            //no error
+            return if (e.next != null)
+                //have next? return errors from that
+                e.next.accept(this)
+            else
+                //no next return empty list
+                ret
+        else
+            //return errors
+            //TODO: add info
+            ret
     }
 
     override fun visit(e: NaturalExpr): List<CKCError> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return ArrayList()
     }
 
     override fun visit(e: RefExpr): List<CKCError> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //make sure e.id is in scope
+        val ret = ArrayList<CKCError>()
+        val def = e.accept(FindDefinitionVisitor(e.id))
+        if (def == null)
+            ret.add(CKCError("unbound variable ${e.id}"))
+        return ret
     }
 
     override fun visit(e: ApplyExpr): List<CKCError> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val ret = ArrayList<CKCError>()
+        //get types of arguments
+        val argTypes = e.args.map { a -> a.accept(GetExpressionTypeVisitor()) }
+        if (argTypes.any{ at -> at is ErrorType }) {
+            //arg contains error
+            argTypes.forEach{ at ->
+                if (at is ErrorType)
+                    ret.add(CKCError(at.what))
+            }
+        } else {
+            //no errors in args
+            val targetType = e.target.accept(GetExpressionTypeVisitor())
+            when (targetType) {
+                is ErrorType -> ret.add(CKCError(targetType.what))
+                is FunType -> {
+                    when {
+                        targetType.paramTypes.size != argTypes.size -> {
+                            //not correct number of args
+                            ret.add(CKCError("incorrect number of arguments"))
+                        }
+                        targetType.paramTypes.zip(argTypes).any { p -> p.first != p.second } -> {
+                            //an argument doesn't match function parameter type
+                            ret.add(CKCError("argument type mismatch"))
+                        }
+                        else -> {
+                            //everything is fine
+                        }
+                    }
+                }
+                else -> ret.add(CKCError("target of apply expr must be a function"))
+            }
+        }
+        return ret
     }
 
     override fun visit(e: UnaryExpr): List<CKCError> {
