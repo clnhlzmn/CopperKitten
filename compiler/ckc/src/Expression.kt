@@ -1,8 +1,8 @@
 //Expressions
 
-open class Expr(val enclosingScope: ASTNode?) : BaseASTNode()
+open class Expr(var enclosingScope: ASTNode? = null) : BaseASTNode()
 
-class UnitExpr(enclosingScope: ASTNode?) : Expr(enclosingScope) {
+class UnitExpr() : Expr() {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
@@ -11,7 +11,7 @@ class UnitExpr(enclosingScope: ASTNode?) : Expr(enclosingScope) {
     }
 }
 
-class SequenceExpr(enclosingScope: ASTNode?, val expr: Expr, val next: Expr?) : Expr(enclosingScope) {
+class SequenceExpr(val expr: Expr, val next: Expr?) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -24,7 +24,7 @@ class SequenceExpr(enclosingScope: ASTNode?, val expr: Expr, val next: Expr?) : 
 
 }
 
-class NaturalExpr(enclosingScope: ASTNode?, val value: Int) : Expr(enclosingScope) {
+class NaturalExpr(val value: Int) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -33,7 +33,7 @@ class NaturalExpr(enclosingScope: ASTNode?, val value: Int) : Expr(enclosingScop
         value.toString()
 }
 
-class RefExpr(enclosingScope: ASTNode?, val id: String) : Expr(enclosingScope) {
+class RefExpr(val id: String) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -42,7 +42,7 @@ class RefExpr(enclosingScope: ASTNode?, val id: String) : Expr(enclosingScope) {
         id
 }
 
-class ApplyExpr(enclosingScope: ASTNode?, val target: Expr, val args: List<Expr>) : Expr(enclosingScope) {
+class ApplyExpr(val target: Expr, val args: List<Expr>) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -51,7 +51,7 @@ class ApplyExpr(enclosingScope: ASTNode?, val target: Expr, val args: List<Expr>
         "$target(${args.toString(", ")})"
 }
 
-class UnaryExpr(enclosingScope: ASTNode?, val op: String, val expr: Expr) : Expr(enclosingScope) {
+class UnaryExpr(val op: String, val expr: Expr) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -60,7 +60,7 @@ class UnaryExpr(enclosingScope: ASTNode?, val op: String, val expr: Expr) : Expr
         "$op $expr"
 }
 
-class BinaryExpr(enclosingScope: ASTNode?, val lhs: Expr, val op: String, val rhs: Expr) : Expr(enclosingScope) {
+class BinaryExpr(val lhs: Expr, val op: String, val rhs: Expr) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -69,7 +69,7 @@ class BinaryExpr(enclosingScope: ASTNode?, val lhs: Expr, val op: String, val rh
         "$lhs $op $rhs"
 }
 
-class CondExpr(enclosingScope: ASTNode?, val cond: Expr, val csq: Expr, val alt: Expr) : Expr(enclosingScope) {
+class CondExpr(val cond: Expr, val csq: Expr, val alt: Expr) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -78,7 +78,7 @@ class CondExpr(enclosingScope: ASTNode?, val cond: Expr, val csq: Expr, val alt:
         "$cond ? $csq : $alt"
 }
 
-class AssignExpr(enclosingScope: ASTNode?, val target: Expr, val value: Expr) : Expr(enclosingScope) {
+class AssignExpr(val target: Expr, val value: Expr) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -87,12 +87,12 @@ class AssignExpr(enclosingScope: ASTNode?, val target: Expr, val value: Expr) : 
         "$target = $value"
 }
 
-class Param(enclosingScope: ASTNode?, val id: String, val type: Type) {
+class Param(val id: String, val type: Type) {
     override fun toString(): String =
         "$id: $type"
 }
 
-class FunExpr(enclosingScope: ASTNode?, val params: List<Param>, val type: Type, val body: Expr) : Expr(enclosingScope) {
+class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -101,7 +101,7 @@ class FunExpr(enclosingScope: ASTNode?, val params: List<Param>, val type: Type,
         "(${params.toString(", ")}):$type $body"
 }
 
-class LetExpr(enclosingScope: ASTNode?, val id: String, val value: Expr, val body: Expr?) : Expr(enclosingScope) {
+class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -114,7 +114,7 @@ class LetExpr(enclosingScope: ASTNode?, val id: String, val value: Expr, val bod
 
 }
 
-class IfExpr(enclosingScope: ASTNode?, val cond: Expr, val csq: Expr, val alt: Expr?) : Expr(enclosingScope) {
+class IfExpr(val cond: Expr, val csq: Expr, val alt: Expr?) : Expr() {
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
@@ -126,7 +126,7 @@ class IfExpr(enclosingScope: ASTNode?, val cond: Expr, val csq: Expr, val alt: E
 
 }
 
-class WhileExpr(enclosingScope: ASTNode?, val cond: Expr, val body: Expr) : Expr(enclosingScope) {
+class WhileExpr(val cond: Expr, val body: Expr) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
@@ -136,7 +136,7 @@ class WhileExpr(enclosingScope: ASTNode?, val cond: Expr, val body: Expr) : Expr
 
 }
 
-class BreakExpr(enclosingScope: ASTNode?, val value: Expr?) : Expr(enclosingScope) {
+class BreakExpr(val value: Expr?) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)

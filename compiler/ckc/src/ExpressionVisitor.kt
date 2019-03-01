@@ -133,7 +133,11 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
                 else null
         )
 
-    //TODO: return and break
+    override fun visitBreakExpr(ctx: ckParser.BreakExprContext?): Expr =
+        if (ctx!!.expr() != null)
+            BreakExpr(ExprVisitor().visit(ctx.expr()))
+        else
+            BreakExpr(null)
 
 }
 

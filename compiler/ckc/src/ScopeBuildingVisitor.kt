@@ -1,11 +1,16 @@
 
 
-class ScopeVisitor : ASTVisitor<Unit> {
+class ScopeBuildingVisitor : ASTVisitor<Unit> {
 
+    //start with null scope (top level)
+    var currentScope: ASTNode? = null
+
+    //leaf node, do nothing
     override fun visit(e: UnitExpr) {
         //nothing
     }
 
+    //not a ref or an enclosing scope, just have to visit children
     override fun visit(e: SequenceExpr) {
         e.expr.accept(this)
         e.next?.accept(this)
@@ -16,67 +21,74 @@ class ScopeVisitor : ASTVisitor<Unit> {
     }
 
     override fun visit(e: RefExpr) {
-//        val found = scope.lookupLocal(e.id)
-//        if (found == -1) {
-//            scope.pushCapture(e.id, e)
-//        }
+        //ref expr needs to have scope set
+        e.enclosingScope = currentScope
     }
 
+    //visit children
     override fun visit(e: ApplyExpr) {
         e.target.accept(this)
         e.args.forEach{ a -> a.accept(this) }
     }
 
+    //visit children
     override fun visit(e: UnaryExpr) {
         e.expr.accept(this)
     }
 
+    //visit children
     override fun visit(e: BinaryExpr) {
         e.lhs.accept(this)
         e.rhs.accept(this)
     }
 
+    //visit children
     override fun visit(e: CondExpr) {
         e.cond.accept(this)
         e.csq.accept(this)
         e.alt.accept(this)
     }
 
+    //visit children
     override fun visit(e: AssignExpr) {
         e.target.accept(this)
         e.value.accept(this)
     }
 
+    //FunExpr creates a new scope
     override fun visit(e: FunExpr) {
-//        val savedScope = scope
-//        scope = Scope()
-//        e.body.accept(this)
-//        //TODO: treat non locals from the function body as refExprs here
-//        e.scope = scope
-//        scope = savedScope
+        //first save current scope as enclosing scope for e
+        e.enclosingScope = currentScope
+        //then set the current scope to e
+        currentScope = e
+        //then visit the body of e with the new current scope set
+        e.body.accept(this)
     }
 
+    //LetExpr creates a new scope
     override fun visit(e: LetExpr) {
-//        //add the local to scope
-//        scope.pushLocal(e.id, e)
-//        //visit body
-//        e.body?.accept(this)
-//        //remove the local from scope
-//        //TODO: save this state in e, instead of just throwing it away here
-//        scope.popLocal()
+        //first save current scope as enclosing scope for e
+        e.enclosingScope = currentScope
+        //then set the current scope to e
+        currentScope = e
+        //then visit the body of e with the new current scope set
+        e.body?.accept(this)
     }
 
+    //visit children
     override fun visit(e: IfExpr) {
         e.cond.accept(this)
         e.csq.accept(this)
         e.alt?.accept(this)
     }
 
+    //visit children
     override fun visit(e: WhileExpr) {
         e.cond.accept(this)
         e.body.accept(this)
     }
 
+    //visit children
     override fun visit(e: BreakExpr) {
         e.value?.accept(this)
     }
