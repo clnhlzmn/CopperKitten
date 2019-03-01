@@ -106,7 +106,7 @@ class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() 
         visitor.visit(this)
 
     override fun toString(): String =
-        "(${params.toString(", ")}):$type $body"
+        "(${params.toString(", ")}): $type $body"
 }
 
 class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr() {
