@@ -29,7 +29,7 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
     override fun visit(e: RefExpr): List<CKCError> {
         //make sure e.id is in scope
         val ret = ArrayList<CKCError>()
-        val def = e.accept(FindDefinitionVisitor(e.id))
+        val def = e.accept(FindDefinitionVisitor())
         if (def == null)
             ret.add(CKCError("unbound variable ${e.id}"))
         return ret
@@ -38,7 +38,7 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
     override fun visit(e: ApplyExpr): List<CKCError> {
         val ret = ArrayList<CKCError>()
         //get types of arguments
-        val argTypes = e.args.map { a -> a.accept(GetExpressionTypeVisitor()) }
+        val argTypes = e.args.map { a -> a.accept(GetTypeVisitor()) }
         if (argTypes.any{ at -> at is ErrorType }) {
             //arg contains error
             argTypes.forEach{ at ->
@@ -47,7 +47,7 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
             }
         } else {
             //no errors in args
-            val targetType = e.target.accept(GetExpressionTypeVisitor())
+            val targetType = e.target.accept(GetTypeVisitor())
             when (targetType) {
                 is ErrorType -> ret.add(CKCError(targetType.what))
                 is FunType -> {
@@ -72,7 +72,14 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
     }
 
     override fun visit(e: UnaryExpr): List<CKCError> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val ret = ArrayList<CKCError>()
+        val exprType = e.expr.accept(GetTypeVisitor())
+        when {
+            exprType is SimpleType && exprType.id == "Int" -> ret //OK
+            exprType is ErrorType -> ret.add(CKCError(exprType.what)) //error
+            else -> ret.add(CKCError("type error"))
+        }
+        return ret
     }
 
     override fun visit(e: BinaryExpr): List<CKCError> {

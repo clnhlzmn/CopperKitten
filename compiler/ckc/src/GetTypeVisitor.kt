@@ -1,5 +1,5 @@
 
-class GetExpressionTypeVisitor : ASTVisitor<Type> {
+class GetTypeVisitor : ASTVisitor<Type> {
 
     //unit expr has unit type
     override fun visit(e: UnitExpr): Type {
@@ -21,7 +21,7 @@ class GetExpressionTypeVisitor : ASTVisitor<Type> {
 
     //ref has type of it's definition
     override fun visit(e: RefExpr): Type {
-        val def = e.accept(FindDefinitionVisitor(e.id))
+        val def = e.accept(FindDefinitionVisitor())
         return when (def) {
             is Param -> def.type
             is LetExpr -> def.value.accept(this)

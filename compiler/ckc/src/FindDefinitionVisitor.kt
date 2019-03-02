@@ -2,7 +2,9 @@
 
 //a visitor used to traverse the ast using enclosing
 //scope to find the definition of a RefExpr
-class FindDefinitionVisitor(val id: String) : ASTVisitor<ASTNode?> {
+class FindDefinitionVisitor : ASTVisitor<ASTNode?> {
+
+    var id: String? = null
 
     override fun visit(e: UnitExpr): ASTNode? {
         return null
@@ -19,6 +21,7 @@ class FindDefinitionVisitor(val id: String) : ASTVisitor<ASTNode?> {
     //first visit should be to a RefExpr where we immediately
     //start visiting enclosing scopes
     override fun visit(e: RefExpr): ASTNode? {
+        id = e.id
         return e.enclosingScope?.accept(this)
     }
 

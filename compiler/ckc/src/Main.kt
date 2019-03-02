@@ -17,7 +17,7 @@ val context = parser.file()
 fun main() {
     val res = context.accept(FileVisitor())
     res.accept(ScopeBuildingVisitor())
-    val type = res.accept(GetExpressionTypeVisitor())
+    val type = res.accept(GetTypeVisitor())
     println(res)
     println(type)
 }
