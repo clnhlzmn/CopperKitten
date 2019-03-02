@@ -12,8 +12,8 @@ class ScopeBuildingVisitor : ASTVisitor<Unit> {
 
     //not a ref or an enclosing scope, just have to visit children
     override fun visit(e: SequenceExpr) {
-        e.expr.accept(this)
-        e.next?.accept(this)
+        e.first.accept(this)
+        e.second?.accept(this)
     }
 
     override fun visit(e: NaturalExpr) {
@@ -21,7 +21,7 @@ class ScopeBuildingVisitor : ASTVisitor<Unit> {
     }
 
     override fun visit(e: RefExpr) {
-        //ref expr needs to have scope set
+        //ref first needs to have scope set
         e.enclosingScope = currentScope
     }
 

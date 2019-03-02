@@ -7,14 +7,14 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
     }
 
     override fun visit(e: SequenceExpr): List<CKCError> {
-        val ret = e.expr.accept(this)
+        val ret = e.first.accept(this)
         return if (ret.isEmpty())
             //no error
-            return if (e.next != null)
-                //have next? return errors from that
-                e.next.accept(this)
+            return if (e.second != null)
+                //have second? return errors from that
+                e.second.accept(this)
             else
-                //no next return empty list
+                //no second return empty list
                 ret
         else
             //return errors
@@ -39,6 +39,7 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
         val ret = ArrayList<CKCError>()
         //get types of arguments
         val argTypes = e.args.map { a -> a.accept(GetTypeVisitor()) }
+        //TODO: also visit args with this
         if (argTypes.any{ at -> at is ErrorType }) {
             //arg contains error
             argTypes.forEach{ at ->
@@ -65,7 +66,7 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
                         }
                     }
                 }
-                else -> ret.add(CKCError("target of apply expr must be a function"))
+                else -> ret.add(CKCError("target of apply first must be a function"))
             }
         }
         return ret
@@ -73,9 +74,12 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
 
     override fun visit(e: UnaryExpr): List<CKCError> {
         val ret = ArrayList<CKCError>()
+        //get type of first
         val exprType = e.expr.accept(GetTypeVisitor())
+        //check first also
+        ret.addAll(e.expr.accept(this))
         when {
-            exprType is SimpleType && exprType.id == "Int" -> ret //OK
+            exprType is SimpleType && exprType.id == "Int" -> run {}
             exprType is ErrorType -> ret.add(CKCError(exprType.what)) //error
             else -> ret.add(CKCError("type error"))
         }
@@ -83,7 +87,9 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
     }
 
     override fun visit(e: BinaryExpr): List<CKCError> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val ret = ArrayList<CKCError>()
+
+        return ret
     }
 
     override fun visit(e: CondExpr): List<CKCError> {

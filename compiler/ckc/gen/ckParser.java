@@ -27,7 +27,7 @@ public class ckParser extends Parser {
 		RULE_params = 5, RULE_type = 6, RULE_types = 7;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"file", "expr", "args", "sequence", "param", "params", "type", "types"
+			"file", "first", "args", "sequence", "param", "params", "type", "types"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();

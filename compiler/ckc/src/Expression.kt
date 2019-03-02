@@ -11,16 +11,16 @@ class UnitExpr() : Expr() {
     }
 }
 
-class SequenceExpr(val expr: Expr, val next: Expr?) : Expr() {
+class SequenceExpr(val first: Expr, val second: Expr?) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
     override fun toString(): String =
-        if (next == null)
-            "$expr"
-        else
-            "{$expr; $next}"
+        when (second) {
+            null -> "$first"
+            else -> "{$first; $second}"
+        }
 
 }
 
