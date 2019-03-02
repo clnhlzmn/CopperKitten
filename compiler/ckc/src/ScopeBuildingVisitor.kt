@@ -33,7 +33,7 @@ class ScopeBuildingVisitor : ASTVisitor<Unit> {
 
     //visit children
     override fun visit(e: UnaryExpr) {
-        e.expr.accept(this)
+        e.operand.accept(this)
     }
 
     //visit children
@@ -76,6 +76,8 @@ class ScopeBuildingVisitor : ASTVisitor<Unit> {
         e.enclosingScope = currentScope
         //then set the current scope to e
         currentScope = e
+        //then visit value of let operand
+        e.value.accept(this)
         //then visit the body of e with the new current scope set
         e.body?.accept(this)
     }

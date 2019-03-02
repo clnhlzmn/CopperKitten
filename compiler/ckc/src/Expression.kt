@@ -53,22 +53,22 @@ class ApplyExpr(val target: Expr, val args: List<Expr>) : Expr() {
         "$target(${args.toString(", ")})"
 }
 
-class UnaryExpr(val op: String, val expr: Expr) : Expr() {
+class UnaryExpr(val operator: String, val operand: Expr) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
     override fun toString(): String =
-        "$op $expr"
+        "$operator $operand"
 }
 
-class BinaryExpr(val lhs: Expr, val op: String, val rhs: Expr) : Expr() {
+class BinaryExpr(val lhs: Expr, val operator: String, val rhs: Expr) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
 
     override fun toString(): String =
-        "$lhs $op $rhs"
+        "$lhs $operator $rhs"
 }
 
 class CondExpr(val cond: Expr, val csq: Expr, val alt: Expr) : Expr() {

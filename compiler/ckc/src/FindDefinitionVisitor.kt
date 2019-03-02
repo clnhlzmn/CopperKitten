@@ -63,7 +63,7 @@ class FindDefinitionVisitor : ASTVisitor<ASTNode?> {
     override fun visit(e: LetExpr): ASTNode? {
         //check the id of LetExpr
         if (e.id == id) {
-            return e.value
+            return e
         }
         //otherwise look in enclosing scope
         return e.enclosingScope?.accept(this)

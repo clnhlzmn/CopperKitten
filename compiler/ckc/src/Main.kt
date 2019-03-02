@@ -2,11 +2,9 @@ import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
     "{" +
-        "let foo = bar(42, 43); " +
-        "baz(); " +
-        "while (1) { 1 + 2 / 3 % 4 - 1 } ; " +
-        "if(1) doThis() else doThat() ; " +
-        "foo = (a:Int, b:String):Unit ()" +
+       "let foo = ():Int 42;" +
+        "let bar = foo();" +
+        "bar" +
     "}"
 )
 val lexer = ckLexer(stream)

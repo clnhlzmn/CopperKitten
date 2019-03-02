@@ -22,77 +22,77 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
 
     override fun visitUnaryExpr(ctx: ckParser.UnaryExprContext?): Expr =
         UnaryExpr(
-            op = ctx!!.op.text,
-            expr = ExprVisitor().visit(ctx.expr())
+            operator = ctx!!.op.text,
+            operand = ExprVisitor().visit(ctx.expr())
         )
 
     override fun visitMultExpr(ctx: ckParser.MultExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = ctx.op.text,
+            operator = ctx.op.text,
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 
     override fun visitAddExpr(ctx: ckParser.AddExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = ctx.op.text,
+            operator = ctx.op.text,
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 
     override fun visitShiftExpr(ctx: ckParser.ShiftExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = ctx.op.text,
+            operator = ctx.op.text,
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 
     override fun visitRelExpr(ctx: ckParser.RelExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = ctx.op.text,
+            operator = ctx.op.text,
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 
     override fun visitEqualityExpr(ctx: ckParser.EqualityExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = ctx.op.text,
+            operator = ctx.op.text,
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 
     override fun visitBitAndExpr(ctx: ckParser.BitAndExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = "&",
+            operator = "&",
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 
     override fun visitBitXorExpr(ctx: ckParser.BitXorExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = "^",
+            operator = "^",
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 
     override fun visitBitOrExpr(ctx: ckParser.BitOrExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = "|",
+            operator = "|",
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 
     override fun visitAndExpr(ctx: ckParser.AndExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = "&&",
+            operator = "&&",
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 
     override fun visitOrExpr(ctx: ckParser.OrExprContext?): Expr =
         BinaryExpr(
             lhs = ExprVisitor().visit(ctx!!.lhs),
-            op = "||",
+            operator = "||",
             rhs = ExprVisitor().visit(ctx.rhs)
         )
 

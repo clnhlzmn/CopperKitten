@@ -75,9 +75,9 @@ class TypeCheckVisitor : ASTVisitor<List<CKCError>> {
     override fun visit(e: UnaryExpr): List<CKCError> {
         val ret = ArrayList<CKCError>()
         //get type of first
-        val exprType = e.expr.accept(GetTypeVisitor())
+        val exprType = e.operand.accept(GetTypeVisitor())
         //check first also
-        ret.addAll(e.expr.accept(this))
+        ret.addAll(e.operand.accept(this))
         when {
             exprType is SimpleType && exprType.id == "Int" -> run {}
             exprType is ErrorType -> ret.add(CKCError(exprType.what)) //error

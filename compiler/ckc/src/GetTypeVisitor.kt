@@ -11,17 +11,17 @@ class GetTypeVisitor : ASTVisitor<Type> {
 
     //check the
     override fun visit(e: SequenceExpr): Type {
-        //get the type of the first expr
+        //get the type of the first operand
         val type = e.first.accept(this)
         return when (type) {
             //if error then return error
             is ErrorType -> type
             //else first is ok, discard
             else -> {
-                //get type of second expr
+                //get type of second operand
                 val nextType = e.second?.accept(this)
                 when (nextType) {
-                    //if nextType is null then there was no second expr, return type of first
+                    //if nextType is null then there was no second operand, return type of first
                     null -> type
                     //else return second
                     else -> nextType
@@ -41,39 +41,76 @@ class GetTypeVisitor : ASTVisitor<Type> {
         return when (def) {
             is Param -> def.type
             is LetExpr -> def.value.accept(this)
-            else -> ErrorType("unbound reference")
+            else -> ErrorType("unbound reference ${e.id}")
         }
     }
 
     //apply first has type of its target's return type
     override fun visit(e: ApplyExpr): Type {
-        //e.target must be a function type
-        //return it's return type
-        val funType = e.target.accept(this)
-        return when (funType) {
-            is FunType -> funType.returnType
-            else -> ErrorType("type of target of apply expression must be a function")
+        //get target type
+        val targetType = e.target.accept(this)
+        //get types of arguments
+        val argTypes = e.args.map { a -> a.accept(this) }
+        //check target
+        return when (targetType) {
+            //if target is error return that
+            is ErrorType -> targetType
+            //target is fun
+            is FunType -> {
+                when {
+                    //num args doesn't match
+                    targetType.paramTypes.size != argTypes.size ->
+                        ErrorType("incorrect number of arguments in $e")
+                    //argument type mismatch
+                    targetType.paramTypes.zip(argTypes).any { p -> p.first != p.second } ->
+                        ErrorType("argument type mismatch in $e")
+                    //everything ok so return target return type
+                    else -> targetType.returnType
+                }
+            }
+            //target must be fun
+            else -> ErrorType("${e.target} must be a function in $e")
         }
     }
 
-    //unary first has type int (for now)
     override fun visit(e: UnaryExpr): Type {
-        //unary first must be int for now
-        return SimpleType("Int")
+        val operandType = e.operand.accept(this)
+        return when {
+            operandType is ErrorType -> operandType
+            operandType is SimpleType && operandType.id == "Int" -> operandType
+            else -> ErrorType("expected Int in $e")
+        }
     }
 
-    //binary first has type int (for now)
     override fun visit(e: BinaryExpr): Type {
-        //binary first must be int for now
-        return SimpleType("Int")
+        val lhsType = e.lhs.accept(this)
+        val rhsType = e.rhs.accept(this)
+        return when {
+            lhsType is ErrorType -> lhsType
+            rhsType is ErrorType -> rhsType
+            lhsType is SimpleType && lhsType.id == "Int"
+                && rhsType is SimpleType && rhsType.id == "Int" -> SimpleType("Int")
+            else -> ErrorType("operands to $e must be Int")
+        }
     }
 
-    //conditional first has type of alt or csq (must be the same, but not checked here)
     override fun visit(e: CondExpr): Type {
-        //not attempting to check things here
-        //e must have same type for csq and alt
-        //return type of csq
-        return e.csq.accept(this)
+        val condType = e.cond.accept(this)
+        val csqType = e.csq.accept(this)
+        val altType = e.alt.accept(this)
+        //cond type must be int
+        return when {
+            condType is ErrorType -> condType
+            condType is SimpleType && condType.id == "Int" -> {
+                when {
+                    csqType is ErrorType -> csqType
+                    altType is ErrorType -> altType
+                    csqType == altType -> csqType
+                    else -> ErrorType("${e.csq} and ${e.alt} must have same type in $e")
+                }
+            }
+            else -> ErrorType("${e.cond} must be Int in $e")
+        }
     }
 
     //assign first has type of value
