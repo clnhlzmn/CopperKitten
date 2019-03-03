@@ -6,7 +6,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
 
     //unit first has unit type
     override fun visit(e: UnitExpr): Type {
-        return SimpleType("Unit")
+        return UnitType
     }
 
     //check first and then check next
@@ -32,7 +32,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
 
     //natural first has type Int
     override fun visit(e: NaturalExpr): Type {
-        return SimpleType("Int")
+        return IntType
     }
 
     //ref has type of it's definition
@@ -77,7 +77,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
         val operandType = e.operand.accept(this)
         return when {
             operandType is ErrorType -> operandType
-            operandType is SimpleType && operandType.id == "Int" -> operandType
+            operandType is IntType -> operandType
             else -> ErrorType("expected Int in $e")
         }
     }
@@ -88,8 +88,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
         return when {
             lhsType is ErrorType -> lhsType
             rhsType is ErrorType -> rhsType
-            lhsType is SimpleType && lhsType.id == "Int"
-                && rhsType is SimpleType && rhsType.id == "Int" -> SimpleType("Int")
+            lhsType is IntType && rhsType is IntType -> IntType
             else -> ErrorType("operands to $e must be Int")
         }
     }
@@ -101,7 +100,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
         //cond type must be int
         return when {
             condType is ErrorType -> condType
-            condType is SimpleType && condType.id == "Int" -> {
+            condType is IntType -> {
                 when {
                     csqType is ErrorType -> csqType
                     altType is ErrorType -> altType
@@ -153,7 +152,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
         val bodyType = e.body?.accept(this)
         return when {
             valueType is ErrorType -> valueType
-            bodyType == null -> SimpleType("Unit")
+            bodyType == null -> UnitType
             else -> bodyType
         }
     }
@@ -167,11 +166,13 @@ class GetTypeVisitor : ASTVisitor<Type> {
             //if cond is error return that
             condType is ErrorType -> condType
             //cond must be Int
-            !(condType is SimpleType && condType.id == "Int") -> ErrorType("${e.cond} must have type Int in $e")
+            !(condType is IntType) -> ErrorType("${e.cond} must have type Int in $e")
             //if csq is error return that
             csqType is ErrorType -> csqType
             //if no alt then csq must be Unit
-            altType == null && !(csqType is SimpleType && csqType.id == "Unit") -> ErrorType("${e.csq} must have type Unit when no alternate in $e")
+            altType == null && !(csqType is UnitType) -> ErrorType("${e.csq} must have type Unit when no alternate in $e")
+            //no alt and csq is unit
+            altType == null && csqType is UnitType -> UnitType
             //if alt is error return that
             altType is ErrorType -> altType
             //csq and alt must match
@@ -189,7 +190,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
             //if cond is error return that
             condType is ErrorType -> condType
             //cond must be Int
-            !(condType is SimpleType && condType.id == "Int") -> ErrorType("${e.cond} must have type Int in $e")
+            !(condType is IntType) -> ErrorType("${e.cond} must have type Int in $e")
             //otherwise it's the type of the body
             else -> bodyType
         }
@@ -199,7 +200,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
     override fun visit(e: BreakExpr): Type {
         val valueType = e.value?.accept(this)
         return when (valueType) {
-            null -> SimpleType("Unit")
+            null -> UnitType
             else -> valueType
         }
     }

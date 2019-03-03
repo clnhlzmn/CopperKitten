@@ -185,7 +185,11 @@ class ParamsVisitor : ckBaseVisitor<List<Param>>() {
 class TypeVisitor : ckBaseVisitor<Type>() {
 
     override fun visitSimpleType(ctx: ckParser.SimpleTypeContext?): Type =
-        SimpleType(ctx!!.TYPEID().text)
+        when (ctx!!.TYPEID().text) {
+            "Int" -> IntType
+            "Unit" -> UnitType
+            else -> ErrorType("unknown type ${ctx.TYPEID().text}") //SimpleType(ctx.TYPEID().text)
+        }
 
     override fun visitFunType(ctx: ckParser.FunTypeContext?): Type =
         FunType(
