@@ -9,7 +9,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
         return SimpleType("Unit")
     }
 
-    //check the
+    //check first and then check next
     override fun visit(e: SequenceExpr): Type {
         //get the type of the first operand
         val type = e.first.accept(this)
@@ -133,16 +133,17 @@ class GetTypeVisitor : ASTVisitor<Type> {
     }
 
     override fun visit(e: FunExpr): Type {
-        //function expr has same type as its body
-        //should also match declared type, note that declared type
-        //isn't necessary at for a function expression as the body
-        //will tell us the type
+        //function expr has function type
         val declType = e.type
         val bodyType = e.body.accept(this)
         return when {
             bodyType is ErrorType -> bodyType
-            declType != bodyType -> ErrorType("type mismatch between $declType and $bodyType in $e")
-            else -> bodyType
+            declType != bodyType -> ErrorType("type mismatch between ${e.type} and $bodyType in $e")
+            e.params.distinctBy { p -> p.id }.count() != e.params.size -> ErrorType("parameters names must be distinct in $e")
+            else -> FunType(
+                e.params.map { p -> p.type },
+                e.type
+            )
         }
     }
 
@@ -160,16 +161,47 @@ class GetTypeVisitor : ASTVisitor<Type> {
 
     override fun visit(e: IfExpr): Type {
         val condType = e.cond.accept(this)
+        val csqType = e.csq.accept(this)
+        val altType = e.alt?.accept(this)
+        return when {
+            //if cond is error return that
+            condType is ErrorType -> condType
+            //cond must be Int
+            !(condType is SimpleType && condType.id == "Int") -> ErrorType("${e.cond} must have type Int in $e")
+            //if csq is error return that
+            csqType is ErrorType -> csqType
+            //if no alt then csq must be Unit
+            altType == null && !(csqType is SimpleType && csqType.id == "Unit") -> ErrorType("${e.csq} must have type Unit when no alternate in $e")
+            //if alt is error return that
+            altType is ErrorType -> altType
+            //csq and alt must match
+            csqType != altType -> ErrorType("type mismatch between $csqType and $altType in $e")
+            //otherwise it's csq type
+            else -> csqType
+        }
     }
 
 
     override fun visit(e: WhileExpr): Type {
-
+        val condType = e.cond.accept(this)
+        val bodyType = e.body.accept(this)
+        return when {
+            //if cond is error return that
+            condType is ErrorType -> condType
+            //cond must be Int
+            !(condType is SimpleType && condType.id == "Int") -> ErrorType("${e.cond} must have type Int in $e")
+            //otherwise it's the type of the body
+            else -> bodyType
+        }
     }
 
 
     override fun visit(e: BreakExpr): Type {
-
+        val valueType = e.value?.accept(this)
+        return when (valueType) {
+            null -> SimpleType("Unit")
+            else -> valueType
+        }
     }
 
 

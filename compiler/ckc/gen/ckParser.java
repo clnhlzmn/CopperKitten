@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from /Users/colinholzman/Documents/CopperKitten/compiler/ckc/grammar/ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -27,7 +27,7 @@ public class ckParser extends Parser {
 		RULE_params = 5, RULE_type = 6, RULE_types = 7;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"file", "first", "args", "sequence", "param", "params", "type", "types"
+			"file", "expr", "args", "sequence", "param", "params", "type", "types"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -1618,7 +1618,7 @@ public class ckParser extends Parser {
 		"[\7\31\2\2[r\5\4\3\r\\]\f\13\2\2]^\7\32\2\2^r\5\4\3\f_`\f\n\2\2`a\7\33"+
 		"\2\2ar\5\4\3\13bc\f\t\2\2cd\7\34\2\2de\5\4\3\2ef\7\35\2\2fg\5\4\3\tgr"+
 		"\3\2\2\2hi\f\b\2\2ij\7\36\2\2jr\5\4\3\bkl\f\25\2\2ln\7\5\2\2mo\5\6\4\2"+
-		"nm\3\2\2\2no\3\2\2\2operator\3\2\2\2pr\7\6\2\2qD\3\2\2\2qG\3\2\2\2qJ\3\2\2\2"+
+		"nm\3\2\2\2no\3\2\2\2op\3\2\2\2pr\7\6\2\2qD\3\2\2\2qG\3\2\2\2qJ\3\2\2\2"+
 		"qM\3\2\2\2qP\3\2\2\2qS\3\2\2\2qV\3\2\2\2qY\3\2\2\2q\\\3\2\2\2q_\3\2\2"+
 		"\2qb\3\2\2\2qh\3\2\2\2qk\3\2\2\2ru\3\2\2\2sq\3\2\2\2st\3\2\2\2t\5\3\2"+
 		"\2\2us\3\2\2\2v{\5\4\3\2wx\7$\2\2xz\5\4\3\2yw\3\2\2\2z}\3\2\2\2{y\3\2"+

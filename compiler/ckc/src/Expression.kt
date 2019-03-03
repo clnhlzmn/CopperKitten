@@ -1,6 +1,10 @@
 //Expressions
 
-open class Expr : BaseASTNode()
+open class Expr : ASTNode {
+    override fun <T> accept(visitor: ASTVisitor<T>): T {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}
 
 class UnitExpr() : Expr() {
     override fun <T> accept(visitor: ASTVisitor<T>): T =

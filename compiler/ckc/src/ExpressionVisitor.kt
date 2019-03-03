@@ -113,9 +113,6 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
         val params =
             if (ctx!!.params() != null) ParamsVisitor().visit(ctx.params())
             else ArrayList()
-        if (params.distinctBy{p -> p.id}.count() != params.size) {
-            throw CKCError("parameters must have distinct names")
-        }
         return FunExpr(
             params = params,
             type = TypeVisitor().visit(ctx.type()),

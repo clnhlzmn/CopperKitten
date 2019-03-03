@@ -1,11 +1,7 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "{" +
-       "let foo = ():Int 42;" +
-        "let bar = foo();" +
-        "bar" +
-    "}"
+    ""
 )
 val lexer = ckLexer(stream)
 val tokens = CommonTokenStream(lexer)
