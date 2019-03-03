@@ -113,9 +113,18 @@ class GetTypeVisitor : ASTVisitor<Type> {
         }
     }
 
-    //assign first has type of value
+    //assign has type of value, target must have same type
+    //and be assignable (var, arrayRef, ...)
     override fun visit(e: AssignExpr): Type {
-        return e.value.accept(this)
+        val targetType = e.target.accept(this)
+        val valueType = e.value.accept(this)
+        return when {
+            targetType is ErrorType -> targetType
+            valueType is ErrorType -> valueType
+            //TODO: check that target is assignable
+            targetType == valueType -> valueType
+            else -> ErrorType("type mismatch between ${e.target} and ${e.value} in $e")
+        }
     }
 
     //this visitor shouldn't ever see a Param
@@ -123,44 +132,44 @@ class GetTypeVisitor : ASTVisitor<Type> {
         return ErrorType("shouldn't happen")
     }
 
-    //fun first has function type
     override fun visit(e: FunExpr): Type {
-        return FunType(
-            e.params.map { p -> p.type },
-            e.type
-        )
+        //function expr has same type as its body
+        //should also match declared type, note that declared type
+        //isn't necessary at for a function expression as the body
+        //will tell us the type
+        val declType = e.type
+        val bodyType = e.body.accept(this)
+        return when {
+            bodyType is ErrorType -> bodyType
+            declType != bodyType -> ErrorType("type mismatch between $declType and $bodyType in $e")
+            else -> bodyType
+        }
     }
 
-    //let first has type of body or Unit if no body
     override fun visit(e: LetExpr): Type {
-        return if (e.body == null)
-            SimpleType("Unit")
-        else
-            e.body.accept(this)
+        //let expr has type of its body, or if no body then unit
+        val valueType = e.value.accept(this)
+        val bodyType = e.body?.accept(this)
+        return when {
+            valueType is ErrorType -> valueType
+            bodyType == null -> SimpleType("Unit")
+            else -> bodyType
+        }
     }
 
-    //if an IfExpr has no alt then it's return type must be Unit
-    //otherwise csq and alt must be the same type so return type of csq
+
     override fun visit(e: IfExpr): Type {
-        return if (e.alt == null)
-            SimpleType("Unit")
-        else
-            //e must have same type for csq and alt
-            //return type of csq
-            e.csq.accept(this)
+        val condType = e.cond.accept(this)
     }
 
-    //while first has type of body
+
     override fun visit(e: WhileExpr): Type {
-        return e.body.accept(this)
+
     }
 
-    //break first has unit type or type of value if present
+
     override fun visit(e: BreakExpr): Type {
-        return if (e.value == null)
-            SimpleType("Unit")
-        else
-            e.value.accept(this)
+
     }
 
 
