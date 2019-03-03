@@ -75,9 +75,9 @@ class GetTypeVisitor : ASTVisitor<Type> {
 
     override fun visit(e: UnaryExpr): Type {
         val operandType = e.operand.accept(this)
-        return when {
-            operandType is ErrorType -> operandType
-            operandType is IntType -> operandType
+        return when (operandType) {
+            is ErrorType -> operandType
+            is IntType -> operandType
             else -> ErrorType("expected Int in $e")
         }
     }
@@ -98,9 +98,9 @@ class GetTypeVisitor : ASTVisitor<Type> {
         val csqType = e.csq.accept(this)
         val altType = e.alt.accept(this)
         //cond type must be int
-        return when {
-            condType is ErrorType -> condType
-            condType is IntType -> {
+        return when (condType) {
+            is ErrorType -> condType
+            is IntType -> {
                 when {
                     csqType is ErrorType -> csqType
                     altType is ErrorType -> altType
@@ -166,11 +166,11 @@ class GetTypeVisitor : ASTVisitor<Type> {
             //if cond is error return that
             condType is ErrorType -> condType
             //cond must be Int
-            !(condType is IntType) -> ErrorType("${e.cond} must have type Int in $e")
+            condType !is IntType -> ErrorType("${e.cond} must have type Int in $e")
             //if csq is error return that
             csqType is ErrorType -> csqType
             //if no alt then csq must be Unit
-            altType == null && !(csqType is UnitType) -> ErrorType("${e.csq} must have type Unit when no alternate in $e")
+            altType == null && csqType !is UnitType -> ErrorType("${e.csq} must have type Unit when no alternate in $e")
             //no alt and csq is unit
             altType == null && csqType is UnitType -> UnitType
             //if alt is error return that
@@ -182,17 +182,17 @@ class GetTypeVisitor : ASTVisitor<Type> {
         }
     }
 
-
+    //For now loops return ()
     override fun visit(e: WhileExpr): Type {
         val condType = e.cond.accept(this)
         val bodyType = e.body.accept(this)
         return when {
-            //if cond is error return that
             condType is ErrorType -> condType
+            bodyType is ErrorType -> bodyType
             //cond must be Int
-            !(condType is IntType) -> ErrorType("${e.cond} must have type Int in $e")
-            //otherwise it's the type of the body
-            else -> bodyType
+            condType !is IntType -> ErrorType("${e.cond} must have type Int in $e")
+            //otherwise it's Unit
+            else -> UnitType
         }
     }
 
@@ -201,7 +201,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
         val valueType = e.value?.accept(this)
         return when (valueType) {
             null -> UnitType
-            else -> valueType
+            else -> ErrorType("break not accepting value at this time")
         }
     }
 
