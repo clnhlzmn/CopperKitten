@@ -139,7 +139,7 @@ class GetTypeVisitor : ASTVisitor<Type> {
         return when {
             bodyType is ErrorType -> bodyType
             declType != bodyType -> ErrorType("type mismatch between ${e.type} and $bodyType in $e")
-            e.params.distinctBy { p -> p.id }.count() != e.params.size -> ErrorType("parameters names must be distinct in $e")
+            e.params.distinctBy { p -> p.id }.count() != e.params.size -> ErrorType("parameters must be distinct in $e")
             else -> FunType(
                 e.params.map { p -> p.type },
                 e.type
