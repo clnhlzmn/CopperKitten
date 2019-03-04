@@ -1,10 +1,9 @@
 
 
-open class Definition {}
+open class Definition(val node: ASTNode) {}
 
-data class LocalDef(val def: LetExpr) : Definition()
-data class ParamDef(val def: Param) : Definition()
-data class NonLocalDef(val def: LetExpr) : Definition()
+class LocalDef(node: ASTNode) : Definition(node)
+class NonLocalDef(node: ASTNode) : Definition(node)
 
 //a visitor used to traverse the ast using enclosing
 //scope to find the definition of a RefExpr
@@ -61,7 +60,10 @@ class FindDefinitionVisitor : ASTVisitor<Definition?> {
         //look at function parameters for id
         for (param in e.params) {
             if (param.id == id) {
-                return ParamDef(param)
+                return if (local)
+                    LocalDef(param)
+                else
+                    NonLocalDef(param)
             }
         }
         local = false

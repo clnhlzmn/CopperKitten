@@ -1,7 +1,10 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "while (1) break 42"
+    "{" +
+        "let foo = 42;" +
+        "let bar = ():Int foo" +
+    "}"
 )
 val lexer = ckLexer(stream)
 val tokens = CommonTokenStream(lexer)
@@ -12,6 +15,7 @@ fun main() {
     val res = context.accept(FileVisitor())
     res.accept(ScopeBuildingVisitor())
     val type = res.accept(GetTypeVisitor())
+    res.accept(ComputeCapturesVisitor())
     println(res)
     println(type)
 }

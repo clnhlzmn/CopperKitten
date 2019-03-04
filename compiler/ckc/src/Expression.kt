@@ -104,6 +104,8 @@ class Param(val id: String, val type: Type): ASTNode {
 
 class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
 
+    var captures = ArrayList<ASTNode>()
+
     var enclosingScope: ASTNode? = null
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
