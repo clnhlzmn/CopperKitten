@@ -2,88 +2,94 @@
 
 open class Definition {}
 
-data class Local(val def: ASTNode) : Definition()
-data class Parameter(val def: ASTNode) : Definition()
-data class NonLocal(val def: ASTNode) : Definition()
+data class LocalDef(val def: LetExpr) : Definition()
+data class ParamDef(val def: Param) : Definition()
+data class NonLocalDef(val def: LetExpr) : Definition()
 
 //a visitor used to traverse the ast using enclosing
 //scope to find the definition of a RefExpr
-class FindDefinitionVisitor : ASTVisitor<ASTNode?> {
+class FindDefinitionVisitor : ASTVisitor<Definition?> {
+
+    var local = true
 
     var id: String? = null
 
-    override fun visit(e: UnitExpr): ASTNode? {
+    override fun visit(e: UnitExpr): Definition? {
         return null
     }
 
-    override fun visit(e: SequenceExpr): ASTNode? {
+    override fun visit(e: SequenceExpr): Definition? {
         return null
     }
 
-    override fun visit(e: NaturalExpr): ASTNode? {
+    override fun visit(e: NaturalExpr): Definition? {
         return null
     }
 
     //first visit should be to a RefExpr where we immediately
     //start visiting enclosing scopes
-    override fun visit(e: RefExpr): ASTNode? {
+    override fun visit(e: RefExpr): Definition? {
         id = e.id
         return e.enclosingScope?.accept(this)
     }
 
-    override fun visit(e: ApplyExpr): ASTNode? {
+    override fun visit(e: ApplyExpr): Definition? {
         return null
     }
 
-    override fun visit(e: UnaryExpr): ASTNode? {
+    override fun visit(e: UnaryExpr): Definition? {
         return null
     }
 
-    override fun visit(e: BinaryExpr): ASTNode? {
+    override fun visit(e: BinaryExpr): Definition? {
         return null
     }
 
-    override fun visit(e: CondExpr): ASTNode? {
+    override fun visit(e: CondExpr): Definition? {
         return null
     }
 
-    override fun visit(e: AssignExpr): ASTNode? {
+    override fun visit(e: AssignExpr): Definition? {
         return null
     }
 
-    override fun visit(p: Param): ASTNode? {
+    override fun visit(p: Param): Definition? {
         return null
     }
 
-    override fun visit(e: FunExpr): ASTNode? {
+    override fun visit(e: FunExpr): Definition? {
         //look at function parameters for id
         for (param in e.params) {
             if (param.id == id) {
-                return param
+                return ParamDef(param)
             }
         }
+        local = false
         //otherwise look in enclosing scope
         return e.enclosingScope?.accept(this)
     }
 
-    override fun visit(e: LetExpr): ASTNode? {
+    override fun visit(e: LetExpr): Definition? {
         //check the id of LetExpr
         if (e.id == id) {
-            return e
+            return if (local)
+                LocalDef(e)
+            else
+                NonLocalDef(e)
         }
         //otherwise look in enclosing scope
         return e.enclosingScope?.accept(this)
     }
 
-    override fun visit(e: IfExpr): ASTNode? {
+    override fun visit(e: IfExpr): Definition? {
         return null
     }
 
-    override fun visit(e: WhileExpr): ASTNode? {
+    override fun visit(e: WhileExpr): Definition? {
         return null
     }
 
-    override fun visit(e: BreakExpr): ASTNode? {
+    override fun visit(e: BreakExpr): Definition? {
         return null
     }
 

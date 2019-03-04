@@ -39,8 +39,9 @@ class GetTypeVisitor : ASTVisitor<Type> {
     override fun visit(e: RefExpr): Type {
         val def = e.accept(FindDefinitionVisitor())
         return when (def) {
-            is Param -> def.type
-            is LetExpr -> def.value.accept(this)
+            is ParamDef -> def.def.type
+            is LocalDef -> def.def.value.accept(this)
+            is NonLocalDef -> def.def.value.accept(this)
             else -> ErrorType("unbound reference ${e.id}")
         }
     }
