@@ -32,31 +32,37 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
     }
 
     override fun visit(e: ApplyExpr) {
+
         //evaluate arguments
-        e.args.forEach { a -> a.accept(this) }
+        e.args.reversed().forEach{ a -> a.accept(this) }
         //then evaluate function
         e.target.accept(this)
         //duplicate function
         code.add("dup")
         //get code address
         code.add("rload 0")
+
         //call
         code.add("call")
+
+        //swap function with return value
+        code.add("swap")
+        //remove function
+        code.add("pop")
+        //remove args in the same way
+        e.args.forEach { _ ->
+            code.add("swap");
+            code.add("pop")
+        }
     }
 
     override fun visit(e: UnaryExpr) {
         //evaluate operand
         e.operand.accept(this)
         when (e.operator) {
-            "-" ->
-                //TODO: implement neg
-                code.add("neg")
-            "!" ->
-                //TODO: implement not
-                code.add("not")
-            "~" ->
-                //TODO: implement bitnot
-                code.add("bitnot")
+            "-" -> code.add("neg")
+            "!" -> code.add("not")
+            "~" -> code.add("bitnot")
             else -> TODO("not implemented")
         }
     }
@@ -72,19 +78,19 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
             "-" -> code.add("sub")
             "<<" -> code.add("shl")
             ">>" -> code.add("shr")
-            "<" -> code.add("lt") //TODO: implement this
-            "<=" -> code.add("lte") //TODO: implement this
-            ">" -> code.add("gt") //TODO: implement this
-            ">=" -> code.add("gte") //TODO: implement this
+            "<" -> code.add("lt")
+            "<=" -> code.add("lte")
+            ">" -> code.add("gt")
+            ">=" -> code.add("gte")
             "<>" -> code.add("cmp")
-            "==" -> code.add("equal") //TODO: implement this
-            "!=" -> code.add("nequal") //TODO: implement this
-            "&" -> code.add("bitand") //TODO: implement this
-            "^" -> code.add("bitxor") //TODO: implement this
-            "|" -> code.add("bitor") //TODO: implement this
-            "&&" -> code.add("and") //TODO: implement this (short circuiting)
-            "||" -> code.add("or") //TODO: implement this (short circuiting)
-            else -> code.add("error") //TODO
+            "==" -> code.add("equal")
+            "!=" -> code.add("nequal")
+            "&" -> code.add("bitand")
+            "^" -> code.add("bitxor")
+            "|" -> code.add("bitor")
+            "&&" -> TODO("not implemented")
+            "||" -> TODO("not implemented")
+            else -> TODO("not implemented")
         }
     }
 
@@ -98,7 +104,7 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
     }
 
     override fun visit(p: Param) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun visit(e: FunExpr) {

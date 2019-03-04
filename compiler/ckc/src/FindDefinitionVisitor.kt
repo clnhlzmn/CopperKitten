@@ -1,5 +1,11 @@
 
 
+open class Definition {}
+
+data class Local(val def: ASTNode) : Definition()
+data class Parameter(val def: ASTNode) : Definition()
+data class NonLocal(val def: ASTNode) : Definition()
+
 //a visitor used to traverse the ast using enclosing
 //scope to find the definition of a RefExpr
 class FindDefinitionVisitor : ASTVisitor<ASTNode?> {

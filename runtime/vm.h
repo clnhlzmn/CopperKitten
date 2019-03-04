@@ -47,6 +47,18 @@ enum vm_op_code {
     MOD,        //[...|lhs|rhs]->[...|lhs%rhs]
     SHL,        //[...|lhs|rhs]->[...|lhs<<rhs]
     SHR,        //[...|lhs|rhs]->[...|lhs>>rhs]
+    NEG,        //[...|op]->[...|-op]
+    NOT,        //[...|op]->[...|!op]
+    BITNOT,     //[...|op]->[...|~op]
+    BITAND,
+    BITXOR,
+    BITOR,
+    LT,         //[...|lhs|rhs]->[...|lhs<rhs]
+    LTE,        //[...|lhs|rhs]->[...|lhs<=rhs]
+    GT,         //[...|lhs|rhs]->[...|lhs>rhs]
+    GTE,        //[...|lhs|rhs]->[...|lhs>=rhs]
+    EQUAL,      //[...|lhs|rhs]->[...|lhs==rhs]
+    NEQUAL,     //[...|lhs|rhs]->[...|lhs!=rhs]
     CMP,        //[...|lhs|rhs]->[...|lhs<rhs?-1:lhs>rhs?1:0]
     CALL,       //jump to the address on the stack and push current address
     RET,        //pop address from the stack and jump to it
