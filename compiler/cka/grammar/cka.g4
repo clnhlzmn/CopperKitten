@@ -30,10 +30,14 @@ literalLabelMnemonic
 
 literalIntMnemonic
     : 'push'
+    | 'aload'
+    | 'astore'
     | 'lload'
     | 'lstore'
     | 'rload'
     | 'rstore'
+    | 'cload'
+    | 'cstore'
     ;
 
 simpleInstruction
