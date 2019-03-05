@@ -1,26 +1,28 @@
 
 
 fun compileTopLevel(expr: Expr): String {
-    val functions = ArrayList<String>()
     val code = ArrayList<String>()
 
-    expr.accept(ToCKAVisitor(functions, code))
+    expr.accept(ToCKAVisitor(code))
 
-    return functions.fold("") { acc, s -> "$acc\n$s" } + "\n" + code.fold("") { acc, s -> "$acc\n$s" }
+    return code.fold("") { acc, s -> "$acc\n$s" }
 }
 
-class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<String>) : ASTVisitor<Unit> {
+class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
+
+    var frame = StackFrame()
 
     companion object {
         var count:Int = 0
     }
 
-    fun nextLabel():String {
+    private fun nextLabel():String {
         return "Label_${count++}"
     }
 
     override fun visit(e: UnitExpr) {
         code.add("push 0")
+        frame.pushTemp(false)
     }
 
     override fun visit(e: SequenceExpr) {
@@ -30,6 +32,7 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
 
     override fun visit(e: NaturalExpr) {
         code.add("push ${e.value}")
+        frame.pushTemp(false)
     }
 
     override fun visit(e: RefExpr) {
@@ -39,7 +42,9 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
     override fun visit(e: ApplyExpr) {
 
         //evaluate arguments
-        e.args.reversed().forEach{ a -> a.accept(this) }
+        e.args.reversed().forEach{ a ->
+            a.accept(this)
+        }
         //then evaluate function
         e.target.accept(this)
         //duplicate function
@@ -47,17 +52,24 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
         //get code address
         code.add("rload 0")
 
-        //call
+        //call (replaces code address with return value)
         code.add("call")
+        val retType = e.accept(GetTypeVisitor())
+        when (retType) {
+            is FunType -> frame.pushTemp(true)
+            else -> frame.pushTemp(false)
+        }
 
         //swap function with return value
         code.add("swap")
         //remove function
         code.add("pop")
+        frame.popTemp()
         //remove args in the same way
         e.args.forEach { _ ->
             code.add("swap");
             code.add("pop")
+            frame.popTemp()
         }
     }
 
@@ -70,6 +82,7 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
             "~" -> code.add("bitnot")
             else -> TODO("not implemented")
         }
+        frame.pushTemp(false)
     }
 
     override fun visit(e: BinaryExpr) {
@@ -97,6 +110,7 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
             "||" -> TODO("not implemented")
             else -> TODO("not implemented")
         }
+        frame.popTemp()
     }
 
     override fun visit(e: CondExpr) {
@@ -130,7 +144,13 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
     }
 
     override fun visit(e: FunExpr) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val bodyLabel = nextLabel()
+        //alloc array for function (need to know the layout of the stack at this point)
+        //store bodyLabel in fun[0]
+        //compile capture references
+        //and store in fun[1] to fun[1 + captures.size - 1]
+        code.add("$bodyLabel:")
+        e.body.accept(this)
     }
 
     override fun visit(e: LetExpr) {
