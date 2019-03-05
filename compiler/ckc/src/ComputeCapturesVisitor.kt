@@ -19,8 +19,18 @@ class ComputeCapturesVisitor : ASTVisitor<Unit> {
 
     override fun visit(e: RefExpr) {
         val def = e.accept(FindDefinitionVisitor())
+        //create capture expr
+        val capture = RefExpr(e.id)
+        capture.enclosingScope = currentFun?.enclosingScope
         when (def) {
-            is NonLocalDef -> currentFun?.captures?.add(def.node)
+            //if def is non local then add capture to currentFun
+            is NonLocalDef -> {
+                val cf = currentFun
+                when (cf) {
+                    null -> TODO("impossible, as long as GetTypeVisitor returned non ErrorType on the program")
+                    else -> cf.captures.add(e)
+                }
+            }
         }
     }
 
@@ -54,10 +64,16 @@ class ComputeCapturesVisitor : ASTVisitor<Unit> {
     }
 
     override fun visit(e: FunExpr) {
+        //save current fun
         val lastFun = currentFun
+        //set current fun to e
         currentFun = e
+        //compute captures for e
         e.body.accept(this)
+        //reset current fun
         currentFun = lastFun
+        //do a pass on any captures from e, to add to current fun if necessary
+        e.captures.forEach { c -> c.accept(this) }
     }
 
     override fun visit(e: LetExpr) {

@@ -54,7 +54,7 @@ class ApplyExpr(val target: Expr, val args: List<Expr>) : Expr() {
         visitor.visit(this)
 
     override fun toString(): String =
-        "$target(${args.toString(", ")})"
+        "{$target}(${args.toString(", ")})"
 }
 
 class UnaryExpr(val operator: String, val operand: Expr) : Expr() {
@@ -104,6 +104,7 @@ class Param(val id: String, val type: Type): ASTNode {
 
 class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
 
+    //a list of refExprs that are the variables that this funExpr needs to capture
     var captures = ArrayList<ASTNode>()
 
     var enclosingScope: ASTNode? = null
