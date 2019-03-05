@@ -150,7 +150,9 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
         //compile capture references
         //and store in fun[1] to fun[1 + captures.size - 1]
         code.add("$bodyLabel:")
+        //TODO: add 'enter' instruction here and create a new StackFrame
         e.body.accept(this)
+        //TODO: add 'leave' and 'return' here and restore old StackFrame
     }
 
     override fun visit(e: LetExpr) {
