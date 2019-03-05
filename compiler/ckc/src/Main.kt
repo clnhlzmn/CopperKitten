@@ -1,7 +1,7 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "{let foo = 42; ():Int {{():Int foo}()}}"   //ok
+    "42 ? 42 : -42"   //ok
     //"{let foo = 42; ():Int {{():Int bar}()}}" //unbound reference bar
 )
 val lexer = ckLexer(stream)
@@ -16,13 +16,16 @@ fun main() {
     res.accept(ScopeBuildingVisitor())
     //get program type
     val type = res.accept(GetTypeVisitor())
+    //print type
+    println(type)
     if (type !is ErrorType) {
         //compute function captures
         res.accept(ComputeCapturesVisitor())
+        val code = compileTopLevel(res)
+        //print AST
+        println(res)
+        //print code
+        println(code)
     }
-    //print AST
-    println(res)
-    //print type
-    println(type)
 }
 

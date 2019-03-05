@@ -1,18 +1,23 @@
 
 
-fun compileTopLevel(expr: Expr) {
+fun compileTopLevel(expr: Expr): String {
     val functions = ArrayList<String>()
     val code = ArrayList<String>()
 
-    code.add("enter")
-    code.add("layout [0]")
-
     expr.accept(ToCKAVisitor(functions, code))
 
-    code.add("leave")
+    return functions.fold("") { acc, s -> "$acc\n$s" } + "\n" + code.fold("") { acc, s -> "$acc\n$s" }
 }
 
 class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<String>) : ASTVisitor<Unit> {
+
+    companion object {
+        var count:Int = 0
+    }
+
+    fun nextLabel():String {
+        return "Label_${count++}"
+    }
 
     override fun visit(e: UnitExpr) {
         code.add("push 0")
@@ -95,8 +100,25 @@ class ToCKAVisitor(val functions: MutableList<String>, val code: MutableList<Str
     }
 
     override fun visit(e: CondExpr) {
-        //evaluate condition
+
+        //<cond>
+        //jz Alt
+        //<csq>
+        //j End:
+        //Alt:
+        //<alt>
+        //End:
+
+        val altLabel = nextLabel()
+        val endLabel = nextLabel()
+
         e.cond.accept(this)
+        code.add("jumpz $altLabel")
+        e.csq.accept(this)
+        code.add("jump $endLabel")
+        code.add("$altLabel:")
+        e.alt.accept(this)
+        code.add("$endLabel:")
     }
 
     override fun visit(e: AssignExpr) {
