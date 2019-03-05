@@ -25,11 +25,9 @@ class ComputeCapturesVisitor : ASTVisitor<Unit> {
         when (def) {
             //if def is non local then add capture to currentFun
             is NonLocalDef -> {
-                val cf = currentFun
-                when (cf) {
-                    null -> TODO("impossible, as long as GetTypeVisitor returned non ErrorType on the program")
-                    else -> cf.captures.add(e)
-                }
+                //currentFun can't be null here, right?
+                //as long as GetTypeVisitor returned non ErrorType on the program
+                currentFun!!.captures.add(capture)
             }
         }
     }
