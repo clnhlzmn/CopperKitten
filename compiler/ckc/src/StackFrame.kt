@@ -13,9 +13,10 @@ class StackFrame {
         return ret
     }
 
-    fun pushLocal(b: Boolean) {
+    fun pushLocal(b: Boolean):Int {
         locals.add(b)
         maxLocals = max(locals.size, maxLocals)
+        return locals.size - 1
     }
 
     fun popLocal() {

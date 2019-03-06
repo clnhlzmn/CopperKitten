@@ -1,15 +1,14 @@
 
 
 fun compileTopLevel(expr: Expr): String {
-    val code = ArrayList<String>()
 
     //TODO: wrap top level expr in {():Unit expr}()
-    expr.accept(ToCKAVisitor(code))
+    val program = expr.accept(ToCKAVisitor())
 
-    return code.fold("") { acc, s -> "$acc\n$s" }
+    return program.fold("") { acc, s -> "$acc\n$s" }
 }
 
-class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
+class ToCKAVisitor() : ASTVisitor<List<String>> {
 
     //to keep track of locals and temps on the stack
     //(to be able to generate layout [] instructions)
@@ -28,26 +27,41 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
         return "Label_${count++}"
     }
 
-    override fun visit(e: UnitExpr) {
-        code.add("push 0")
+    override fun visit(e: UnitExpr): List<String> {
         frame!!.pushTemp(false)
+        return listOf("push 0")
     }
 
-    override fun visit(e: SequenceExpr) {
-        e.first.accept(this)
-        e.second?.accept(this)
+    override fun visit(e: SequenceExpr): List<String> {
+        val ret = ArrayList(e.first.accept(this))
+        if (e.second != null) {
+            ret.addAll(e.second.accept(this))
+        }
+        return ret
     }
 
-    override fun visit(e: NaturalExpr) {
-        code.add("push ${e.value}")
+    override fun visit(e: NaturalExpr): List<String> {
         frame!!.pushTemp(false)
+        return listOf("push ${e.value}")
     }
 
-    override fun visit(e: RefExpr) {
-        //TODO: lookup ref and access according to local, arg, or nonlocal
+    override fun visit(e: RefExpr): List<String> {
+        val def = e.accept(FindDefinitionVisitor())
+        when (def) {
+            is NonLocalDef -> {
+                TODO("get enclosing fun, lookup capture index, access capture accordingly")
+            }
+            is LocalDef -> {
+                when (def.node) {
+                    is Param -> TODO("get enclosing fun, lookup param index, access argument accordingly")
+                    is LetExpr -> TODO("get local index from let expr (must add field to set when this visits LetExpr, or get from StackFrame")
+                }
+            }
+        }
+        TODO("not yet implemented")
     }
 
-    override fun visit(e: ApplyExpr) {
+    override fun visit(e: ApplyExpr): List<String> {
 
         //evaluate arguments
         e.args.reversed().forEach{ a ->
@@ -81,7 +95,7 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
         }
     }
 
-    override fun visit(e: UnaryExpr) {
+    override fun visit(e: UnaryExpr): List<String> {
         //evaluate operand
         e.operand.accept(this)
         when (e.operator) {
@@ -92,7 +106,7 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
         }
     }
 
-    override fun visit(e: BinaryExpr) {
+    override fun visit(e: BinaryExpr): List<String> {
         e.lhs.accept(this)
         e.rhs.accept(this)
         when (e.operator) {
@@ -121,7 +135,7 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
         frame!!.popTemp()
     }
 
-    override fun visit(e: CondExpr) {
+    override fun visit(e: CondExpr): List<String> {
 
         //<cond>
         //jz Alt
@@ -143,15 +157,15 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
         code.add("$endLabel:")
     }
 
-    override fun visit(e: AssignExpr) {
+    override fun visit(e: AssignExpr): List<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(p: Param) {
+    override fun visit(p: Param): List<String> {
         TODO("not implemented")
     }
 
-    override fun visit(e: FunExpr) {
+    override fun visit(e: FunExpr): List<String> {
         val bodyLabel = nextLabel()
         //alloc array for function (need to know the layout of the stack at this point)
         //store bodyLabel in fun[0]
@@ -163,19 +177,19 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
         //TODO: add 'leave' and 'return' here and restore old StackFrame
     }
 
-    override fun visit(e: LetExpr) {
+    override fun visit(e: LetExpr): List<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: IfExpr) {
+    override fun visit(e: IfExpr): List<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: WhileExpr) {
+    override fun visit(e: WhileExpr): List<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: BreakExpr) {
+    override fun visit(e: BreakExpr): List<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
