@@ -3,6 +3,7 @@
 fun compileTopLevel(expr: Expr): String {
     val code = ArrayList<String>()
 
+    //TODO: wrap top level expr in {():Unit expr}()
     expr.accept(ToCKAVisitor(code))
 
     return code.fold("") { acc, s -> "$acc\n$s" }
@@ -10,7 +11,14 @@ fun compileTopLevel(expr: Expr): String {
 
 class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
 
-    var frame = StackFrame()
+    //to keep track of locals and temps on the stack
+    //(to be able to generate layout [] instructions)
+    //whenever the stack is changed (because we emit an
+    //instruction like push, pop, dup, add, etc) we need
+    //to adjust the corresponding frame element. similarly
+    //when we emit an enter or leave instruction we need
+    //to create a new, or restore the last, StackFrame object
+    var frame:StackFrame? = null
 
     companion object {
         var count:Int = 0
@@ -22,7 +30,7 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
 
     override fun visit(e: UnitExpr) {
         code.add("push 0")
-        frame.pushTemp(false)
+        frame!!.pushTemp(false)
     }
 
     override fun visit(e: SequenceExpr) {
@@ -32,7 +40,7 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
 
     override fun visit(e: NaturalExpr) {
         code.add("push ${e.value}")
-        frame.pushTemp(false)
+        frame!!.pushTemp(false)
     }
 
     override fun visit(e: RefExpr) {
@@ -56,20 +64,20 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
         code.add("call")
         val retType = e.accept(GetTypeVisitor())
         when (retType) {
-            is FunType -> frame.pushTemp(true)
-            else -> frame.pushTemp(false)
+            is FunType -> frame!!.pushTemp(true)
+            else -> frame!!.pushTemp(false)
         }
 
         //swap function with return value
         code.add("swap")
         //remove function
         code.add("pop")
-        frame.popTemp()
+        frame!!.popTemp()
         //remove args in the same way
         e.args.forEach { _ ->
             code.add("swap");
             code.add("pop")
-            frame.popTemp()
+            frame!!.popTemp()
         }
     }
 
@@ -82,7 +90,6 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
             "~" -> code.add("bitnot")
             else -> TODO("not implemented")
         }
-        frame.pushTemp(false)
     }
 
     override fun visit(e: BinaryExpr) {
@@ -110,7 +117,8 @@ class ToCKAVisitor(val code: MutableList<String>) : ASTVisitor<Unit> {
             "||" -> TODO("not implemented")
             else -> TODO("not implemented")
         }
-        frame.popTemp()
+        //all the above instructions (except && ||) remove a temp from the stack
+        frame!!.popTemp()
     }
 
     override fun visit(e: CondExpr) {

@@ -1,7 +1,7 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "42 ? 42 : -42"   //ok
+    "(a:Int):Unit {a()}" //a must have function type
     //"{let foo = 42; ():Int {{():Int bar}()}}" //unbound reference bar
 )
 val lexer = ckLexer(stream)
