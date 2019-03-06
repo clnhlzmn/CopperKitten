@@ -105,7 +105,7 @@ class Param(val id: String, val type: Type): ASTNode {
 class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
 
     //a list of refExprs that are the variables that this funExpr needs to capture
-    var captures = ArrayList<ASTNode>()
+    val captures = ArrayList<RefExpr>()
 
     var enclosingScope: ASTNode? = null
 

@@ -49,16 +49,30 @@ class ToCKAVisitor() : ASTVisitor<List<String>> {
         val def = e.accept(FindDefinitionVisitor())
         when (def) {
             is NonLocalDef -> {
-                TODO("get enclosing fun, lookup capture index, access capture accordingly")
+                val enclosingFun = e.accept(GetEnclosingFunction())!!
+                val captureIndex = enclosingFun.captures.indexOfFirst{c -> c.id == e.id }
+                return listOf("cload $captureIndex")
             }
             is LocalDef -> {
                 when (def.node) {
-                    is Param -> TODO("get enclosing fun, lookup param index, access argument accordingly")
-                    is LetExpr -> TODO("get local index from let expr (must add field to set when this visits LetExpr, or get from StackFrame")
+                    is Param -> {
+                        val enclosingFun = e.accept(GetEnclosingFunction())!!
+                        val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
+                        return listOf("aload $paramIndex")
+                    }
+                    is LetExpr -> {
+                        val localIndex = frame!!.lookupLocal(e.id)
+                        if (localIndex != null) {
+                            return listOf("lload $localIndex")
+                        } else {
+                            TODO("error")
+                        }
+                    }
+                    else -> TODO("error")
                 }
             }
+            else -> TODO("error")
         }
-        TODO("not yet implemented")
     }
 
     override fun visit(e: ApplyExpr): List<String> {
