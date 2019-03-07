@@ -147,8 +147,10 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
 
     override fun visit(e: BinaryExpr): List<String> {
         val ret = ArrayList<String>()
-        ret.addAll(e.lhs.accept(this))
-        ret.addAll(e.rhs.accept(this))
+        if (e.operator != "&&" && e.operator != "||") {
+            ret.addAll(e.lhs.accept(this))
+            ret.addAll(e.rhs.accept(this))
+        }
         when (e.operator) {
             "*" -> ret.add("mul")
             "/" -> ret.add("div")
@@ -167,8 +169,24 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
             "&" -> ret.add("bitand")
             "^" -> ret.add("bitxor")
             "|" -> ret.add("bitor")
-            "&&" -> TODO("not implemented")
-            "||" -> TODO("not implemented")
+            "&&" -> {
+                val endLabel = nextLabel()
+                ret.addAll(e.lhs.accept(this))
+                ret.add("dup")
+                ret.add("jumpz $endLabel")
+                ret.add("pop")
+                ret.addAll(e.rhs.accept(this))
+                ret.add("$endLabel:")
+            }
+            "||" -> {
+                val endLabel = nextLabel()
+                ret.addAll(e.lhs.accept(this))
+                ret.add("dup")
+                ret.add("jumpnz $endLabel")
+                ret.add("pop")
+                ret.addAll(e.rhs.accept(this))
+                ret.add("$endLabel:")
+            }
             else -> TODO("not implemented")
         }
         //all the above instructions (except && ||) remove a temp from the stack

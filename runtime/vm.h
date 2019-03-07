@@ -205,15 +205,15 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->ip = self->program + vm_get_word(self);
             break;
         case JUMPZ:
-            if (*(self->sp - 1)) {
-                vm_get_word(self);
-            } else {
+            if (*(self->sp - 1) == 0) {
                 self->ip = self->program + vm_get_word(self);
+            } else {
+                vm_get_word(self);
             }
             self->sp--;
             break;
         case JUMPNZ:
-            if (*(self->sp - 1)) {
+            if (*(self->sp - 1) != 0) {
                 self->ip = self->program + vm_get_word(self);
             } else {
                 vm_get_word(self);
