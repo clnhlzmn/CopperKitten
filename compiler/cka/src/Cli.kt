@@ -56,10 +56,10 @@ class Cli(val args: Array<String>) {
                 }
                 if (outputFileName != null) {
                     File(outputFileName).printWriter().use { out ->
-                        out.println(oc.emit())
+                        out.print(oc.emit())
                     }
                 } else {
-                    println(oc.emit())
+                    print(oc.emit())
                 }
             }
 

@@ -43,6 +43,6 @@ class OutputContext(private val memSize: Int, private val stackSize: Int) {
             "\tvm_init(&vm_instance, &gc_instance, stack_mem, layouts);\n" +
             "\tvm_execute(&vm_instance, program);\n" +
             "\treturn 0;\n" +
-            "}\n"
+            "}"
     }
 }
