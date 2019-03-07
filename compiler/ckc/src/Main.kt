@@ -1,7 +1,7 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "(a:Int):Unit {a()}" //a must have function type
+    "{let foo = 42; {(a:Int):Int {a; foo}}(42)}"
     //"{let foo = 42; ():Int {{():Int bar}()}}" //unbound reference bar
 )
 
@@ -25,11 +25,11 @@ fun main() {
         if (type !is ErrorType) {
             //compute function captures
             res.accept(ComputeCapturesVisitor())
-            val code = compileTopLevel(res)
+            val code = compileFunctionBody(res)
             //print AST
             println(res)
             //print code
-            println(code)
+            println(code.toString("\n"))
         }
     }
 }

@@ -1,24 +1,28 @@
 //Types
 
-open class Type
+interface Type {
+    fun isRefType(): Boolean
+}
 
-data class ErrorType(val what: String) : Type() {
+data class ErrorType(val what: String) : Type {
+
+    override fun isRefType(): Boolean = false
+
     override fun toString(): String = "Error: $what"
 }
 
-object IntType : Type() {
+object IntType : Type {
+    override fun isRefType(): Boolean = false
     override fun toString(): String = "Int"
 }
 
-object UnitType : Type() {
+object UnitType : Type {
+    override fun isRefType(): Boolean = false
     override fun toString(): String = "Unit"
 }
 
-//data class SimpleType(val id: String) : Type() {
-//    override fun toString(): String = id
-//}
-
-data class FunType(val paramTypes: List<Type>, val returnType: Type) : Type() {
+data class FunType(val paramTypes: List<Type>, val returnType: Type) : Type {
+    override fun isRefType(): Boolean = true
     override fun toString(): String =
         "(${paramTypes.toString(", ")}): $returnType"
 }
