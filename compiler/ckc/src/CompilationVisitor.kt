@@ -54,6 +54,7 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
         val ret = ArrayList(e.first.accept(this))
         if (e.second != null) {
             ret.add("pop")
+            frame.popTemp()
             ret.addAll(e.second.accept(this))
         }
         return ret
@@ -66,10 +67,12 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
 
     override fun visit(e: RefExpr): List<String> {
         val def = e.accept(FindDefinitionVisitor())
+        val isRef = e.accept(GetTypeVisitor()).isRefType()
         when (def) {
             is NonLocalDef -> {
                 val enclosingFun = e.accept(GetEnclosingFunction())!!
                 val captureIndex = enclosingFun.captures.indexOfFirst{c -> c.id == e.id }
+                frame.pushTemp(isRef)
                 return listOf("cload $captureIndex")
             }
             is LocalDef -> {
@@ -77,11 +80,13 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
                     is Param -> {
                         val enclosingFun = e.accept(GetEnclosingFunction())!!
                         val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
+                        frame.pushTemp(isRef)
                         return listOf("aload $paramIndex")
                     }
                     is LetExpr -> {
                         val localIndex = frame.lookupLocal(e.id)
                         if (localIndex != null) {
+                            frame.pushTemp(isRef)
                             return listOf("lload $localIndex")
                         } else {
                             TODO("error")
@@ -99,20 +104,20 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
         //evaluate arguments
         e.args.reversed().forEach{ a ->
             ret.addAll(a.accept(this))
-            frame.pushTemp(a.accept(GetTypeVisitor()).isRefType())
         }
         //then evaluate function
         ret.addAll(e.target.accept(this))
-        frame.pushTemp(true)
-        //duplicate function
+        //duplicate function (puts another ref on stack)
         ret.add("dup")
-        //get code address
+        //get code address (replaces dup'd function with non-ref function address)
         ret.add("rload 0")
         frame.pushTemp(false)
+        //layout instruction
         ret.add("layout [${frame.getLayout().toString(", ")}]")
-        //call (removes code address)
+        //call (removes function address)
         ret.add("call")
-        //remove function
+        frame.popTemp()
+        //remove original function
         ret.add("pop")
         frame.popTemp()
         //remove args in the same way
@@ -122,19 +127,15 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
         }
         //load return value
         ret.add("load")
-        //push temp
-        val retType = e.accept(GetTypeVisitor())
-        when (retType) {
-            is FunType -> frame.pushTemp(true)
-            else -> frame.pushTemp(false)
-        }
+        //push temp (return value)
+        frame.pushTemp(e.accept(GetTypeVisitor()).isRefType())
         return ret
     }
 
     override fun visit(e: UnaryExpr): List<String> {
         val ret = ArrayList<String>()
         //evaluate operand
-        e.operand.accept(this)
+        ret.addAll(e.operand.accept(this))
         when (e.operator) {
             "-" -> ret.add("neg")
             "!" -> ret.add("not")
@@ -146,8 +147,8 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
 
     override fun visit(e: BinaryExpr): List<String> {
         val ret = ArrayList<String>()
-        e.lhs.accept(this)
-        e.rhs.accept(this)
+        ret.addAll(e.lhs.accept(this))
+        ret.addAll(e.rhs.accept(this))
         when (e.operator) {
             "*" -> ret.add("mul")
             "/" -> ret.add("div")
@@ -179,7 +180,7 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
         val ret = ArrayList<String>()
         val altLabel = nextLabel()
         val endLabel = nextLabel()
-        e.cond.accept(this)
+        ret.addAll(e.cond.accept(this))
         ret.add("jumpz $altLabel")
         ret.addAll(e.csq.accept(this))
         ret.add("jump $endLabel")

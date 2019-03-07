@@ -1,7 +1,7 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "{():Int 42}()"
+    "42 < 43 ? 1 : 0"
     //"{let foo = 42; ():Int {{():Int bar}()}}" //unbound reference bar
 )
 
