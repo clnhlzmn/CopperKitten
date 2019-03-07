@@ -20,6 +20,7 @@ struct vm {
     intptr_t *sp;       //pointer to one above tos
     intptr_t *fp;       //pointer to stack frame
     foreach_t *layouts; //pointer to array of layout functions
+    intptr_t temp       //temporary register (not a root)
 };
 
 static inline void vm_init(
@@ -50,18 +51,18 @@ enum vm_op_code {
     NEG,        //[...|op]->[...|-op]
     NOT,        //[...|op]->[...|!op]
     BITNOT,     //[...|op]->[...|~op]
-    BITAND,
-    BITXOR,
-    BITOR,
+    BITAND,     //[...|lhs|rhs]->[...|lhs&rhs]
+    BITXOR,     //[...|lhs|rhs]->[...|lhs^rhs]
+    BITOR,      //[...|lhs|rhs]->[...|lhs|rhs]
     LT,         //[...|lhs|rhs]->[...|lhs<rhs]
     LTE,        //[...|lhs|rhs]->[...|lhs<=rhs]
     GT,         //[...|lhs|rhs]->[...|lhs>rhs]
     GTE,        //[...|lhs|rhs]->[...|lhs>=rhs]
-    EQUAL,      //[...|lhs|rhs]->[...|lhs==rhs]
-    NEQUAL,     //[...|lhs|rhs]->[...|lhs!=rhs]
+    EQ,         //[...|lhs|rhs]->[...|lhs==rhs]
+    NEQ,        //[...|lhs|rhs]->[...|lhs!=rhs]
     CMP,        //[...|lhs|rhs]->[...|lhs<rhs?-1:lhs>rhs?1:0]
     CALL,       //jump to the address on the stack and push current address
-    RET,        //pop address from the stack and jump to it
+    RETURN,        //pop address from the stack and jump to it
     JUMP,       //jump to the address following JMP
     JUMPZ,      //same as JMP if tos is zero
     JUMPNZ,     //same as JMP if toz is not zero
@@ -75,6 +76,8 @@ enum vm_op_code {
     OUT,        //print a byte to the console
     LAYOUT,     //[...]->[...], set the frame layout from the next word in the program
     ALLOC,      //[...|size]->[...|ref], allocate n cells with the given layout. size is on stack, layout is in instruction stream
+    LOAD,       //[...]->[...|value], load value from temp register
+    STORE,      //[...|value]->[...], store value in temp register
     LLOAD,      //[...]->[...|value], get the word at fp+index, index is the word following instruction
     LSTORE,     //[...value]->[...], set the word at fp+index to the given value
     RLOAD,      //[...|ref]->[...|value], get the word at ref+index
@@ -142,6 +145,51 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case SHR:
             *(self->sp - 2) = *(self->sp - 2) >> *(self->sp - 1);
+            self->sp--;
+            break;
+        case NEG:
+            *(self->sp - 1) = -*(self->sp - 1);
+            break;
+        case NOT:
+            *(self->sp - 1) = !*(self->sp - 1);
+            break;
+        case NOT:
+            *(self->sp - 1) = ~*(self->sp - 1);
+            break;
+        case BITAND:
+            *(self->sp - 2) = *(self->sp - 2) & *(self->sp - 1);
+            self->sp--;
+            break;
+        case BITXOR:
+            *(self->sp - 2) = *(self->sp - 2) ^ *(self->sp - 1);
+            self->sp--;
+            break;
+        case BITOR:
+            *(self->sp - 2) = *(self->sp - 2) | *(self->sp - 1);
+            self->sp--;
+            break;
+        case LT:
+            *(self->sp - 2) = *(self->sp - 2) < *(self->sp - 1);
+            self->sp--;
+            break;
+        case LTE:
+            *(self->sp - 2) = *(self->sp - 2) <= *(self->sp - 1);
+            self->sp--;
+            break;
+        case GT:
+            *(self->sp - 2) = *(self->sp - 2) > *(self->sp - 1);
+            self->sp--;
+            break;
+        case GTE:
+            *(self->sp - 2) = *(self->sp - 2) >= *(self->sp - 1);
+            self->sp--;
+            break;
+        case EQ:
+            *(self->sp - 2) = *(self->sp - 2) == *(self->sp - 1);
+            self->sp--;
+            break;
+        case NEQ:
+            *(self->sp - 2) = *(self->sp - 2) !- *(self->sp - 1);
             self->sp--;
             break;
         case CMP: 
@@ -217,6 +265,14 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             //TODO: foreach_t funtion for this guy: traverse frames and call frame layout function for each
             *(self->sp - 1) = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 1), self->layouts[vm_get_word(self)]);
             break;
+        case LOAD:
+            *self->sp = self->temp;
+            self->sp++;
+            break;
+        case STORE:
+            self->temp = *(self->sp - 1);
+            self->sp--;
+            break;
         case LLOAD:
             *self->sp = *(self->fp + vm_get_word(self) + 2);
             self->sp++;
@@ -233,6 +289,18 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             //TODO: gc_write_barrier
             *((intptr_t*)*(self->sp - 2) + vm_get_word(self)) = *(self->sp - 1);
             self->sp--;
+            break;
+        case ALOAD:
+            //TODO
+            break;
+        case ASTORE:
+            //TODO
+            break;
+        case CLOAD:
+            //TODO
+            break;
+        case CSTORE:
+            //TODO
             break;
         case NCALL: {
             void(*fun)(struct vm *) = (void(*)(struct vm *))*(self->sp-1);

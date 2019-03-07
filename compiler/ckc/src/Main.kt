@@ -1,7 +1,7 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "42"
+    "{():Int 42}()"
     //"{let foo = 42; ():Int {{():Int bar}()}}" //unbound reference bar
 )
 
@@ -25,7 +25,8 @@ fun main() {
         if (type !is ErrorType) {
             //compute function captures
             res.accept(ComputeCapturesVisitor())
-            val code = compileFunctionBody(res)
+            val code = ArrayList<String>(compileFunctionBody(res))
+            code.add("halt")
             //print AST
             println(res)
             //print code

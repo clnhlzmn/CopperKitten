@@ -17,6 +17,8 @@ fun compileFunctionBody(expr: Expr): List<String> {
     preamble.addAll(program)
     //program is preamble
     program = preamble
+    //save return value
+    program.add("store")
     //remove locals
     program.addAll(List(maxLocals) {"pop"})
     //leave top level frame
@@ -50,8 +52,8 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
 
     override fun visit(e: SequenceExpr): List<String> {
         val ret = ArrayList(e.first.accept(this))
-        ret.add("pop")
         if (e.second != null) {
+            ret.add("pop")
             ret.addAll(e.second.accept(this))
         }
         return ret
@@ -108,23 +110,23 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
         ret.add("rload 0")
         frame.pushTemp(false)
         ret.add("layout [${frame.getLayout().toString(", ")}]")
-        //call (replaces code address with return value)
+        //call (removes code address)
         ret.add("call")
-        val retType = e.accept(GetTypeVisitor())
-        when (retType) {
-            is FunType -> frame.pushTemp(true)
-            else -> frame.pushTemp(false)
-        }
-        //swap function with return value
-        ret.add("swap")
         //remove function
         ret.add("pop")
         frame.popTemp()
         //remove args in the same way
         e.args.forEach { _ ->
-            ret.add("swap");
             ret.add("pop")
             frame.popTemp()
+        }
+        //load return value
+        ret.add("load")
+        //push temp
+        val retType = e.accept(GetTypeVisitor())
+        when (retType) {
+            is FunType -> frame.pushTemp(true)
+            else -> frame.pushTemp(false)
         }
         return ret
     }
@@ -228,8 +230,11 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
         ret.add("jump $contLabel")
         //here goes the body
         ret.add("$bodyLabel:")
+        //compile body (including 'enter', 'store' ret val, and 'leave', but no 'return')
         ret.addAll(compileFunctionBody(e.body))
+        //put 'return' here
         ret.add("return")
+        //continue program from above
         ret.add("$contLabel:")
         return ret
     }
