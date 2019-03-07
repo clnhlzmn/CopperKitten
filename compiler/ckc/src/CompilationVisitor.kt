@@ -224,9 +224,12 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
             ret.add("rstore 0")
             frame.popTemp()
         }
+        //jump over the function body
         ret.add("jump $contLabel")
+        //here goes the body
         ret.add("$bodyLabel:")
         ret.addAll(compileFunctionBody(e.body))
+        ret.add("return")
         ret.add("$contLabel:")
         return ret
     }
