@@ -297,7 +297,25 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
     }
 
     override fun visit(e: WhileExpr): List<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val ret = ArrayList<String>()
+        val beginLabel = nextLabel()
+        val endLabel = nextLabel()
+        val condLabel = nextLabel()
+        ret.add("jump $condLabel")
+        ret.add("$beginLabel:")
+        ret.addAll(e.body.accept(this))
+        //discard result
+        ret.add("pop")
+        frame.popTemp()
+        ret.add("$condLabel:")
+        ret.addAll(e.cond.accept(this))
+        ret.add("jumpnz $beginLabel")
+        frame.popTemp()
+        ret.add("$endLabel:")
+        //value of type Unit
+        ret.add("push 0")
+        frame.pushTemp(false)
+        return ret
     }
 
     override fun visit(e: BreakExpr): List<String> {

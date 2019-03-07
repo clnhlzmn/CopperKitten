@@ -1,7 +1,7 @@
 import org.antlr.v4.runtime.*
 
 val stream = CharStreams.fromString(
-    "{if (42 || 43) 1 else 0}"
+    "while (1) 42"
     //"let forever = ():Unit {forever()}" //stack overflow in GetTypeVisitor
     //"{let foo = 42; ():Int {{():Int bar}()}}" //unbound reference bar
 )
