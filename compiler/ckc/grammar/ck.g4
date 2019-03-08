@@ -5,7 +5,15 @@ grammar ck;
 //basic CK
 
 file 
-    : expr? EOF
+    : decls? expr? EOF
+    ;
+
+decls
+    : decl+
+    ;
+
+decl
+    : 'cfun' ID ':' type                                                #cfunDecl
     ;
 
 expr
