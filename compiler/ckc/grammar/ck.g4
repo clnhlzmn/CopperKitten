@@ -13,7 +13,7 @@ decls
     ;
 
 decl
-    : 'cfun' ID ':' type                                                #cfunDecl
+    : 'cfun' ID '=' type                                                #cfunDecl
     ;
 
 expr
