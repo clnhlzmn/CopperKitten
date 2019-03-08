@@ -10,8 +10,10 @@ CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE}
 
 RUNTIMEDIR = ../runtime
 
+GCIMPL = ../runtime/mark_compact_gc.c
+
 example: example.c
-	gcc example.c -o example -I${RUNTIMEDIR}
+	gcc example.c ${GCIMPL} -o example -I${RUNTIMEDIR}
 
 example.c : example.cka
 	${CKA} -i example.cka -o example.c ${CKAFLAGS}

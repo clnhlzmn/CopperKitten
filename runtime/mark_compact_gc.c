@@ -44,10 +44,10 @@ void gc_init(struct gc *self, intptr_t *mem, size_t size) {
 //callback for root iterator.
 //marks the object pointed to by the 
 //reference pointed to by it
-static inline void mark_ref_cb(void *it, void *ctx) {
+static inline void mark_ref_cb(intptr_t **it, void *ctx) {
     assert(it);
     (void)ctx;
-    intptr_t *ref = *(intptr_t **)it;
+    intptr_t *ref = *it;
     struct gc_object *obj = get_gc_ptr(ref);
     if (obj->mark == 0) {
         /*printf("mark_ref_cb: obj = %p\r\n", obj);*/
@@ -58,10 +58,10 @@ static inline void mark_ref_cb(void *it, void *ctx) {
 
 //callback for root iterator.
 //to update the reference pointed to by it
-static inline void update_ref_address_cb(void *it, void *ctx) {
+static inline void update_ref_address_cb(intptr_t **it, void *ctx) {
     assert(it);
     (void)ctx;
-    intptr_t **ref = (intptr_t **)it;
+    intptr_t **ref = it;
     struct gc_object *obj = get_gc_ptr(*ref);
     if (obj->forward) {
         /*printf("update_ref_address_cb: old = %p, new = %p\r\n", obj, (void*)obj->forward);*/
@@ -162,10 +162,10 @@ static inline intptr_t *gc_alloc(
 
 //callback for foreach_t. zeros the reference pointed to by it.
 //doesn't care about context
-static inline void zero_ref_cb(void *it, void *ctx) {
+static inline void zero_ref_cb(intptr_t **it, void *ctx) {
     (void)ctx;
     assert(it);
-    *(intptr_t**)it = NULL;
+    *it = NULL;
 }
 
 //allocate GC managed memory with custom layout

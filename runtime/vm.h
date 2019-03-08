@@ -153,7 +153,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
         case NOT:
             *(self->sp - 1) = !*(self->sp - 1);
             break;
-        case NOT:
+        case BITNOT:
             *(self->sp - 1) = ~*(self->sp - 1);
             break;
         case BITAND:
@@ -189,7 +189,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp--;
             break;
         case NEQ:
-            *(self->sp - 2) = *(self->sp - 2) !- *(self->sp - 1);
+            *(self->sp - 2) = *(self->sp - 2) != *(self->sp - 1);
             self->sp--;
             break;
         case CMP: 
