@@ -20,3 +20,9 @@ example.c : example.cka
 
 example.cka : example.ck
 	${CKC} -i example.ck -o example.cka
+
+clean:
+	rm -rf example.cka
+	rm -rf example.c
+	rm -rf example.exe
+	rm -rf example

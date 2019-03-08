@@ -1,9 +1,0 @@
-enter
-push 0
-push 42
-lstore 0
-lload 0
-store
-pop
-leave
-halt
