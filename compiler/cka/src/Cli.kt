@@ -73,9 +73,7 @@ class Cli(val args: Array<String>) {
 
     private fun help() {
         // This prints out some help
-        val formater = HelpFormatter()
-        formater.printHelp("h", options)
-        System.exit(0)
+        HelpFormatter().printHelp("h", options)
     }
 }
 

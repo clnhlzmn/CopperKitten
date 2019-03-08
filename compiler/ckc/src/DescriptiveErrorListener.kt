@@ -3,7 +3,7 @@ import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 
-class DescriptiveErrorListener(val error: Array<Boolean>) : BaseErrorListener() {
+class DescriptiveErrorListener(val error: MutableList<String>) : BaseErrorListener() {
 
     override fun syntaxError(
         recognizer: Recognizer<*, *>?, offendingSymbol: Any?,
@@ -16,7 +16,6 @@ class DescriptiveErrorListener(val error: Array<Boolean>) : BaseErrorListener() 
             sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine)
         }
 
-        System.err.println("$sourceName line $line:$charPositionInLine $msg")
-        error[0] = true
+        error.add("$sourceName line $line:$charPositionInLine $msg")
     }
 }
