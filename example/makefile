@@ -1,12 +1,17 @@
 
-CKC = java -jar "..\compiler\out\artifacts\ckc_jar\ckc.jar"
-CKA = java -jar "..\compiler\out\artifacts\cka_jar\cka.jar"
+CKC = java -jar ../compiler/out/artifacts/ckc_jar/ckc.jar
+CKA = java -jar ../compiler/out/artifacts/cka_jar/cka.jar
 
 STACKSIZE = 100
 HEAPSIZE = 1000
 WORDSIZE = 4
 
 CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE}
+
+RUNTIMEDIR = ../runtime
+
+example: example.c
+	gcc example.c -o example -I${RUNTIMEDIR}
 
 example.c : example.cka
 	${CKA} -i example.cka -o example.c ${CKAFLAGS}

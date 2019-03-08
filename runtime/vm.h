@@ -20,7 +20,7 @@ struct vm {
     intptr_t *sp;       //pointer to one above tos
     intptr_t *fp;       //pointer to stack frame
     foreach_t *layouts; //pointer to array of layout functions
-    intptr_t temp       //temporary register (not a root)
+    intptr_t temp;      //temporary register (not a root)
 };
 
 static inline void vm_init(
