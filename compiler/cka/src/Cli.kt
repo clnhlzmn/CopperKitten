@@ -59,7 +59,7 @@ class Cli(val args: Array<String>) {
                         out.print(oc.emit())
                     }
                 } else {
-                    print(oc.emit())
+                    println(oc.emit())
                 }
             }
 

@@ -54,15 +54,15 @@ class Cli(val args: Array<String>) {
                                 out.print(code.toString("\n"))
                             }
                         } else {
-                            print(code.toString("\n"))
+                            println(code.toString("\n"))
                         }
                     } else {
                         //print error
-                        print(type)
+                        println(type)
                     }
                 } else {
                     //parse error
-                    print(parseError.toString("\n"))
+                    println(parseError.toString("\n"))
                 }
             }
 
