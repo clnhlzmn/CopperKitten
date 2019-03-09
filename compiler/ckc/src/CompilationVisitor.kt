@@ -69,30 +69,33 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
         val def = e.accept(FindDefinitionVisitor())
         val isRef = e.accept(GetTypeVisitor()).isRefType()
         when (def) {
-            is NonLocalDef -> {
-                val enclosingFun = e.accept(GetEnclosingFunction())!!
-                val captureIndex = enclosingFun.captures.indexOfFirst{c -> c.id == e.id }
-                frame.pushTemp(isRef)
-                return listOf("cload $captureIndex")
-            }
-            is LocalDef -> {
-                when (def.node) {
-                    is Param -> {
-                        val enclosingFun = e.accept(GetEnclosingFunction())!!
-                        val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
-                        frame.pushTemp(isRef)
-                        return listOf("aload $paramIndex")
-                    }
-                    is LetExpr -> {
-                        val localIndex = frame.lookupLocal(e.id)
-                        if (localIndex != null) {
-                            frame.pushTemp(isRef)
-                            return listOf("lload $localIndex")
-                        } else {
-                            TODO("error")
+            is Definition -> {
+                when (def.local) {
+                    true -> {
+                        when (def) {
+                            is Definition.Param -> {
+                                val enclosingFun = e.accept(GetEnclosingFunction())!!
+                                val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
+                                frame.pushTemp(isRef)
+                                return listOf("aload $paramIndex")
+                            }
+                            is Definition.Let -> {
+                                val localIndex = frame.lookupLocal(e.id)
+                                if (localIndex != null) {
+                                    frame.pushTemp(isRef)
+                                    return listOf("lload $localIndex")
+                                } else {
+                                    TODO("error")
+                                }
+                            }
                         }
                     }
-                    else -> TODO("error")
+                    false -> {
+                        val enclosingFun = e.accept(GetEnclosingFunction())!!
+                        val captureIndex = enclosingFun.captures.indexOfFirst{c -> c.id == e.id }
+                        frame.pushTemp(isRef)
+                        return listOf("cload $captureIndex")
+                    }
                 }
             }
             else -> TODO("error")
@@ -212,10 +215,6 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(p: Param): List<String> {
-        TODO("not implemented")
-    }
-
     override fun visit(e: FunExpr): List<String> {
         val ret = ArrayList<String>()
         val bodyLabel = nextLabel()
@@ -261,18 +260,18 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
     override fun visit(e: LetExpr): List<String> {
         //return var
         val ret = ArrayList<String>()
-        //get local index in which to store this value
+        //get isLocal index in which to store this value
         val localIndex = frame.pushLocal(e.id, e.value.accept(GetTypeVisitor()).isRefType())
         //compile the value expr
         ret.addAll(e.value.accept(this))
-        //store value in local
+        //store value in isLocal
         ret.add("lstore $localIndex")
         frame.popTemp()
         //compile body if present
         if (e.body != null) {
             ret.addAll(e.body.accept(this))
         }
-        //remove local now we're done with it
+        //remove isLocal now we're done with it
         frame.popLocal()
         return ret
     }

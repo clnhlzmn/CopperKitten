@@ -38,10 +38,6 @@ class GetEnclosingFunction : ASTVisitor<FunExpr?> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(p: Param): FunExpr? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun visit(e: FunExpr): FunExpr? {
         return e
     }

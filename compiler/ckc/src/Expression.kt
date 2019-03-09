@@ -89,16 +89,12 @@ class AssignExpr(val target: Expr, val value: Expr) : Expr {
         "$target = $value"
 }
 
-class Param(val id: String, val type: Type): ASTNode {
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
-
-    override fun toString(): String =
-        "$id: $type"
-}
-
 class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr {
+
+    class Param(val id: String, val type: Type) {
+        override fun toString(): String =
+            "$id: $type"
+    }
 
     //a list of refExprs that are the variables that this funExpr needs to capture
     val captures = ArrayList<RefExpr>()

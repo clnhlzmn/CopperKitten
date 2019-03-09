@@ -1,15 +1,15 @@
 
 
-open class Definition(val node: ASTNode) {}
-
-class LocalDef(node: ASTNode) : Definition(node)
-class NonLocalDef(node: ASTNode) : Definition(node)
+sealed class Definition private constructor (val local: Boolean) {
+    class Let(val node: LetExpr, local: Boolean) : Definition(local)
+    class Param(val node: FunExpr.Param, local: Boolean) : Definition(local)
+}
 
 //a visitor used to traverse the ast using enclosing
 //scope to find the definition of a RefExpr
 class FindDefinitionVisitor : ASTVisitor<Definition?> {
 
-    var local = true
+    var isLocal = true
 
     var id: String? = null
 
@@ -52,21 +52,14 @@ class FindDefinitionVisitor : ASTVisitor<Definition?> {
         return null
     }
 
-    override fun visit(p: Param): Definition? {
-        return null
-    }
-
     override fun visit(e: FunExpr): Definition? {
         //look at function parameters for id
         for (param in e.params) {
             if (param.id == id) {
-                return if (local)
-                    LocalDef(param)
-                else
-                    NonLocalDef(param)
+                return Definition.Param(param, isLocal)
             }
         }
-        local = false
+        isLocal = false
         //otherwise look in enclosing scope
         return e.enclosingScope?.accept(this)
     }
@@ -74,10 +67,7 @@ class FindDefinitionVisitor : ASTVisitor<Definition?> {
     override fun visit(e: LetExpr): Definition? {
         //check the id of LetExpr
         if (e.id == id) {
-            return if (local)
-                LocalDef(e)
-            else
-                NonLocalDef(e)
+            return Definition.Let(e, isLocal)
         }
         //otherwise look in enclosing scope
         return e.enclosingScope?.accept(this)

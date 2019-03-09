@@ -172,16 +172,16 @@ class ArgsVisitor : ckBaseVisitor<List<Expr>>() {
         ctx!!.expr().map { ectx -> ExprVisitor().visit(ectx) }
 }
 
-class ParamVisitor : ckBaseVisitor<Param>() {
-    override fun visitParam(ctx: ckParser.ParamContext?): Param =
-        Param(
+class ParamVisitor : ckBaseVisitor<FunExpr.Param>() {
+    override fun visitParam(ctx: ckParser.ParamContext?): FunExpr.Param =
+        FunExpr.Param(
             id = ctx!!.ID().text,
             type = TypeVisitor().visit(ctx.type())
         )
 }
 
-class ParamsVisitor : ckBaseVisitor<List<Param>>() {
-    override fun visitParams(ctx: ckParser.ParamsContext?): List<Param> =
+class ParamsVisitor : ckBaseVisitor<List<FunExpr.Param>>() {
+    override fun visitParams(ctx: ckParser.ParamsContext?): List<FunExpr.Param> =
         ctx!!.param().map { p -> ParamVisitor().visit(p) }
 }
 

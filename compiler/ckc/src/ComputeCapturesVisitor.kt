@@ -22,9 +22,9 @@ class ComputeCapturesVisitor : ASTVisitor<Unit> {
         //create capture expr
         val capture = RefExpr(e.id)
         capture.enclosingScope = currentFun?.enclosingScope
-        when (def) {
-            //if def is non local then add capture to currentFun
-            is NonLocalDef -> {
+        when {
+            //if def is non isLocal then add capture to currentFun
+            def is Definition && !def.local -> {
                 //currentFun can't be null here, right?
                 //as long as GetTypeVisitor returned non ErrorType on the program
                 currentFun!!.captures.add(capture)
@@ -55,10 +55,6 @@ class ComputeCapturesVisitor : ASTVisitor<Unit> {
     override fun visit(e: AssignExpr) {
         e.target.accept(this)
         e.value.accept(this)
-    }
-
-    override fun visit(p: Param) {
-        TODO("not implemented")
     }
 
     override fun visit(e: FunExpr) {

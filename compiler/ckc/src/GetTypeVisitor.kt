@@ -38,15 +38,14 @@ class GetTypeVisitor : ASTVisitor<Type> {
     //ref has type of it's definition
     override fun visit(e: RefExpr): Type {
         val def = e.accept(FindDefinitionVisitor())
-        return when (def) {
+        return when(def) {
             is Definition -> {
-                return when (def.node) {
-                    is LetExpr -> def.node.value.accept(this)
-                    is Param -> def.node.type
-                    else -> ErrorType("unbound reference ${e.id}")
+                return when (def) {
+                    is Definition.Let -> def.node.value.accept(this)
+                    is Definition.Param -> def.node.type
                 }
             }
-            else -> ErrorType("unbound reference ${e.id}")
+            null -> ErrorType("unbound reference ${e.id}")
         }
     }
 
@@ -129,11 +128,6 @@ class GetTypeVisitor : ASTVisitor<Type> {
             targetType == valueType -> valueType
             else -> ErrorType("type mismatch between ${e.target} and ${e.value} in $e")
         }
-    }
-
-    //this visitor shouldn't ever see a Param
-    override fun visit(p: Param): Type {
-        return ErrorType("shouldn't happen")
     }
 
     override fun visit(e: FunExpr): Type {
