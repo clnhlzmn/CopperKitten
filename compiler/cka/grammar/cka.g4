@@ -19,6 +19,7 @@ instruction
     | literalLabelMnemonic LABEL    #literalLabelInst
     | 'layout' frameLayout          #layoutInst
     | 'alloc' allocLayout           #allocInst
+    | 'ncall' ID                    #ncallInst
     ;
 
 literalLabelMnemonic
@@ -68,8 +69,6 @@ simpleInstruction
     | 'swap'
     | 'enter'
     | 'leave'
-    | 'in'
-    | 'out'
     | 'nop'
     | 'halt'
     | 'load'
@@ -91,7 +90,7 @@ integer : '-'? NATURAL ;
 
 NATURAL : ('0'..'9')+ ;
 
-//ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
+ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 LABEL : ('A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 
 //NL : '\n'|'\r\n' ;

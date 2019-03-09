@@ -64,6 +64,13 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAllocInst(ckaParser.AllocInstContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code ncallInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNcallInst(ckaParser.NcallInstContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ckaParser#literalLabelMnemonic}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

@@ -70,18 +70,33 @@ data class LiteralLabelInstruction(val mnemonic: String, val label: String) : In
 //layout <layoutptr>
 //or
 //alloc <layoutptr>
-data class LayoutInstruction(val mnemonic: String, val layout: LayoutFunction) : Instruction {
+data class LayoutInstruction(val mnemonic: String, val layout: Function) : Instruction {
     override fun size(tc: TargetContext): Int {
         return 1 + tc.wordSize
     }
 
     override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
-        val layoutIndex = oc.addLayout(layout)
+        val layoutIndex = oc.addFunction(layout)
         oc.program.add(tc.convert(mnemonic))
         oc.program.addAll(
             (0 until tc.wordSize)
                 .map { i -> (layoutIndex shr i * 8 and 0xFF).toString() }
         )
     }
+}
+
+data class NCallInstruction(val id: String) : Instruction {
+    override fun size(tc: TargetContext): Int =
+        1 + tc.wordSize
+
+    override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
+        val functionIndex = oc.addFunction(NativeFunction(id))
+        oc.program.add(tc.convert("ncall"))
+        oc.program.addAll(
+            (0 until tc.wordSize)
+                .map { i -> (functionIndex shr i * 8 and 0xFF).toString() }
+        )
+    }
+
 }
 

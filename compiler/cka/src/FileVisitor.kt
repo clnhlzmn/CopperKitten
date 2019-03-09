@@ -42,28 +42,32 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
         pc.instructions.add(LayoutInstruction("alloc", AllocLayoutVisitor().visit(ctx!!.allocLayout())))
     }
 
+    override fun visitNcallInst(ctx: ckaParser.NcallInstContext?) {
+        pc.instructions.add(NCallInstruction(ctx!!.ID().text))
+    }
+
 }
 
-open class FrameLayoutVisitor : ckaBaseVisitor<LayoutFunction>() {
-    override fun visitEmptyFrameLayout(ctx: ckaParser.EmptyFrameLayoutContext?): LayoutFunction {
+open class FrameLayoutVisitor : ckaBaseVisitor<Function>() {
+    override fun visitEmptyFrameLayout(ctx: ckaParser.EmptyFrameLayoutContext?): Function {
         return CustomLayoutFunction(ArrayList())
     }
 
-    override fun visitNonEmptyFrameLayout(ctx: ckaParser.NonEmptyFrameLayoutContext?): LayoutFunction {
+    override fun visitNonEmptyFrameLayout(ctx: ckaParser.NonEmptyFrameLayoutContext?): Function {
         return CustomLayoutFunction(ctx!!.NATURAL().map { node -> node.text.toInt() })
     }
 }
 
 class AllocLayoutVisitor : FrameLayoutVisitor() {
-    override fun visitRefArrayLayout(ctx: ckaParser.RefArrayLayoutContext?): LayoutFunction {
+    override fun visitRefArrayLayout(ctx: ckaParser.RefArrayLayoutContext?): Function {
         return RefArrayLayoutFunction
     }
 
-    override fun visitEmptyCustomLayout(ctx: ckaParser.EmptyCustomLayoutContext?): LayoutFunction {
+    override fun visitEmptyCustomLayout(ctx: ckaParser.EmptyCustomLayoutContext?): Function {
         return CustomLayoutFunction(ArrayList())
     }
 
-    override fun visitCustomLayout(ctx: ckaParser.CustomLayoutContext?): LayoutFunction {
+    override fun visitCustomLayout(ctx: ckaParser.CustomLayoutContext?): Function {
         return CustomLayoutFunction(ctx!!.NATURAL().map { n -> n.text.toInt() })
     }
 }

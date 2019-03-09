@@ -14,20 +14,20 @@
 #endif
 
 struct vm {
-    struct gc *gc;      //pointer to gc instance
-    uint8_t *program;   //pointer to program
-    uint8_t *ip;        //pointer to next instruction
-    intptr_t *sp;       //pointer to one above tos
-    intptr_t *fp;       //pointer to stack frame
-    foreach_t *layouts; //pointer to array of layout functions
-    intptr_t temp;      //temporary register (not a root)
+    struct gc *gc;          //pointer to gc instance
+    uint8_t *program;       //pointer to program
+    uint8_t *ip;            //pointer to next instruction
+    intptr_t *sp;           //pointer to one above tos
+    intptr_t *fp;           //pointer to stack frame
+    void **functions;       //pointer to array of functions (some layout, some external)
+    intptr_t temp;          //temporary register (not a root)
 };
 
 static inline void vm_init(
     struct vm *self,
     struct gc *gc,
     intptr_t *stack,
-    foreach_t *layouts)
+    void **functions)
 {
     assert(self);
     assert(gc);
@@ -37,7 +37,7 @@ static inline void vm_init(
     self->sp = stack;
     self->gc = gc;
     self->fp = NULL;
-    self->layouts = layouts;
+    self->functions = functions;
 }
 
 enum vm_op_code {
@@ -72,8 +72,6 @@ enum vm_op_code {
     SWAP,       //swap the top two items on the stack
     ENTER,      //enter a stack frame
     LEAVE,      //leave a stack frame
-    IN,         //read a byte from the console
-    OUT,        //print a byte to the console
     LAYOUT,     //[...]->[...], set the frame layout from the next word in the program
     ALLOC,      //[...|size]->[...|ref], allocate n cells with the given layout. size is on stack, layout is in instruction stream
     LOAD,       //[...]->[...|value], load value from temp register
@@ -118,7 +116,7 @@ static inline intptr_t vm_get_word(struct vm *self) {
 }
 
 static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
-    switch (instruction) {
+    switch ((enum vm_op_code)instruction) {
         case ADD:
             *(self->sp - 2) = *(self->sp - 2) + *(self->sp - 1);
             self->sp--;
@@ -201,6 +199,16 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
                                                     : 0;
             self->sp--;
             break;
+        case CALL: {
+            intptr_t ip = (intptr_t)self->ip;
+            self->ip = (uint8_t*)*(self->sp - 1);
+            *(self->sp - 1) = ip;
+            break;
+        }
+        case RETURN:
+            self->ip = (uint8_t*)*(self->sp - 1);
+            self->sp--;
+            break;
         case JUMP: 
             self->ip = self->program + vm_get_word(self);
             break;
@@ -246,24 +254,13 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->fp = (intptr_t*)*(self->sp - 1);
             self->sp--;
             break;
-        case IN: {
-            char c;
-            scanf("%c", &c);
-            *self->sp = c;
-            self->sp++;
-            break;
-        }
-        case OUT:
-            printf("%c", (int)*(self->sp - 1));
-            self->sp--;
-            break;
         case LAYOUT:
             //set the first cell in the frame to the layout function found using the index in the word following ip
-            *(self->fp + 1) = (intptr_t)self->layouts[vm_get_word(self)];
+            *(self->fp + 1) = (intptr_t)self->functions[vm_get_word(self)];
             break;
         case ALLOC:
             //TODO: foreach_t funtion for this guy: traverse frames and call frame layout function for each
-            *(self->sp - 1) = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 1), self->layouts[vm_get_word(self)]);
+            *(self->sp - 1) = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 1), self->functions[vm_get_word(self)]);
             break;
         case LOAD:
             *self->sp = self->temp;
@@ -303,8 +300,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             //TODO
             break;
         case NCALL: {
-            void(*fun)(struct vm *) = (void(*)(struct vm *))*(self->sp-1);
-            self->sp--;
+            void(*fun)(struct vm *) = (void(*)(struct vm *))self->functions[vm_get_word(self)];
             fun(self);
             break;
         }

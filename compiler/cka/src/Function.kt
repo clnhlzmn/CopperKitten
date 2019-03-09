@@ -20,17 +20,23 @@
 //cb_ctx is also provided by the gc as a way to get information into cb
 
 //when the gc calls a heap object layout function the heap object user address is passed as foreach_ctx
-interface LayoutFunction {
+interface Function {
     fun name(): String
-    fun emit(): String
+    fun declare(): String
+    fun define(): String
 }
 
-data class CustomLayoutFunction(val layout: List<Int>) : LayoutFunction {
+data class CustomLayoutFunction(val layout: List<Int>) : Function {
+
     override fun name(): String {
         return "gen_layout${layout.map { i -> i.toString() }.fold("") { acc, s -> "${acc}_$s" }}"
     }
 
-    override fun emit(): String {
+    override fun declare(): String {
+        return "static inline void ${name()}(void (*)(intptr_t **, void *), void *, void *);"
+    }
+
+    override fun define(): String {
         return "static inline void ${name()}(void (*cb)(intptr_t **it, void *ctx), void *cb_ctx, void *foreach_ctx) {\n" +
             "\tintptr_t **base_ptr = (intptr_t**)foreach_ctx;\n" +
             layout.map { i -> "\tcb(&base_ptr[${i}], cb_ctx);\n" }.fold("") { acc, s -> "$acc$s" } +
@@ -38,14 +44,34 @@ data class CustomLayoutFunction(val layout: List<Int>) : LayoutFunction {
     }
 }
 
-object RefArrayLayoutFunction : LayoutFunction {
+object RefArrayLayoutFunction : Function {
 
     override fun name(): String {
         return "gc_layout_ref_array"
     }
 
-    override fun emit(): String {
+    override fun declare(): String {
+        return "static inline void ${name()}(void (*)(intptr_t **, void *), void *, void *);"
+    }
+
+    override fun define(): String {
         //don't have to implement this function it's implemented in gc_interface.h
         return ""
     }
+}
+
+data class NativeFunction(val id: String) : Function {
+    override fun name(): String {
+        return id
+    }
+
+    override fun declare(): String {
+        return "void ${name()}(struct vm *);"
+    }
+
+    override fun define(): String {
+        //implemented elsewhere
+        return ""
+    }
+
 }

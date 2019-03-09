@@ -111,6 +111,18 @@ public class ckaBaseListener implements ckaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterNcallInst(ckaParser.NcallInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNcallInst(ckaParser.NcallInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterLiteralLabelMnemonic(ckaParser.LiteralLabelMnemonicContext ctx) { }
 	/**
 	 * {@inheritDoc}

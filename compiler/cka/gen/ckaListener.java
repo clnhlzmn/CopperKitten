@@ -99,6 +99,18 @@ public interface ckaListener extends ParseTreeListener {
 	 */
 	void exitAllocInst(ckaParser.AllocInstContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code ncallInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void enterNcallInst(ckaParser.NcallInstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ncallInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void exitNcallInst(ckaParser.NcallInstContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ckaParser#literalLabelMnemonic}.
 	 * @param ctx the parse tree
 	 */
