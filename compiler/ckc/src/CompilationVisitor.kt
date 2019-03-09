@@ -70,32 +70,29 @@ class CompilationVisitor() : ASTVisitor<List<String>> {
         val isRef = e.accept(GetTypeVisitor()).isRefType()
         when (def) {
             is Definition -> {
-                when (def.local) {
-                    true -> {
-                        when (def) {
-                            is Definition.Param -> {
-                                val enclosingFun = e.accept(GetEnclosingFunction())!!
-                                val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
+                if (def.local) {
+                    when (def) {
+                        is Definition.Param -> {
+                            val enclosingFun = e.accept(GetEnclosingFunction())!!
+                            val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
+                            frame.pushTemp(isRef)
+                            return listOf("aload $paramIndex")
+                        }
+                        is Definition.Let -> {
+                            val localIndex = frame.lookupLocal(e.id)
+                            if (localIndex != null) {
                                 frame.pushTemp(isRef)
-                                return listOf("aload $paramIndex")
-                            }
-                            is Definition.Let -> {
-                                val localIndex = frame.lookupLocal(e.id)
-                                if (localIndex != null) {
-                                    frame.pushTemp(isRef)
-                                    return listOf("lload $localIndex")
-                                } else {
-                                    TODO("error")
-                                }
+                                return listOf("lload $localIndex")
+                            } else {
+                                TODO("error")
                             }
                         }
                     }
-                    false -> {
-                        val enclosingFun = e.accept(GetEnclosingFunction())!!
-                        val captureIndex = enclosingFun.captures.indexOfFirst{c -> c.id == e.id }
-                        frame.pushTemp(isRef)
-                        return listOf("cload $captureIndex")
-                    }
+                } else {
+                    val enclosingFun = e.accept(GetEnclosingFunction())!!
+                    val captureIndex = enclosingFun.captures.indexOfFirst{c -> c.id == e.id }
+                    frame.pushTemp(isRef)
+                    return listOf("cload $captureIndex")
                 }
             }
             else -> TODO("error")
