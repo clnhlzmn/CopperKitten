@@ -12,17 +12,19 @@ RUNTIMEDIR = ../runtime
 
 GCIMPL = ../runtime/mark_compact_gc.c
 
-example: example.c
-	gcc example.c ${GCIMPL} -o example -I${RUNTIMEDIR}
+all: out out/example
 
-example.c : example.cka
-	${CKA} -i example.cka -o example.c ${CKAFLAGS}
+out:
+	mkdir out
 
-example.cka : example.ck
-	${CKC} -i example.ck -o example.cka
+out/example: out/example.c
+	gcc out/example.c ${GCIMPL} -o out/example -I${RUNTIMEDIR}
+
+out/example.c: out/example.cka
+	${CKA} -i out/example.cka -o out/example.c ${CKAFLAGS}
+
+out/example.cka: example.ck
+	${CKC} -i example.ck -o out/example.cka
 
 clean:
-	rm -rf example.cka
-	rm -rf example.c
-	rm -rf example.exe
-	rm -rf example
+	rm -rf out
