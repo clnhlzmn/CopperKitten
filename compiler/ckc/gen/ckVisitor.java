@@ -16,6 +16,19 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFile(ckParser.FileContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ckParser#decls}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDecls(ckParser.DeclsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code cfunDecl}
+	 * labeled alternative in {@link ckParser#decl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCfunDecl(ckParser.CfunDeclContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code applyExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
