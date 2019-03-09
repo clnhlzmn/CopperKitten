@@ -248,7 +248,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case IN: {
             char c;
-            sscanf("%c", &c);
+            scanf("%c", &c);
             *self->sp = c;
             self->sp++;
             break;

@@ -1,0 +1,30 @@
+enter
+push 0
+push 42
+lstore 0
+layout []
+push 2
+alloc []
+dup
+push Label_0
+rstore 0
+dup
+rstore 0
+jump Label_1
+Label_0:
+enter
+cload 0
+store
+leave
+return
+Label_1:
+dup
+rload 0
+layout [0, 1]
+call
+pop
+load
+store
+pop
+leave
+halt
