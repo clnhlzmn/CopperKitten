@@ -1,7 +1,7 @@
 
 
 //TODO: add enclosingLoop field to break expr and link it up here
-class ScopeBuildingVisitor : ASTVisitor<Unit> {
+class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
 
     //start with null scope (top level)
     var currentScope: ASTNode? = null

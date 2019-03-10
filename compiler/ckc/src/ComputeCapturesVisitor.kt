@@ -1,6 +1,6 @@
 
 
-class ComputeCapturesVisitor : ASTVisitor<Unit> {
+class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
 
     var currentFun: FunExpr? = null
 

@@ -26,7 +26,7 @@ fun compileFunctionBody(expr: Expr): List<String> {
     return program
 }
 
-class CompilationVisitor() : ASTVisitor<List<String>> {
+class CompilationVisitor() : BaseASTVisitor<List<String>>() {
 
     //to keep track of locals and temps on the stack
     //(to be able to generate layout [] instructions)

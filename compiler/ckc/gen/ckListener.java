@@ -1,4 +1,4 @@
-// Generated from /Users/colinholzman/Documents/CopperKitten/compiler/ckc/grammar/ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -17,24 +17,14 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitFile(ckParser.FileContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ckParser#decls}.
-	 * @param ctx the parse tree
-	 */
-	void enterDecls(ckParser.DeclsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ckParser#decls}.
-	 * @param ctx the parse tree
-	 */
-	void exitDecls(ckParser.DeclsContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code cfunDecl}
-	 * labeled alternative in {@link ckParser#decl}.
+	 * labeled alternative in {@link ckParser#def}.
 	 * @param ctx the parse tree
 	 */
 	void enterCfunDecl(ckParser.CfunDeclContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code cfunDecl}
-	 * labeled alternative in {@link ckParser#decl}.
+	 * labeled alternative in {@link ckParser#def}.
 	 * @param ctx the parse tree
 	 */
 	void exitCfunDecl(ckParser.CfunDeclContext ctx);

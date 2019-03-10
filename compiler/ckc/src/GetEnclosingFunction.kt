@@ -1,6 +1,6 @@
 
 
-class GetEnclosingFunction : ASTVisitor<FunExpr?> {
+class GetEnclosingFunction : BaseASTVisitor<FunExpr?>() {
 
     override fun visit(e: UnitExpr): FunExpr? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

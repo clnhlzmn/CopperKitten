@@ -2,7 +2,7 @@
 
 //gets the type of the expression it's visiting
 //also checks the expression types for correctness
-class GetTypeVisitor : ASTVisitor<Type> {
+class GetTypeVisitor : BaseASTVisitor<Type>() {
 
     //unit first has unit type
     override fun visit(e: UnitExpr): Type {
