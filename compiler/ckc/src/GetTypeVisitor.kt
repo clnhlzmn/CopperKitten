@@ -145,6 +145,9 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
+    override fun visit(e: CFunExpr): Type =
+        e.sig
+
     override fun visit(e: LetExpr): Type {
         //let expr has type of its body, or if no body then unit
         val valueType = e.value.accept(this)

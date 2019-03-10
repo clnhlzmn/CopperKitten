@@ -1,7 +1,5 @@
 
-cfun foo = ():Int
-
 {
-    let bar = foo();
-    {():Int bar}()
+    let bar = cfun foo (Int):Int;
+    {():Int bar(42)}()
 }

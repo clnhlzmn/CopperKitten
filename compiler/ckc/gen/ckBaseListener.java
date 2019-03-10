@@ -27,13 +27,25 @@ public class ckBaseListener implements ckListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCfunDecl(ckParser.CfunDeclContext ctx) { }
+	@Override public void enterDecls(ckParser.DeclsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCfunDecl(ckParser.CfunDeclContext ctx) { }
+	@Override public void exitDecls(ckParser.DeclsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDecl(ckParser.DeclContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDecl(ckParser.DeclContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -219,6 +231,18 @@ public class ckBaseListener implements ckListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterCfunExpr(ckParser.CfunExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCfunExpr(ckParser.CfunExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterIfExpr(ckParser.IfExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -358,6 +382,18 @@ public class ckBaseListener implements ckListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitParams(ckParser.ParamsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterType(ckParser.TypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitType(ckParser.TypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

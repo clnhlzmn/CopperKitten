@@ -23,6 +23,7 @@ fun compileFunctionBody(expr: Expr): List<String> {
     program.addAll(List(maxLocals) {"pop"})
     //leave top level frame
     program.add("leave")
+    //TODO: add return
     return program
 }
 
@@ -247,6 +248,40 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         ret.add("$bodyLabel:")
         //compile body (including 'enter', 'store' ret val, and 'leave', but no 'return')
         ret.addAll(compileFunctionBody(e.body))
+        //put 'return' here
+        ret.add("return")
+        //continue program from above
+        ret.add("$contLabel:")
+        return ret
+    }
+
+    override fun visit(e: CFunExpr): List<String> {
+        val ret = ArrayList<String>()
+        val bodyLabel = nextLabel()
+        val contLabel = nextLabel()
+        //set current layout
+        ret.add("layout [${frame.getLayout().map { i -> i.toString() }.toString(", ")}]")
+        //push size of 1 for function address
+        ret.add("push 1")
+        //alloc function array
+        ret.add("alloc []")
+        frame.pushTemp(true)
+        //duplicate function array
+        ret.add("dup")
+        frame.pushTemp(true)
+        //store function address in fun[0]
+        ret.add("push $bodyLabel")
+        ret.add("rstore 0")
+        frame.popTemp()
+        //jump over the function body
+        ret.add("jump $contLabel")
+        //here goes the body
+        ret.add("$bodyLabel:")
+        //compile body (including 'enter', 'store' ret val, and 'leave', but no 'return')
+        ret.add("enter")
+        ret.add("ncall ${e.id}")
+        ret.add("store")
+        ret.add("leave")
         //put 'return' here
         ret.add("return")
         //continue program from above

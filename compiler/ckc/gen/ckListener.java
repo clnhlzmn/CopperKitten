@@ -17,17 +17,25 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitFile(ckParser.FileContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code cfunDecl}
-	 * labeled alternative in {@link ckParser#def}.
+	 * Enter a parse tree produced by {@link ckParser#decls}.
 	 * @param ctx the parse tree
 	 */
-	void enterCfunDecl(ckParser.CfunDeclContext ctx);
+	void enterDecls(ckParser.DeclsContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code cfunDecl}
-	 * labeled alternative in {@link ckParser#def}.
+	 * Exit a parse tree produced by {@link ckParser#decls}.
 	 * @param ctx the parse tree
 	 */
-	void exitCfunDecl(ckParser.CfunDeclContext ctx);
+	void exitDecls(ckParser.DeclsContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ckParser#decl}.
+	 * @param ctx the parse tree
+	 */
+	void enterDecl(ckParser.DeclContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckParser#decl}.
+	 * @param ctx the parse tree
+	 */
+	void exitDecl(ckParser.DeclContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code applyExpr}
 	 * labeled alternative in {@link ckParser#expr}.
@@ -209,6 +217,18 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitRefExpr(ckParser.RefExprContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code cfunExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterCfunExpr(ckParser.CfunExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code cfunExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitCfunExpr(ckParser.CfunExprContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code ifExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -345,26 +365,32 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitParams(ckParser.ParamsContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code simpleType}
-	 * labeled alternative in {@link ckParser#type}.
+	 * Enter a parse tree produced by {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void enterType(ckParser.TypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void exitType(ckParser.TypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ckParser#simpleType}.
 	 * @param ctx the parse tree
 	 */
 	void enterSimpleType(ckParser.SimpleTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code simpleType}
-	 * labeled alternative in {@link ckParser#type}.
+	 * Exit a parse tree produced by {@link ckParser#simpleType}.
 	 * @param ctx the parse tree
 	 */
 	void exitSimpleType(ckParser.SimpleTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code funType}
-	 * labeled alternative in {@link ckParser#type}.
+	 * Enter a parse tree produced by {@link ckParser#funType}.
 	 * @param ctx the parse tree
 	 */
 	void enterFunType(ckParser.FunTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code funType}
-	 * labeled alternative in {@link ckParser#type}.
+	 * Exit a parse tree produced by {@link ckParser#funType}.
 	 * @param ctx the parse tree
 	 */
 	void exitFunType(ckParser.FunTypeContext ctx);

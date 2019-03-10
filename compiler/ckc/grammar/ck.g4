@@ -13,7 +13,7 @@ decls
     ;
 
 decl
-    : 'cfun' ID '=' type                                                #cfunDecl
+    : 'decl'
     ;
 
 expr
@@ -36,6 +36,7 @@ expr
     | <assoc=right> cond=expr '?' con=expr ':' alt=expr                 #condExpr
     | <assoc=right> target=expr '=' value=expr                          #assignExpr
     | '(' params? ')' ':' type expr                                     #funExpr
+    | 'cfun' ID funType                                                 #cfunExpr
     | 'let' ID '=' value=expr                                           #letExpr
     | 'if' '(' cond=expr ')' csq=expr ( 'else' alt=expr )?              #ifExpr
     | 'while' '(' cond=expr ')' body=expr                               #whileExpr
@@ -60,8 +61,16 @@ params
     ;
 
 type
-    : TYPEID                            #simpleType
-    | '(' types? ')' ':' type           #funType
+    : simpleType
+    | funType
+    ;
+
+simpleType
+    : TYPEID
+    ;
+
+funType
+    : '(' types? ')' ':' type
     ;
 
 types

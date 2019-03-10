@@ -39,11 +39,11 @@ class Cli(val args: Array<String>) {
                 val context = ckParser.file()
                 if (parseError.isEmpty()) {
                     //get AST
-                    val res = context.accept(FileVisitor())
+                    val res: Expr = context.accept(FileVisitor())
                     //link enclosingScope fields
                     res.accept(ScopeBuildingVisitor())
                     //get program type
-                    val type = res.accept(GetTypeVisitor())
+                    val type: Type = res.accept(GetTypeVisitor())
                     if (type !is ErrorType) {
                         //compute function captures
                         res.accept(ComputeCapturesVisitor())

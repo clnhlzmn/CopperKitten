@@ -112,6 +112,12 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             value = ExprVisitor().visit(ctx.value)
         )
 
+    override fun visitCfunExpr(ctx: ckParser.CfunExprContext?): Expr =
+        CFunExpr(
+            ctx!!.ID().text,
+            ctx.funType().accept(TypeVisitor()) as FunType
+        )
+
     override fun visitFunExpr(ctx: ckParser.FunExprContext?): Expr {
         val params =
             if (ctx!!.params() != null) ParamsVisitor().visit(ctx.params())
@@ -194,7 +200,7 @@ class TypeVisitor : ckBaseVisitor<Type>() {
             else -> ErrorType("unknown type ${ctx.TYPEID().text}") //SimpleType(ctx.TYPEID().text)
         }
 
-    override fun visitFunType(ctx: ckParser.FunTypeContext?): Type =
+    override fun visitFunType(ctx: ckParser.FunTypeContext?): FunType =
         FunType(
             paramTypes =
             if (ctx!!.types() != null)

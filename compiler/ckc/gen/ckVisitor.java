@@ -16,12 +16,17 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFile(ckParser.FileContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code cfunDecl}
-	 * labeled alternative in {@link ckParser#def}.
+	 * Visit a parse tree produced by {@link ckParser#decls}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCfunDecl(ckParser.CfunDeclContext ctx);
+	T visitDecls(ckParser.DeclsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ckParser#decl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDecl(ckParser.DeclContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code applyExpr}
 	 * labeled alternative in {@link ckParser#expr}.
@@ -128,6 +133,13 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRefExpr(ckParser.RefExprContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code cfunExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCfunExpr(ckParser.CfunExprContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ifExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -208,15 +220,19 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitParams(ckParser.ParamsContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code simpleType}
-	 * labeled alternative in {@link ckParser#type}.
+	 * Visit a parse tree produced by {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitType(ckParser.TypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ckParser#simpleType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSimpleType(ckParser.SimpleTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code funType}
-	 * labeled alternative in {@link ckParser#type}.
+	 * Visit a parse tree produced by {@link ckParser#funType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */

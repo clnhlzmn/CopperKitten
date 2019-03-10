@@ -70,6 +70,10 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
         e.captures.forEach { c -> c.accept(this) }
     }
 
+    override fun visit(e: CFunExpr) {
+        //nothing
+    }
+
     override fun visit(e: LetExpr) {
         e.value.accept(this)
         e.body?.accept(this)

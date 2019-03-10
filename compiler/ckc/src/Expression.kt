@@ -108,6 +108,15 @@ class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() 
         "(${params.toString(", ")}): $type $body"
 }
 
+class CFunExpr(val id: String, val sig: FunType) : Expr() {
+
+    override fun <T> accept(visitor: ASTVisitor<T>): T =
+        visitor.visit(this)
+
+    override fun toString(): String =
+        "cfun $id $sig"
+}
+
 class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr() {
 
     var enclosingScope: ASTNode? = null

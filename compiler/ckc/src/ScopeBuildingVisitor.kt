@@ -66,6 +66,10 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
         e.body.accept(this)
     }
 
+    override fun visit(e: CFunExpr) {
+        //nothing
+    }
+
     //LetExpr creates a new scope
     override fun visit(e: LetExpr) {
         //first save current scope as enclosing scope for e

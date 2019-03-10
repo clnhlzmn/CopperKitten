@@ -14,6 +14,7 @@ interface ASTVisitor<T> {
     fun visit(e: CondExpr): T
     fun visit(e: AssignExpr): T
     fun visit(e: FunExpr): T
+    fun visit(e: CFunExpr): T
     fun visit(e: LetExpr): T
     fun visit(e: IfExpr): T
     fun visit(e: WhileExpr): T
@@ -62,6 +63,10 @@ open class BaseASTVisitor<T> : ASTVisitor<T> {
     }
 
     override fun visit(e: FunExpr): T {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(e: CFunExpr): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
