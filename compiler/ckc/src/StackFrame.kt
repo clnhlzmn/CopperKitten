@@ -9,7 +9,7 @@ class StackFrame {
     fun getLayout(): List<Int> {
         val ret = ArrayList<Int>()
         locals.forEachIndexed { index, b -> if (b.second) ret.add(index) }
-        temps.forEachIndexed { index, b -> if (b) ret.add(index) }
+        temps.forEachIndexed { index, b -> if (b) ret.add(index + locals.size) }
         return ret
     }
 
