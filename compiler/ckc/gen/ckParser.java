@@ -23,11 +23,11 @@ public class ckParser extends Parser {
 		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, NATURAL=37, ID=38, TYPEID=39, 
 		WHITESPACE=40, COMMENT=41;
 	public static final int
-		RULE_file = 0, RULE_def = 1, RULE_expr = 2, RULE_args = 3, RULE_sequence = 4, 
+		RULE_file = 0, RULE_decl = 1, RULE_expr = 2, RULE_args = 3, RULE_sequence = 4, 
 		RULE_param = 5, RULE_params = 6, RULE_type = 7, RULE_types = 8;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"file", "def", "expr", "args", "sequence", "param", "params", "type", 
+			"file", "decl", "expr", "args", "sequence", "param", "params", "type", 
 			"types"
 		};
 	}
@@ -103,11 +103,11 @@ public class ckParser extends Parser {
 
 	public static class FileContext extends ParserRuleContext {
 		public TerminalNode EOF() { return getToken(ckParser.EOF, 0); }
-		public List<DefContext> def() {
-			return getRuleContexts(DefContext.class);
+		public List<DeclContext> decl() {
+			return getRuleContexts(DeclContext.class);
 		}
-		public DefContext def(int i) {
-			return getRuleContext(DefContext.class,i);
+		public DeclContext decl(int i) {
+			return getRuleContext(DeclContext.class,i);
 		}
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
@@ -145,7 +145,7 @@ public class ckParser extends Parser {
 				{
 				{
 				setState(18);
-				def();
+				decl();
 				}
 				}
 				setState(23);
@@ -177,23 +177,23 @@ public class ckParser extends Parser {
 		return _localctx;
 	}
 
-	public static class DefContext extends ParserRuleContext {
-		public DefContext(ParserRuleContext parent, int invokingState) {
+	public static class DeclContext extends ParserRuleContext {
+		public DeclContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_def; }
+		@Override public int getRuleIndex() { return RULE_decl; }
 	 
-		public DefContext() { }
-		public void copyFrom(DefContext ctx) {
+		public DeclContext() { }
+		public void copyFrom(DeclContext ctx) {
 			super.copyFrom(ctx);
 		}
 	}
-	public static class CfunDeclContext extends DefContext {
+	public static class CfunDeclContext extends DeclContext {
 		public TerminalNode ID() { return getToken(ckParser.ID, 0); }
 		public TypeContext type() {
 			return getRuleContext(TypeContext.class,0);
 		}
-		public CfunDeclContext(DefContext ctx) { copyFrom(ctx); }
+		public CfunDeclContext(DeclContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
 			if ( listener instanceof ckListener ) ((ckListener)listener).enterCfunDecl(this);
@@ -209,9 +209,9 @@ public class ckParser extends Parser {
 		}
 	}
 
-	public final DefContext def() throws RecognitionException {
-		DefContext _localctx = new DefContext(_ctx, getState());
-		enterRule(_localctx, 2, RULE_def);
+	public final DeclContext decl() throws RecognitionException {
+		DeclContext _localctx = new DeclContext(_ctx, getState());
+		enterRule(_localctx, 2, RULE_decl);
 		try {
 			_localctx = new CfunDeclContext(_localctx);
 			enterOuterAlt(_localctx, 1);

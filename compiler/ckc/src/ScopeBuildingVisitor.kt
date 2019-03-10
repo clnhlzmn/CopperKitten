@@ -6,6 +6,8 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
     //start with null scope (top level)
     var currentScope: ASTNode? = null
 
+    //TODO: visit CkFile
+
     //leaf node, do nothing
     override fun visit(e: UnitExpr) {
         //nothing

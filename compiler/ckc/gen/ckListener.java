@@ -18,13 +18,13 @@ public interface ckListener extends ParseTreeListener {
 	void exitFile(ckParser.FileContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code cfunDecl}
-	 * labeled alternative in {@link ckParser#def}.
+	 * labeled alternative in {@link ckParser#decl}.
 	 * @param ctx the parse tree
 	 */
 	void enterCfunDecl(ckParser.CfunDeclContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code cfunDecl}
-	 * labeled alternative in {@link ckParser#def}.
+	 * labeled alternative in {@link ckParser#decl}.
 	 * @param ctx the parse tree
 	 */
 	void exitCfunDecl(ckParser.CfunDeclContext ctx);

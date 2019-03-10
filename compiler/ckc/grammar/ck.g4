@@ -5,11 +5,7 @@ grammar ck;
 //basic CK
 
 file 
-    : decls? expr? EOF
-    ;
-
-decls
-    : decl+
+    : decl* expr? EOF
     ;
 
 decl

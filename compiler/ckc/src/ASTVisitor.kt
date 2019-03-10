@@ -4,6 +4,8 @@ interface ASTVisitor<T> {
 
     fun visit(f: CkFile): T
 
+    fun visit(c: CFunDecl): T
+
     fun visit(e: UnitExpr): T
     fun visit(e: SequenceExpr): T
     fun visit(e: NaturalExpr): T
@@ -21,7 +23,12 @@ interface ASTVisitor<T> {
 }
 
 open class BaseASTVisitor<T> : ASTVisitor<T> {
+
     override fun visit(f: CkFile): T {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(c: CFunDecl): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

@@ -1,5 +1,12 @@
 
 
+fun compileCkFile(ckFile: CkFile): List<String> {
+    val program = ArrayList<String>()
+    program.addAll(compileFunctionBody(ckFile.expr))
+    program.add("halt")
+    return program
+}
+
 fun compileFunctionBody(expr: Expr): List<String> {
     //empty program
     var program = ArrayList<String>()
