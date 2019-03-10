@@ -36,10 +36,10 @@ class Cli(val args: Array<String>) {
                 val parseError:MutableList<String> = ArrayList()
                 ckParser.removeErrorListeners()
                 ckParser.addErrorListener(DescriptiveErrorListener(parseError))
-                val context = ckParser.file()
+                val context: ckParser.FileContext = ckParser.file()
                 if (parseError.isEmpty()) {
                     //get AST
-                    val res: Expr = context.accept(FileVisitor())
+                    val res: CkFile = context.accept(FileVisitor())
                     //link enclosingScope fields
                     res.accept(ScopeBuildingVisitor())
                     //get program type
@@ -47,8 +47,7 @@ class Cli(val args: Array<String>) {
                     if (type !is ErrorType) {
                         //compute function captures
                         res.accept(ComputeCapturesVisitor())
-                        val code = ArrayList<String>(compileFunctionBody(res))
-                        code.add("halt")
+                        val code: List<String> = compileCkFile(res)
                         if (outputFileName != null) {
                             File(outputFileName).printWriter().use { out ->
                                 out.print(code.toString("\n"))

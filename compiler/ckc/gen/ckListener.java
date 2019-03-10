@@ -17,16 +17,6 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitFile(ckParser.FileContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ckParser#decls}.
-	 * @param ctx the parse tree
-	 */
-	void enterDecls(ckParser.DeclsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ckParser#decls}.
-	 * @param ctx the parse tree
-	 */
-	void exitDecls(ckParser.DeclsContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link ckParser#decl}.
 	 * @param ctx the parse tree
 	 */
