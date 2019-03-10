@@ -43,10 +43,10 @@ class Cli(val args: Array<String>) {
                     //link enclosingScope fields
                     res.accept(ScopeBuildingVisitor())
                     //get program type
-                    val type: Type = res.accept(GetTypeVisitor())
+                    val type: Type = res.expr.accept(GetTypeVisitor())
                     if (type !is ErrorType) {
                         //compute function captures
-                        res.accept(ComputeCapturesVisitor())
+                        res.expr.accept(ComputeCapturesVisitor())
                         val code: List<String> = compileCkFile(res)
                         if (outputFileName != null) {
                             File(outputFileName).printWriter().use { out ->

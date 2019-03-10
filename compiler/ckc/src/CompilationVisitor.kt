@@ -287,9 +287,10 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         ret.add("jump $contLabel")
         //here goes the body
         ret.add("$bodyLabel:")
-        //compile body (including 'enter', 'store' ret val, and 'leave', but no 'return')
+        //compile body (including 'enter', 'store' ret val, 'leave', and 'return')
         ret.add("enter")
         ret.add("ncall ${e.id}")
+        //store single return value from cfun
         ret.add("store")
         ret.add("leave")
         //put 'return' here

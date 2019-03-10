@@ -20,7 +20,7 @@ out:
 	mkdir out
 
 out/example: out/example.c
-	gcc out/example.c ${GCIMPL} -o ${OUTDIR}/example -I${RUNTIMEDIR}
+	gcc out/example.c example_cfuns.c ${GCIMPL} -o ${OUTDIR}/example -I${RUNTIMEDIR}
 
 out/example.c: out/example.cka
 	${CKA} -i out/example.cka -o ${OUTDIR}/example.c ${CKAFLAGS}
