@@ -2,12 +2,12 @@
 
 fun compileCkFile(ckFile: CkFile): List<String> {
     val program = ArrayList<String>()
-    program.addAll(compileFunctionBody(ckFile.expr))
+    program.addAll(compileTopLevelExpr(ckFile.expr))
     program.add("halt")
     return program
 }
 
-fun compileFunctionBody(expr: Expr): List<String> {
+fun compileTopLevelExpr(expr: Expr): List<String> {
     //empty program
     var program = ArrayList<String>()
     //compilation visitor
@@ -30,8 +30,13 @@ fun compileFunctionBody(expr: Expr): List<String> {
     program.addAll(List(maxLocals) {"pop"})
     //leave top level frame
     program.add("leave")
-    //TODO: add return
     return program
+}
+
+fun compileFunctionBody(body: Expr): List<String> {
+    val ret = ArrayList(compileTopLevelExpr(body))
+    ret.add("return")
+    return ret
 }
 
 class CompilationVisitor() : BaseASTVisitor<List<String>>() {
@@ -253,10 +258,8 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         ret.add("jump $contLabel")
         //here goes the body
         ret.add("$bodyLabel:")
-        //compile body (including 'enter', 'store' ret val, and 'leave', but no 'return')
+        //compile body (including 'enter', 'store' ret val, 'leave', and 'return')
         ret.addAll(compileFunctionBody(e.body))
-        //put 'return' here
-        ret.add("return")
         //continue program from above
         ret.add("$contLabel:")
         return ret
