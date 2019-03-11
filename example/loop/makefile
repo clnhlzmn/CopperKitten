@@ -6,7 +6,7 @@ CKA = java -jar ../../compiler/out/artifacts/cka_jar/cka.jar
 #ck assembler options
 STACKSIZE = 100
 HEAPSIZE = 1000
-WORDSIZE = 8
+WORDSIZE = 4
 
 #cka options
 CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE}
@@ -23,23 +23,23 @@ GCIMPL = ../../runtime/mark_compact_gc.c
 #directory of output
 OUTDIR = out
 
-#make outdir and simple_io.exe
-all: ${OUTDIR} ${OUTDIR}/simple_io
+#make outdir and loop.exe
+all: ${OUTDIR} ${OUTDIR}/loop
 
 out:
 	mkdir out
 
 #use gcc to compile generated c code
-out/simple_io: out/simple_io.c simple_io_cfuns.c
-	gcc out/simple_io.c simple_io_cfuns.c ${GCIMPL} -o ${OUTDIR}/simple_io -I${RUNTIMEDIR} ${CFLAGS}
+out/loop: out/loop.c loop_cfuns.c
+	gcc out/loop.c loop_cfuns.c ${GCIMPL} -o ${OUTDIR}/loop -I${RUNTIMEDIR} ${CFLAGS}
 
-#use cka to generate c from simple_io.cka
-out/simple_io.c: out/simple_io.cka
-	${CKA} -i out/simple_io.cka -o ${OUTDIR}/simple_io.c ${CKAFLAGS}
+#use cka to generate c from loop.cka
+out/loop.c: out/loop.cka
+	${CKA} -i out/loop.cka -o ${OUTDIR}/loop.c ${CKAFLAGS}
 
-#use ckc to generate cka from simple_io.ck
-out/simple_io.cka: simple_io.ck
-	${CKC} -i simple_io.ck -o ${OUTDIR}/simple_io.cka
+#use ckc to generate cka from loop.ck
+out/loop.cka: loop.ck
+	${CKC} -i loop.ck -o ${OUTDIR}/loop.cka
 
 #remove outdir
 clean:

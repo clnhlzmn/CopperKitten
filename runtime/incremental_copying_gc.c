@@ -382,3 +382,8 @@ void gc_read_barrier(struct gc *self, intptr_t **ref) {
     }
 }
 
+void gc_write_barrier(struct gc *gc, intptr_t *ref) {
+    (void)gc;
+    (void)ref;
+}
+

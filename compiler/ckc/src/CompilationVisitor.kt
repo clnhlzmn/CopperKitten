@@ -250,8 +250,8 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
             ret.add("dup")
             frame.pushTemp(true)
             //compile capture reference
-            e.captures[i].accept(this)
-            ret.add("rstore 0")
+            ret.addAll(e.captures[i].accept(this))
+            ret.add("rstore ${i + 1}")
             frame.popTemp()
         }
         //jump over the function body

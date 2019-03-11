@@ -84,6 +84,8 @@ enum vm_op_code {
     ASTORE,
     CLOAD,      //same as lload but for function captures
     CSTORE,
+    RBARRIER,   //gc read barrier on ref on tos
+    WBARRIER,   //gc write barrier on ref on tos
     NCALL,      //[...|N]->[...], call the native function N i.e. (void(*)(void))*(sp-1)();
     NOP,        //
     HALT,       //halt execution
@@ -318,7 +320,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case LAYOUT:
             //set the first cell in the frame to the layout function found using the index in the word following ip
-            *(self->fp + 1) = (intptr_t)self->functions[vm_get_word(self)];
+            self->fp[1] = (intptr_t)self->functions[vm_get_word(self)];
             break;
         case ALLOC:
             self->sp[-1] = (intptr_t)gc_alloc_with_layout(
@@ -347,12 +349,10 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             //load a reference from the ref on tos
             //sp[-1] = (sp[-1])[index]
             self->sp[-1] = ((intptr_t*)self->sp[-1])[vm_get_word(self)];
-            //TODO: gc_read_barrier
             break;
         case RSTORE:
             ((intptr_t*)self->sp[-2])[vm_get_word(self)] = self->sp[-1];
             self->sp--;
-            //TODO: gc_write_barrier
             break;
         case ALOAD:
             vm_aload(self, vm_get_word(self));
@@ -372,6 +372,15 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
         case CSTORE:
             ((intptr_t*)self->fp[-2])[1 + vm_get_word(self)] = self->sp[-1];
             self->sp--;
+            break;
+        case RBARRIER: {
+            intptr_t *read = (intptr_t*)self->sp[-1];
+            gc_read_barrier(self->gc, &read);
+            self->sp[-1] = (intptr_t)read;
+            break;
+        }
+        case WBARRIER: 
+            gc_write_barrier(self->gc, (intptr_t*)self->sp[-1]);
             break;
         case NCALL: {
             void(*fun)(struct vm *) = (void(*)(struct vm *))self->functions[vm_get_word(self)];

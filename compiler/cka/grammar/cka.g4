@@ -73,6 +73,8 @@ simpleInstruction
     | 'halt'
     | 'load'
     | 'store'
+    | 'rbarrier'
+    | 'wbarrier'
     ;
 
 frameLayout

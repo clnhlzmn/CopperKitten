@@ -215,3 +215,13 @@ intptr_t *gc_alloc_int_array(
     return gc_alloc_with_layout(
         self, root_iter, root_iter_ctx, size, gc_layout_int_array);
 }
+
+void gc_read_barrier(struct gc *gc, intptr_t **ref) {
+    (void)gc;
+    (void)ref;
+}
+
+void gc_write_barrier(struct gc *gc, intptr_t *ref) {
+    (void)gc;
+    (void)ref;
+}

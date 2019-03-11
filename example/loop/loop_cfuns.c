@@ -15,6 +15,6 @@ void native_write(struct vm *vm) {
     //print arg 0 as char
     vm_aload(vm, 0);
     printf("%c", (int)vm->sp[-1]);
-    //return unit
+    //return unit 
 }
 
