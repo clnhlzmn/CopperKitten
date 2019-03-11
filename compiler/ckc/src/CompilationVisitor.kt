@@ -341,7 +341,6 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
     override fun visit(e: WhileExpr): List<String> {
         val ret = ArrayList<String>()
         val beginLabel = nextLabel()
-        val endLabel = nextLabel()
         val condLabel = nextLabel()
         ret.add("jump $condLabel")
         ret.add("$beginLabel:")
@@ -353,7 +352,6 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         ret.addAll(e.cond.accept(this))
         ret.add("jumpnz $beginLabel")
         frame.popTemp()
-        ret.add("$endLabel:")
         //value of type Unit
         ret.add("push 0")
         frame.pushTemp(false)

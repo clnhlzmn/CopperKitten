@@ -21,7 +21,7 @@ class OutputContext(
 
     fun emit(): String {
         return "#include \"vm.h\"\n" +
-            "#include \"mark_compact_gc.h\"\n" +
+            "#include \"copying_gc.h\"\n" +
             "\n" +
             "#define MEM_SIZE $memSize\n" +
             "intptr_t gc_mem[MEM_SIZE];\n" +

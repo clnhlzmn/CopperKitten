@@ -4,7 +4,7 @@ CKC = java -jar ../../compiler/out/artifacts/ckc_jar/ckc.jar
 CKA = java -jar ../../compiler/out/artifacts/cka_jar/cka.jar
 
 #ck assembler options
-STACKSIZE = 100
+STACKSIZE = 10000
 HEAPSIZE = 1000
 WORDSIZE = 4
 
@@ -18,7 +18,7 @@ CFLAGS = -Wall -Wextra
 RUNTIMEDIR = ../../runtime
 
 #chosen gc impl, currently hardcoded in cka, could be option, would still have to link correct implementation here
-GCIMPL = ../../runtime/mark_compact_gc.c
+GCIMPL = ../../runtime/copying_gc.c
 
 #directory of output
 OUTDIR = out

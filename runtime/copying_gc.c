@@ -273,3 +273,13 @@ static inline void gc_init_pointers(
     self->alloc_end = end;
 }
 
+void gc_read_barrier(struct gc *gc, intptr_t **ref) {
+    (void)gc;
+    (void)ref;
+}
+
+void gc_write_barrier(struct gc *gc, intptr_t *ref) {
+    (void)gc;
+    (void)ref;
+}
+
