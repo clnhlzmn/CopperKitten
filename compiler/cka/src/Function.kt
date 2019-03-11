@@ -39,6 +39,9 @@ data class CustomLayoutFunction(val layout: List<Int>) : Function {
     override fun define(): String {
         return "static inline void ${name()}(void (*cb)(intptr_t **it, void *ctx), void *cb_ctx, void *foreach_ctx) {\n" +
             "\tintptr_t **base_ptr = (intptr_t**)foreach_ctx;\n" +
+            "\t(void)base_ptr;\n" +
+            "\t(void)cb;\n" +
+            "\t(void)cb_ctx;\n" +
             layout.map { i -> "\tcb(&base_ptr[${i}], cb_ctx);\n" }.fold("") { acc, s -> "$acc$s" } +
             "}\n"
     }
