@@ -15,7 +15,7 @@
 
 struct vm {
     struct gc *gc;          //pointer to gc instance
-    uint8_t *program;       //pointer to program
+    uint8_t *program;       //pointer to program base address
     uint8_t *ip;            //pointer to next instruction
     intptr_t *sp;           //pointer to one above tos
     intptr_t *fp;           //pointer to stack frame
@@ -251,8 +251,8 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             //[...|argn-1|...|arg0|fun|fun address]
             //we save the current ip
             intptr_t ip = (intptr_t)self->ip;
-            //set the ip to the address on tos
-            self->ip = (uint8_t*)self->sp[-1];
+            //set the ip to the program base plus offset on stack
+            self->ip = self->program + self->sp[-1];
             //then put the last ip back on the stack
             self->sp[-1] = ip;
             //then the stack looks like
