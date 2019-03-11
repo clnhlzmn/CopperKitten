@@ -1,0 +1,21 @@
+
+
+record Foo {
+    foo: Int
+    bar: ():Int
+}
+
+sum Qux {
+    Int
+    ():Int
+}
+
+//foo: Qux
+let foo = if (input()) Qux(42) else Qux(():42)
+
+//fun: (Qux):Int
+let fun = 
+    (foo: Qux): match (foo) 
+        with Int: foo
+        with ():Int: foo()
+
