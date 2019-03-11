@@ -6,13 +6,13 @@ CKA = java -jar ../../compiler/out/artifacts/cka_jar/cka.jar
 #ck assembler options
 STACKSIZE = 100
 HEAPSIZE = 1000
-WORDSIZE = 4
-
-#C flags
-CFLAGS = -Wall -Wextra
+WORDSIZE = 8
 
 #cka options
 CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE}
+
+#C flags
+CFLAGS = -Wall -Wextra
 
 #path to ck runtime implementation
 RUNTIMEDIR = ../../runtime

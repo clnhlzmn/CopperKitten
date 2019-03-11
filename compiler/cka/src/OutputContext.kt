@@ -7,13 +7,13 @@ class OutputContext(
     //where layout functions are stored
     private val functions = ArrayList<Function>()
 
-    fun addFunction(lf: Function): Int {
+    fun addFunction(lf: Function): Long {
         val ret = functions.indexOf(lf)
         if (ret == -1) {
             functions.add(lf)
-            return functions.size - 1
+            return (functions.size - 1).toLong()
         }
-        return ret
+        return ret.toLong()
     }
 
     //where the program array goes
