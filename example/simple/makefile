@@ -8,6 +8,9 @@ STACKSIZE = 100
 HEAPSIZE = 1000
 WORDSIZE = 4
 
+#C flags
+CFLAGS = -Wall -Wextra
+
 #cka options
 CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE}
 
@@ -27,8 +30,8 @@ out:
 	mkdir out
 
 #use gcc to compile generated c code
-out/example: out/example.c
-	gcc out/example.c example_cfuns.c ${GCIMPL} -o ${OUTDIR}/example -I${RUNTIMEDIR}
+out/example: out/example.c example_cfuns.c
+	gcc out/example.c example_cfuns.c ${GCIMPL} -o ${OUTDIR}/example -I${RUNTIMEDIR} ${CFLAGS}
 
 #use cka to generate c from example.cka
 out/example.c: out/example.cka

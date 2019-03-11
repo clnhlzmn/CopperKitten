@@ -115,6 +115,53 @@ static inline intptr_t vm_get_word(struct vm *self) {
     return word;
 }
 
+static inline void vm_lload(struct vm *self, intptr_t index) {
+    //when loading a local the stack looks like
+    //[...last frame...|last fp|layout fun ptr|...locals...|...temps...]
+    //                 ^                                               ^
+    //                 |                                               |
+    //                 fp                                              sp
+    //to load a local we execute sp[0] = fp[2 + index] then increment sp
+    self->sp[0] = self->fp[2 + index];
+    self->sp++;
+}
+
+static inline void vm_lstore(struct vm *self, intptr_t index) {
+    self->fp[2 + index] = self->sp[-1];
+    self->sp--;
+}
+
+static inline void vm_aload(struct vm *self, intptr_t index) {
+    //when loading an argument the stack should look like
+    //[...|argn-1|...|arg0|fun|ret addr|last fp|layout fun ptr|...locals...|...temps...]
+    //                                 ^                                               ^
+    //                                 fp                                              sp
+    //to load an arg we execute sp[0] = fp[-3 - argindex] then increment sp
+    self->sp[0] = self->fp[-3 - index];
+    self->sp++;
+}
+
+static inline void vm_astore(struct vm *self, intptr_t index) {
+    self->fp[-3 - index] = self->sp[-1];
+    self->sp--;
+}
+
+static inline void vm_stack_layout_for_alloc(
+    void (*cb)(intptr_t **it, void *ctx),
+    void *cb_ctx,
+    void *foreach_ctx) {
+    //foreach_ctx is self
+    struct vm *self = foreach_ctx;
+    //traverse chain of frame layouts and call frame layout fun on each
+    for (intptr_t *fp = self->fp; fp; fp = (intptr_t*)*fp) {
+        foreach_t frame_layout = (foreach_t)fp[1];
+        if (frame_layout) {
+            //call frame layout with pointer to base of locals as ctx
+            frame_layout(cb, cb_ctx, fp + 2);
+        }
+    }
+}
+
 static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
     switch ((enum vm_op_code)instruction) {
         case ADD:
@@ -274,8 +321,13 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             *(self->fp + 1) = (intptr_t)self->functions[vm_get_word(self)];
             break;
         case ALLOC:
-            //TODO: foreach_t funtion for this guy: traverse frames and call frame layout function for each
-            self->sp[-1] = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, self->sp[-1], self->functions[vm_get_word(self)]);
+            self->sp[-1] = (intptr_t)gc_alloc_with_layout(
+                self->gc,                               //gc inst
+                vm_stack_layout_for_alloc,              //stack layout
+                self,                                   //stack layout context
+                self->sp[-1],                           //alloc size
+                self->functions[vm_get_word(self)]      //alloc layout
+            );
             break;
         case LOAD:
             self->sp[0] = self->temp;
@@ -286,18 +338,10 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp--;
             break;
         case LLOAD:
-            //when loading a local the stack looks like
-            //[...last frame...|last fp|layout fun ptr|...locals...|...temps...]
-            //                 ^                                               ^
-            //                 |                                               |
-            //                 fp                                              sp
-            //to load a local we execute sp[0] = fp[2 + index] then increment sp
-            self->sp[0] = self->fp[2 + vm_get_word(self)];
-            self->sp++;
+            vm_lload(self, vm_get_word(self));
             break;
         case LSTORE:
-            self->fp[2 + vm_get_word(self)] = self->sp[-1];
-            self->sp--;
+            vm_lstore(self, vm_get_word(self));
             break;
         case RLOAD:
             //load a reference from the ref on tos
@@ -311,17 +355,10 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             //TODO: gc_write_barrier
             break;
         case ALOAD:
-            //when loading an argument the stack should look like
-            //[...|argn-1|...|arg0|fun|ret addr|last fp|layout fun ptr|...locals...|...temps...]
-            //                                 ^                                               ^
-            //                                 fp                                              sp
-            //to load an arg we execute sp[0] = fp[-3 - argindex] then increment sp
-            self->sp[0] = self->fp[-3 - vm_get_word(self)];
-            self->sp++;
+            vm_aload(self, vm_get_word(self));
             break;
         case ASTORE:
-            self->fp[-3 - vm_get_word(self)] = self->sp[-1];
-            self->sp--;
+            vm_astore(self, vm_get_word(self));
             break;
         case CLOAD:
             //when loading a capture the stack should look like

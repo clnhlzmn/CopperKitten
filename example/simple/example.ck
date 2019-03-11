@@ -1,5 +1,6 @@
 
 {
-    let bar = cfun foo (Int):Int;
-    {():Int bar(42)}()
+    let read = cfun native_read ():Int;
+    let write = cfun native_write (Int):Unit;
+    write(read())
 }
