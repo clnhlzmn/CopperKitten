@@ -118,102 +118,109 @@ static inline intptr_t vm_get_word(struct vm *self) {
 static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
     switch ((enum vm_op_code)instruction) {
         case ADD:
-            *(self->sp - 2) = *(self->sp - 2) + *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] + self->sp[-1];
             self->sp--;
             break;
         case SUB:
-            *(self->sp - 2) = *(self->sp - 2) - *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] - self->sp[-1];
             self->sp--;
             break;
         case MUL: 
-            *(self->sp - 2) = *(self->sp - 2) * *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] * self->sp[-1];
             self->sp--;
             break;
         case DIV:
-            *(self->sp - 2) = *(self->sp - 2) / *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] / self->sp[-1];
             self->sp--;
             break;
         case MOD:
-            *(self->sp - 2) = *(self->sp - 2) % *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] % self->sp[-1];
             self->sp--;
             break;
         case SHL:
-            *(self->sp - 2) = *(self->sp - 2) << *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] << self->sp[-1];
             self->sp--;
             break;
         case SHR:
-            *(self->sp - 2) = *(self->sp - 2) >> *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] >> self->sp[-1];
             self->sp--;
             break;
         case NEG:
-            *(self->sp - 1) = -*(self->sp - 1);
+            self->sp[-1] = -self->sp[-1];
             break;
         case NOT:
-            *(self->sp - 1) = !*(self->sp - 1);
+            self->sp[-1] = !self->sp[-1];
             break;
         case BITNOT:
-            *(self->sp - 1) = ~*(self->sp - 1);
+            self->sp[-1] = ~self->sp[-1];
             break;
         case BITAND:
-            *(self->sp - 2) = *(self->sp - 2) & *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] & self->sp[-1];
             self->sp--;
             break;
         case BITXOR:
-            *(self->sp - 2) = *(self->sp - 2) ^ *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] ^ self->sp[-1];
             self->sp--;
             break;
         case BITOR:
-            *(self->sp - 2) = *(self->sp - 2) | *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] | self->sp[-1];
             self->sp--;
             break;
         case LT:
-            *(self->sp - 2) = *(self->sp - 2) < *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] < self->sp[-1];
             self->sp--;
             break;
         case LTE:
-            *(self->sp - 2) = *(self->sp - 2) <= *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] <= self->sp[-1];
             self->sp--;
             break;
         case GT:
-            *(self->sp - 2) = *(self->sp - 2) > *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] > self->sp[-1];
             self->sp--;
             break;
         case GTE:
-            *(self->sp - 2) = *(self->sp - 2) >= *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] >= self->sp[-1];
             self->sp--;
             break;
         case EQ:
-            *(self->sp - 2) = *(self->sp - 2) == *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] == self->sp[-1];
             self->sp--;
             break;
         case NEQ:
-            *(self->sp - 2) = *(self->sp - 2) != *(self->sp - 1);
+            self->sp[-2] = self->sp[-2] != self->sp[-1];
             self->sp--;
             break;
         case CMP: 
-            *(self->sp - 2) 
-                = *(self->sp - 2) < *(self->sp - 1) 
+            self->sp[-2] 
+                = self->sp[-2] < self->sp[-1] 
                                   ? -1 
-                                  : *(self->sp - 2) > *(self->sp - 1) 
+                                  : self->sp[-2] > self->sp[-1] 
                                                     ? 1 
                                                     : 0;
             self->sp--;
             break;
         case CALL: {
+            //to call a function the stack should look like
+            //[...|argn-1|...|arg0|fun|fun address]
+            //we save the current ip
             intptr_t ip = (intptr_t)self->ip;
-            self->ip = (uint8_t*)*(self->sp - 1);
-            *(self->sp - 1) = ip;
+            //set the ip to the address on tos
+            self->ip = (uint8_t*)self->sp[-1];
+            //then put the last ip back on the stack
+            self->sp[-1] = ip;
+            //then the stack looks like
+            //[...|argn-1|...|arg0|fun|ret address]
             break;
         }
         case RETURN:
-            self->ip = (uint8_t*)*(self->sp - 1);
+            self->ip = (uint8_t*)self->sp[-1];
             self->sp--;
             break;
         case JUMP: 
             self->ip = self->program + vm_get_word(self);
             break;
         case JUMPZ:
-            if (*(self->sp - 1) == 0) {
+            if (self->sp[-1] == 0) {
                 self->ip = self->program + vm_get_word(self);
             } else {
                 vm_get_word(self);
@@ -221,7 +228,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp--;
             break;
         case JUMPNZ:
-            if (*(self->sp - 1) != 0) {
+            if (self->sp[-1] != 0) {
                 self->ip = self->program + vm_get_word(self);
             } else {
                 vm_get_word(self);
@@ -229,29 +236,37 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp--;
             break;
         case PUSH: 
-            *self->sp = vm_get_word(self);
+            self->sp[0] = vm_get_word(self);
             self->sp++;
             break;
         case DUP:
-            *self->sp = *(self->sp - 1);
+            self->sp[0] = self->sp[-1];
             self->sp++;
             break;
         case POP:
             self->sp--;
             break;
         case SWAP:
-            *(self->sp - 2) = *(self->sp - 1);
+            self->sp[-2] = self->sp[-1];
             break;
         case ENTER:
-            *self->sp = (intptr_t)self->fp;
+            //causes the stack to look like the following
+            //[...last frame...|last fp|layout fun ptr|...current frame...]
+            //                 ^                      ^
+            //                 |                      |
+            //                 fp                     sp
+            //store the current fp
+            self->sp[0] = (intptr_t)self->fp;
+            //set current fp to that location
             self->fp = self->sp;
+            //make room for layout function pointer
             self->sp++;
-            *self->sp = 0;
+            self->sp[0] = 0;
             self->sp++;
             break;
         case LEAVE:
             self->sp--;
-            self->fp = (intptr_t*)*(self->sp - 1);
+            self->fp = (intptr_t*)self->sp[-1];
             self->sp--;
             break;
         case LAYOUT:
@@ -260,44 +275,66 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case ALLOC:
             //TODO: foreach_t funtion for this guy: traverse frames and call frame layout function for each
-            *(self->sp - 1) = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, *(self->sp - 1), self->functions[vm_get_word(self)]);
+            self->sp[-1] = (intptr_t)gc_alloc_with_layout(self->gc, NULL, NULL, self->sp[-1], self->functions[vm_get_word(self)]);
             break;
         case LOAD:
-            *self->sp = self->temp;
+            self->sp[0] = self->temp;
             self->sp++;
             break;
         case STORE:
-            self->temp = *(self->sp - 1);
+            self->temp = self->sp[-1];
             self->sp--;
             break;
         case LLOAD:
-            *self->sp = *(self->fp + vm_get_word(self) + 2);
+            //when loading a local the stack looks like
+            //[...last frame...|last fp|layout fun ptr|...locals...|...temps...]
+            //                 ^                                               ^
+            //                 |                                               |
+            //                 fp                                              sp
+            //to load a local we execute sp[0] = fp[2 + index] then increment sp
+            self->sp[0] = self->fp[2 + vm_get_word(self)];
             self->sp++;
             break;
         case LSTORE:
-            *(self->fp + vm_get_word(self) + 2) = *(self->sp - 1);
+            self->fp[2 + vm_get_word(self)] = self->sp[-1];
             self->sp--;
             break;
         case RLOAD:
+            //load a reference from the ref on tos
+            //sp[-1] = (sp[-1])[index]
+            self->sp[-1] = ((intptr_t*)self->sp[-1])[vm_get_word(self)];
             //TODO: gc_read_barrier
-            *(self->sp - 1) = *((intptr_t*)*(self->sp - 1) + vm_get_word(self));
             break;
         case RSTORE:
-            //TODO: gc_write_barrier
-            *((intptr_t*)*(self->sp - 2) + vm_get_word(self)) = *(self->sp - 1);
+            ((intptr_t*)self->sp[-2])[vm_get_word(self)] = self->sp[-1];
             self->sp--;
+            //TODO: gc_write_barrier
             break;
         case ALOAD:
-            //TODO
+            //when loading an argument the stack should look like
+            //[...|argn-1|...|arg0|fun|ret addr|last fp|layout fun ptr|...locals...|...temps...]
+            //                                 ^                                               ^
+            //                                 fp                                              sp
+            //to load an arg we execute sp[0] = fp[-3 - argindex] then increment sp
+            self->sp[0] = self->fp[-3 - vm_get_word(self)];
+            self->sp++;
             break;
         case ASTORE:
-            //TODO
+            self->fp[-3 - vm_get_word(self)] = self->sp[-1];
+            self->sp--;
             break;
         case CLOAD:
-            //TODO
+            //when loading a capture the stack should look like
+            //[...|argn-1|...|arg0|fun|ret addr|last fp|layout fun ptr|...locals...|...temps...]
+            //                                 ^                                               ^
+            //                                 fp                                              sp
+            //execute sp[0] = (fp[-2])[1 + index] then increment sp
+            self->sp[0] = ((intptr_t*)self->fp[-2])[1 + vm_get_word(self)];
+            self->sp++;
             break;
         case CSTORE:
-            //TODO
+            ((intptr_t*)self->fp[-2])[1 + vm_get_word(self)] = self->sp[-1];
+            self->sp--;
             break;
         case NCALL: {
             void(*fun)(struct vm *) = (void(*)(struct vm *))self->functions[vm_get_word(self)];
