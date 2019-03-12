@@ -18,7 +18,7 @@ CFLAGS = -Wall -Wextra
 #path to ck runtime implementation
 RUNTIMEDIR = ../../runtime
 
-#chosen gc impl, currently hardcoded in cka, could be option, would still have to link correct implementation here
+#chosen gc impl
 GCIMPL = ../../runtime/${GC}_gc.c
 
 #directory of output
