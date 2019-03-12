@@ -4,9 +4,9 @@ CKC = java -jar ../../compiler/out/artifacts/ckc_jar/ckc.jar
 CKA = java -jar ../../compiler/out/artifacts/cka_jar/cka.jar
 
 #ck assembler options
-STACKSIZE = 10000
+STACKSIZE = 100
 HEAPSIZE = 1000
-WORDSIZE = 4
+WORDSIZE = 8
 
 #cka options
 CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE}

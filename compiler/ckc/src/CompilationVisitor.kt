@@ -48,7 +48,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
     //to adjust the corresponding frame element. similarly
     //when we emit an enter or leave instruction we need
     //to create a new, or restore the last, StackFrame object
-    var frame:StackFrame = StackFrame()
+    val frame:StackFrame = StackFrame()
 
     companion object {
         var count:Int = 0

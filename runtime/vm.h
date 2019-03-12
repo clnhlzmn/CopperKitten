@@ -295,9 +295,12 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
         case POP:
             self->sp--;
             break;
-        case SWAP:
+        case SWAP: {
+            intptr_t temp = self->sp[-2];
             self->sp[-2] = self->sp[-1];
+            self->sp[-1] = temp;
             break;
+        }
         case ENTER:
             //causes the stack to look like the following
             //[...last frame...|last fp|layout fun ptr|...current frame...]
@@ -347,12 +350,14 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case RLOAD:
             //load a reference from the ref on tos
+            //[...|ref]->[...|ref[index]]
             //sp[-1] = (sp[-1])[index]
             self->sp[-1] = ((intptr_t*)self->sp[-1])[vm_get_word(self)];
             break;
         case RSTORE:
+            //[...|ref|value]->[...]
             ((intptr_t*)self->sp[-2])[vm_get_word(self)] = self->sp[-1];
-            self->sp--;
+            self->sp -= 2;
             break;
         case ALOAD:
             vm_aload(self, vm_get_word(self));
