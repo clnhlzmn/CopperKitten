@@ -1,6 +1,6 @@
 
 
-#include "incremental_copying_gc.h"
+#include "incremental_gc.h"
 #include "c_static_assert.h"
 #include <stdio.h>
 #include <assert.h>

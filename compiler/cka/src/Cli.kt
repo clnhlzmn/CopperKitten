@@ -15,6 +15,7 @@ class Cli(val args: Array<String>) {
         options.addOption("s", "stack_size", true, "set stack size (in words)")
         options.addOption("m", "memory_size", true, "set heap size (in words)")
         options.addOption("w", "word_size", true, "set heap size (in bytes)")
+        options.addOption("g", "garbage_collector", true, "set garbage collector implementation (copying, incremental, mark_compact)")
     }
 
     fun parse() {
@@ -34,6 +35,22 @@ class Cli(val args: Array<String>) {
                 val stackSize = cmd.getOptionValue("s")
                 val heapSize = cmd.getOptionValue("m")
                 val wordSize = cmd.getOptionValue("w")
+                var gcOpt = cmd.getOptionValue("g")
+
+                val gcOpts = listOf("copying", "incremental", "mark_compact")
+
+                if (gcOpt != null) {
+                    if (!gcOpts.contains(gcOpt.toLowerCase())) {
+                        println("unknown option $gcOpt")
+                        help()
+                        return
+                    }
+                } else {
+                    gcOpt = "copying"
+                }
+
+                val gcImpls = gcOpts.map { o -> Pair(o, "${o}_gc.h") }.toMap()
+                val gcImpl = gcImpls.getValue(gcOpt.toLowerCase())
 
                 val tc = TargetContext(
                     { mnemonic -> mnemonic.toUpperCase() },
@@ -49,7 +66,8 @@ class Cli(val args: Array<String>) {
                 val pc = FileVisitor().visit(context)
                 val oc = OutputContext(
                     heapSize?.toInt() ?: 1000,
-                    stackSize?.toInt() ?: 100
+                    stackSize?.toInt() ?: 100,
+                    gcImpl
                 )
                 for (inst in pc.instructions) {
                     inst.emit(pc, tc, oc)

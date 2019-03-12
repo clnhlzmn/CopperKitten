@@ -7,9 +7,10 @@ CKA = java -jar ../../compiler/out/artifacts/cka_jar/cka.jar
 STACKSIZE = 100
 HEAPSIZE = 1000
 WORDSIZE = 8
+GC = mark_compact
 
 #cka options
-CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE}
+CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE} -g ${GC}
 
 #C flags
 CFLAGS = -Wall -Wextra
@@ -18,7 +19,7 @@ CFLAGS = -Wall -Wextra
 RUNTIMEDIR = ../../runtime
 
 #chosen gc impl, currently hardcoded in cka, could be option, would still have to link correct implementation here
-GCIMPL = ../../runtime/copying_gc.c
+GCIMPL = ../../runtime/${GC}_gc.c
 
 #directory of output
 OUTDIR = out

@@ -2,7 +2,8 @@
 //define various parts of the compiled program
 class OutputContext(
     private val memSize: Int,
-    private val stackSize: Int) {
+    private val stackSize: Int,
+    private val gcImpl: String) {
 
     //where layout functions are stored
     private val functions = ArrayList<Function>()
@@ -21,7 +22,7 @@ class OutputContext(
 
     fun emit(): String {
         return "#include \"vm.h\"\n" +
-            "#include \"copying_gc.h\"\n" +
+            "#include \"$gcImpl\"\n" +
             "\n" +
             "#define MEM_SIZE $memSize\n" +
             "intptr_t gc_mem[MEM_SIZE];\n" +
