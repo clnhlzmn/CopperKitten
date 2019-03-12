@@ -1,7 +1,7 @@
 class ExprVisitor : ckBaseVisitor<Expr>() {
 
     override fun visitNaturalExpr(ctx: ckParser.NaturalExprContext?): Expr =
-        NaturalExpr(Integer.valueOf(ctx!!.text))
+        NaturalExpr(ctx!!.text.toLong())
 
     override fun visitSequenceExpr(ctx: ckParser.SequenceExprContext?): Expr =
         SequenceVisitor().visit(ctx!!.sequence())

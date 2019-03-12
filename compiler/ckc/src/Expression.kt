@@ -24,7 +24,7 @@ class SequenceExpr(val first: Expr, val second: Expr?) : Expr() {
 
 }
 
-class NaturalExpr(val value: Int) : Expr() {
+class NaturalExpr(val value: Long) : Expr() {
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
