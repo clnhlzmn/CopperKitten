@@ -79,7 +79,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
     }
 
     override fun visit(e: RefExpr): List<String> {
-        val def = e.accept(FindDefinitionVisitor())
+        val def = e.accept(GetDefinitionVisitor())
         val isRef = e.accept(GetTypeVisitor()).isRefType()
         when (def) {
             is Definition -> {

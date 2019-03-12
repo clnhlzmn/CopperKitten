@@ -18,7 +18,7 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
     }
 
     override fun visit(e: RefExpr) {
-        val def = e.accept(FindDefinitionVisitor())
+        val def = e.accept(GetDefinitionVisitor())
         //create capture expr
         val capture = RefExpr(e.id)
         capture.enclosingScope = currentFun?.enclosingScope

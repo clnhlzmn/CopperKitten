@@ -7,7 +7,7 @@ sealed class Definition private constructor (val local: Boolean) {
 
 //a visitor used to traverse the ast using enclosing
 //scope to find the definition of a RefExpr
-class FindDefinitionVisitor : BaseASTVisitor<Definition?>() {
+class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
 
     var isLocal = true
 

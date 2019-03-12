@@ -37,7 +37,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
 
     //ref has type of it's definition
     override fun visit(e: RefExpr): Type {
-        val def = e.accept(FindDefinitionVisitor())
+        val def = e.accept(GetDefinitionVisitor())
         return when(def) {
             is Definition -> {
                 return when (def) {
