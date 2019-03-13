@@ -10,7 +10,7 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
 
     override fun visit(e: Expr.Sequence) {
         e.first.accept(this)
-        e.second?.accept(this)
+        e.second.accept(this)
     }
 
     override fun visit(e: Expr.Natural) {

@@ -11,22 +11,13 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
 
     //check first and then check next
     override fun visit(e: Expr.Sequence): Type {
-        //get the declType of the first operand
+        //get the type of the first operand
         val type = e.first.accept(this)
         return when (type) {
             //if error then return error
             is ErrorType -> type
             //else first is ok, discard
-            else -> {
-                //get declType of second operand
-                val nextType = e.second?.accept(this)
-                when (nextType) {
-                    //if nextType is null then there was no second operand, return declType of first
-                    null -> type
-                    //else return second
-                    else -> nextType
-                }
-            }
+            else -> e.second.accept(this)
         }
     }
 

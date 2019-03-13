@@ -19,7 +19,7 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
     //not a ref or an enclosing scope, just have to visit children
     override fun visit(e: Expr.Sequence) {
         e.first.accept(this)
-        e.second?.accept(this)
+        e.second.accept(this)
     }
 
     override fun visit(e: Expr.Natural) {

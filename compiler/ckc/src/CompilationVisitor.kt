@@ -65,11 +65,9 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
 
     override fun visit(e: Expr.Sequence): List<String> {
         val ret = ArrayList(e.first.accept(this))
-        if (e.second != null) {
-            ret.add("pop")
-            frame.popTemp()
-            ret.addAll(e.second.accept(this))
-        }
+        ret.add("pop")
+        frame.popTemp()
+        ret.addAll(e.second.accept(this))
         return ret
     }
 

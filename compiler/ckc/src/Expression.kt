@@ -11,16 +11,13 @@ sealed class Expr : BaseASTNode() {
         }
     }
 
-    class Sequence(val first: Expr, val second: Expr?) : Expr() {
+    class Sequence(val first: Expr, val second: Expr) : Expr() {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            when (second) {
-                null -> "$first"
-                else -> "{$first; $second}"
-            }
+            "{$first; $second}"
 
     }
 

@@ -163,12 +163,16 @@ class SequenceVisitor : ckBaseVisitor<Expr>() {
                     if (ctx.sequence() == null) null
                     else SequenceVisitor().visit(ctx.sequence())
                 )
-            else ->
-                Expr.Sequence(
-                    ExprVisitor().visit(ctx.expr()),
-                    if (ctx.sequence() == null) null
-                    else SequenceVisitor().visit(ctx.sequence())
-                )
+            else -> {
+                if (ctx.sequence() == null) {
+                    ctx.expr().accept(ExprVisitor())
+                } else {
+                    Expr.Sequence(
+                        ExprVisitor().visit(ctx.expr()),
+                        SequenceVisitor().visit(ctx.sequence())
+                    )
+                }
+            }
         }
     }
 }
