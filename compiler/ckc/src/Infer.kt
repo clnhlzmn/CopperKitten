@@ -138,7 +138,7 @@ class Infer {
                 is IntType -> t
                 is UnknownType -> if (t.id == x) u else t
                 is FunType -> FunType(t.paramTypes.map { p -> substitute(u, x, p) }, substitute(u, x, t.returnType))
-                else -> throw RuntimeException("not possible")
+                is ErrorType -> throw RuntimeException(t.toString())
             }
 
         data class Substitution(val x: String, val u: Type)
