@@ -1,5 +1,3 @@
-import kotlin.math.exp
-
 class ExprVisitor : ckBaseVisitor<Expr>() {
 
     override fun visitNaturalExpr(ctx: ckParser.NaturalExprContext?): Expr =
@@ -20,7 +18,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
 
     override fun visitApplyExpr(ctx: ckParser.ApplyExprContext?): Expr =
         Expr.Apply(
-            target = ExprVisitor().visit(ctx!!.expr()),
+            fn = ExprVisitor().visit(ctx!!.expr()),
             args =
                 if (ctx.args() != null) ArgsVisitor().visit(ctx.args())
                 else ArrayList()

@@ -34,7 +34,7 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
 
     override fun visit(e: Expr.Apply) {
         e.args.forEach { a -> a.accept(this) }
-        e.target.accept(this)
+        e.fn.accept(this)
     }
 
     override fun visit(e: Expr.Unary) {

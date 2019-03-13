@@ -40,17 +40,17 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    //apply first has declType of its target's return declType
+    //apply first has declType of its fn's return declType
     override fun visit(e: Expr.Apply): Type {
-        //get target declType
-        val targetType = e.target.accept(this)
+        //get fn declType
+        val targetType = e.fn.accept(this)
         //get types of arguments
         val argTypes = e.args.map { a -> a.accept(this) }
-        //check target
+        //check fn
         return when (targetType) {
-            //if target is error return that
+            //if fn is error return that
             is ErrorType -> targetType
-            //target is fun
+            //fn is fun
             is FunType -> {
                 when {
                     //num args doesn't match
@@ -59,12 +59,12 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
                     //argument declType mismatch
                     targetType.paramTypes.zip(argTypes).any { p -> p.first != p.second } ->
                         ErrorType("argument declType mismatch in $e")
-                    //everything ok so return target return declType
+                    //everything ok so return fn return declType
                     else -> targetType.returnType
                 }
             }
-            //target must be fun
-            else -> ErrorType("${e.target} must be a function in $e")
+            //fn must be fun
+            else -> ErrorType("${e.fn} must be a function in $e")
         }
     }
 
@@ -107,7 +107,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    //assign has declType of value, target must have same declType
+    //assign has declType of value, fn must have same declType
     //and be assignable (var, arrayRef, ...)
     override fun visit(e: Expr.Assign): Type {
         val targetType = e.target.accept(this)
@@ -115,7 +115,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         return when {
             targetType is ErrorType -> targetType
             valueType is ErrorType -> valueType
-            //TODO: check that target is assignable
+            //TODO: check that fn is assignable
             targetType == valueType -> valueType
             else -> ErrorType("declType mismatch between ${e.target} and ${e.value} in $e")
         }

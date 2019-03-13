@@ -1,5 +1,3 @@
-import com.sun.xml.internal.bind.v2.model.annotation.RuntimeInlineAnnotationReader
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const
 import java.lang.RuntimeException
 
 //based on https://github.com/prakhar1989/type-inference
@@ -8,21 +6,45 @@ class Infer {
     //annotated expr
     sealed class AExpr(val t: Type) {
 
-        class Unit(t: Type) : AExpr(t)
+        class Unit(t: Type): AExpr(t) {
+            override fun toString(): String = "()"
+        }
 
-        class Natural(val lit: Long, t: Type) : AExpr(t)
+        class Sequence(val first: AExpr, val second: AExpr, t: Type): AExpr(t) {
+            override fun toString(): String = "{$first; $second}:: $t"
+        }
 
-        class Unary(val operator: String, val operand: AExpr, t: Type) : AExpr(t)
+        class Natural(val lit: Long, t: Type): AExpr(t) {
+            override fun toString(): String = "$lit"
+        }
 
-        class Binary(val lhs: AExpr, val op: String, val rhs: AExpr, t: Type) : AExpr(t)
+        class Unary(val operator: String, val operand: AExpr, t: Type): AExpr(t) {
+            override fun toString(): String = "$operator $operand"
+        }
 
-        class Ref(val id: String, t: Type) : AExpr(t)
+        class Binary(val lhs: AExpr, val op: String, val rhs: AExpr, t: Type): AExpr(t) {
+            override fun toString(): String = "$lhs $op $rhs"
+        }
 
-        class Fun(val params: List<String>, val body: AExpr, t: Type) : AExpr(t)
+        class Ref(val id: String, t: Type): AExpr(t) {
+            override fun toString(): String = "$id:: $t"
+        }
 
-        class CFun(val id: String, t: Type) : AExpr(t)
+        class Let(val id: String, val value: AExpr, val body: AExpr, t: Type): AExpr(t) {
+            override fun toString(): String = "{let $id = $value in $body}:: $t"
+        }
 
-        class Apply(val target: AExpr, val args: List<AExpr>, t: Type) : AExpr(t)
+        class Fun(val params: List<String>, val body: AExpr, t: Type): AExpr(t) {
+            override fun toString(): String = "{(${params.toString(", ")}): $body}:: $t"
+        }
+
+        class CFun(val id: String, t: Type): AExpr(t) {
+            override fun toString(): String = "{cfun $id}:: $t"
+        }
+
+        class Apply(val fn: AExpr, val args: List<AExpr>, t: Type): AExpr(t) {
+            override fun toString(): String = "{$fn(${args.toString(", ")})}:: $t"
+        }
 
     }
 
@@ -37,6 +59,7 @@ class Infer {
         fun annotateExpr(e: Expr): AExpr =
             when (e) {
                 is Expr.Unit -> AExpr.Unit(UnitType)
+                is Expr.Sequence -> AExpr.Sequence(annotateExpr(e.first), annotateExpr(e.second), newType())
                 is Expr.Natural -> AExpr.Natural(e.value, IntType)
                 is Expr.Unary -> AExpr.Unary(e.operator, annotateExpr(e.operand), IntType)
                 is Expr.Binary -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), IntType)
@@ -57,10 +80,18 @@ class Infer {
                     }
                 }
                 is Expr.Apply -> AExpr.Apply(
-                    annotateExpr(e.target),
+                    annotateExpr(e.fn),
                     e.args.map { a -> annotateExpr(a) },
                     newType()
                 )
+                is Expr.Let -> {
+                    val aBody = annotateExpr(e.body)
+                    val aValue = annotateExpr(e.value)
+                    if (e.typeInfo == null) {
+                        e.typeInfo = newType()
+                    }
+                    AExpr.Let(e.id, aValue, aBody, e.typeInfo!!)
+                }
                 is Expr.Fun -> {
                     val abody = annotateExpr(e.body)
                     val paramTypes = ArrayList<Type>()
@@ -75,23 +106,28 @@ class Infer {
                         //otherwise (p was referenced in e.body) use existing
                         paramTypes.add(p.typeInfo!!)
                     }
-                    AExpr.Fun(e.params.map{p->p.id}, abody, FunType(paramTypes, newType()))
+                    AExpr.Fun(e.params.map { p -> p.id }, abody, FunType(paramTypes, newType()))
                 }
                 is Expr.CFun -> AExpr.CFun(e.id, e.sig)
                 else -> TODO("not implemented")
             }
 
         //a strict equality on t1, t2
-        data class Constraint(val t1: Type, val t2: Type)
+        data class Constraint(val t1: Type, val t2: Type) {
+            override fun toString(): String =
+                "($t1; $t2)"
+        }
 
         fun collectArgs(lae: List<AExpr>): Sequence<Constraint> =
-            lae.map { a -> collect(a) }.fold(emptySequence()){ acc, seq -> acc + seq }
+            lae.map { a -> collect(a) }.foldRight(emptySequence()){ acc, seq -> acc + seq }
 
         //takes an annotated expr and returns a list of constraints
         fun collect(ae: AExpr): Sequence<Constraint> =
             when (ae) {
                 is AExpr.Unit -> emptySequence()
                 is AExpr.Natural -> emptySequence()
+                //collect first and second, and second.t must equal ae.t
+                is AExpr.Sequence -> collect(ae.first) + collect(ae.second) + sequenceOf(Constraint(ae.t, ae.second.t))
                 //constraints of operand plus operand t must be int type and ae t must be int type
                 is AExpr.Unary ->
                     collect(ae.operand) + sequenceOf(Constraint(ae.operand.t, IntType), Constraint(ae.t, IntType))
@@ -105,29 +141,31 @@ class Infer {
                 //fun expr must have fun type, then add constraints from body, and that ae t is ae.t.returnType
                 is AExpr.Fun -> {
                     when (ae.t) {
-                        is FunType -> collect(ae.body) + sequenceOf(Constraint(ae.t, ae.t.returnType))
-                        else -> throw RuntimeException("not a function")
+                        //pretty sure the next line doesn't need the last part
+                        is FunType -> collect(ae.body)// + sequenceOf(Constraint(ae.t, ae.t.returnType))
+                        else -> throw RuntimeException("not possible")
                     }
                 }
+                is AExpr.Let -> collect(ae.value) + collect(ae.body) + sequenceOf(Constraint(ae.t, ae.body.t))
                 is AExpr.CFun -> {
                     when (ae.t) {
                         is FunType -> sequenceOf(Constraint(ae.t, ae.t.returnType))
-                        else -> throw RuntimeException("not a function")
+                        else -> throw RuntimeException("not possible")
                     }
                 }
                 is AExpr.Apply -> {
-                    when (ae.target.t) {
+                    when (ae.fn.t) {
                         is FunType -> {
-                            if (ae.target.t.paramTypes.size != ae.args.size)
+                            if (ae.fn.t.paramTypes.size != ae.args.size)
                                 throw RuntimeException("incorrect number of arguments")
-                            //target constraints plus arg constraints plus ae.t is ae target return type
-                            //plus ae target param types match ae arg types
-                            collect(ae.target) + collectArgs(ae.args) +
-                                sequenceOf(Constraint(ae.t, ae.target.t.returnType)) +
-                                ae.target.t.paramTypes.zip(ae.args).map { p -> Constraint(p.first, p.second.t) }
+                            //fn constraints plus arg constraints plus ae.t is ae fn return type
+                            //plus ae fn param types match ae arg types
+                            collect(ae.fn) + collectArgs(ae.args) +
+                                sequenceOf(Constraint(ae.t, ae.fn.t.returnType)) +
+                                ae.fn.t.paramTypes.zip(ae.args).map { p -> Constraint(p.first, p.second.t) }
                         }
-                        is UnknownType -> collect(ae.target) + collectArgs(ae.args) +
-                            sequenceOf(Constraint(ae.target.t, FunType(ae.args.map { a -> a.t }, ae.t)))
+                        is UnknownType -> collect(ae.fn) + collectArgs(ae.args) +
+                            sequenceOf(Constraint(ae.fn.t, FunType(ae.args.map { a -> a.t }, ae.t)))
                         else -> throw RuntimeException("incorrect function application")
                     }
                 }
@@ -159,12 +197,12 @@ class Infer {
 
         fun unify(constraints: Sequence<Constraint>): Sequence<Substitution> {
             val first = constraints.firstOrNull()
-            if (first == null) {
-                return emptySequence()
+            return if (first == null) {
+                emptySequence()
             } else {
                 val t2 = unify(constraints.drop(1))
                 val t1 = unifyOne(apply(t2, first.t1), apply(t2, first.t2))
-                return t1 + t2
+                t1 + t2
             }
         }
 
@@ -189,7 +227,7 @@ class Infer {
                         t1.paramTypes.zip(t2.paramTypes).map { p -> Constraint(p.first, p.second) }.asSequence() +
                             sequenceOf(Constraint(t1.returnType, t2.returnType))
                     )
-                else -> throw RuntimeException("mismatched types")
+                else -> throw RuntimeException("mismatched types $t1 and $t2")
             }
         }
 
@@ -207,12 +245,14 @@ class Infer {
             when (ae) {
                 is AExpr.Unit -> AExpr.Unit(apply(subs, ae.t))
                 is AExpr.Natural -> AExpr.Natural(ae.lit, apply(subs, ae.t))
+                is AExpr.Sequence -> AExpr.Sequence(applyExpr(subs, ae.first), applyExpr(subs, ae.second), apply(subs, ae.t))
                 is AExpr.Unary -> AExpr.Unary(ae.operator, applyExpr(subs, ae.operand), apply(subs, ae.t))
                 is AExpr.Binary -> AExpr.Binary(applyExpr(subs, ae.lhs), ae.op, applyExpr(subs, ae.rhs), apply(subs, ae.t))
                 is AExpr.Ref -> AExpr.Ref(ae.id, apply(subs, ae.t))
+                is AExpr.Let -> AExpr.Let(ae.id, applyExpr(subs, ae.value), applyExpr(subs, ae.body), apply(subs, ae.t))
                 is AExpr.Fun -> AExpr.Fun(ae.params, applyExpr(subs, ae.body), apply(subs, ae.t))
                 is AExpr.CFun -> AExpr.CFun(ae.id, apply(subs, ae.t))
-                is AExpr.Apply -> AExpr.Apply(applyExpr(subs, ae.target), ae.args.map { a -> applyExpr(subs, a) }, apply(subs, ae.t))
+                is AExpr.Apply -> AExpr.Apply(applyExpr(subs, ae.fn), ae.args.map { a -> applyExpr(subs, a) }, apply(subs, ae.t))
             }
 
 //        let infer (env: environment) (e: expr) : aexpr =
@@ -227,7 +267,9 @@ class Infer {
         //env included in e
         fun infer(e: Expr): AExpr {
             val ae = annotateExpr(e)
+            println(ae)
             val constraints = collect(ae)
+            println(constraints.toList().toString(" "))
             val subs = unify(constraints)
             return applyExpr(subs, ae)
         }

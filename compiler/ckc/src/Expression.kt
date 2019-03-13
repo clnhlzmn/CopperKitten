@@ -41,13 +41,13 @@ sealed class Expr : BaseASTNode() {
             id
     }
 
-    class Apply(val target: Expr, val args: List<Expr>) : Expr() {
+    class Apply(val fn: Expr, val args: List<Expr>) : Expr() {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$target}(${args.toString(", ")})"
+            "{$fn}(${args.toString(", ")})"
     }
 
     class Unary(val operator: String, val operand: Expr) : Expr() {

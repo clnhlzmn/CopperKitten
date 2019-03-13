@@ -33,7 +33,7 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
 
     //visit children
     override fun visit(e: Expr.Apply) {
-        e.target.accept(this)
+        e.fn.accept(this)
         e.args.forEach{ a -> a.accept(this) }
     }
 

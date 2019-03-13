@@ -117,7 +117,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
             ret.addAll(a.accept(this))
         }
         //then evaluate function
-        ret.addAll(e.target.accept(this))
+        ret.addAll(e.fn.accept(this))
         //duplicate function (puts another ref on stack)
         ret.add("dup")
         //get code address (replaces dup'd function with non-ref function address)

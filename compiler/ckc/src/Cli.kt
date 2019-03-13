@@ -44,6 +44,7 @@ class Cli(val args: Array<String>) {
                     res.accept(ScopeBuildingVisitor())
                     //get program declType
                     val type: Type = res.expr.accept(GetTypeVisitor())
+                    println(res.expr)
                     val ae = Infer.infer(res.expr)
                     println(ae)
                     if (type !is ErrorType) {
