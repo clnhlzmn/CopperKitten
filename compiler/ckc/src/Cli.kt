@@ -48,7 +48,7 @@ class Cli(val args: Array<String>) {
                     println(res.expr)
                     val ae = Infer.infer(res.expr)
                     println(ae)
-                    if (type !is ErrorType) {
+                    if (type !is Type.Error) {
                         //compute function captures
                         res.expr.accept(ComputeCapturesVisitor())
                         val code: List<String> = compileCkFile(res)

@@ -2,32 +2,32 @@
 
 sealed class Type {
     abstract fun isRefType(): Boolean
-}
 
-data class ErrorType(val what: String) : Type() {
-    override fun isRefType(): Boolean = false
-    override fun toString(): String = "Error: $what"
-}
-
-data class UnknownType(val id: String): Type() {
-    override fun isRefType(): Boolean {
-        TODO("not implemented")
+    data class Error(val what: String): Type() {
+        override fun isRefType(): Boolean = false
+        override fun toString(): String = "Error: $what"
     }
-    override fun toString(): String = id
-}
 
-object IntType : Type() {
-    override fun isRefType(): Boolean = false
-    override fun toString(): String = "Int"
-}
+    data class Unknown(val id: String): Type() {
+        override fun isRefType(): Boolean {
+            TODO("not implemented")
+        }
+        override fun toString(): String = id
+    }
 
-object UnitType : Type() {
-    override fun isRefType(): Boolean = false
-    override fun toString(): String = "Unit"
-}
+    object Int: Type() {
+        override fun isRefType(): Boolean = false
+        override fun toString(): String = "Int"
+    }
 
-data class FunType(val paramTypes: List<Type>, val returnType: Type) : Type() {
-    override fun isRefType(): Boolean = true
-    override fun toString(): String =
-        "(${paramTypes.toString(", ")}): $returnType"
+    object Unit: Type() {
+        override fun isRefType(): Boolean = false
+        override fun toString(): String = "Unit"
+    }
+
+    data class Fun(val paramTypes: List<Type>, val returnType: Type): Type() {
+        override fun isRefType(): Boolean = true
+        override fun toString(): String =
+            "(${paramTypes.toString(", ")}): $returnType"
+    }
 }

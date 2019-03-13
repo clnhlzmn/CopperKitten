@@ -107,7 +107,7 @@ sealed class Expr : BaseASTNode() {
             "(${params.toString(", ")}): $type $body"
     }
 
-    class CFun(val id: String, val sig: FunType) : Expr() {
+    class CFun(val id: String, val sig: Type.Fun) : Expr() {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)

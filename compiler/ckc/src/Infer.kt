@@ -6,7 +6,7 @@ class Infer {
     //annotated expr
     sealed class AExpr(val t: Type) {
 
-        object Unit: AExpr(UnitType) {
+        object Unit: AExpr(Type.Unit) {
             override fun toString(): String = "()"
         }
 
@@ -14,7 +14,7 @@ class Infer {
             override fun toString(): String = "{$first; $second}:: $t"
         }
 
-        class Natural(val lit: Long): AExpr(IntType) {
+        class Natural(val lit: Long): AExpr(Type.Int) {
             override fun toString(): String = "$lit"
         }
 
@@ -52,14 +52,14 @@ class Infer {
 
         var i = 0
 
-        fun newType(): UnknownType =
-            UnknownType("T${i++}")
+        fun newType(): Type.Unknown =
+            Type.Unknown("T${i++}")
 
         fun literalType(e: Expr): Type {
             return when (e) {
-                is Expr.Unit -> UnitType
-                is Expr.Natural -> IntType
-                is Expr.Fun -> FunType(e.params.map { newType() }, literalType(e.body))
+                is Expr.Unit -> Type.Unit
+                is Expr.Natural -> Type.Int
+                is Expr.Fun -> Type.Fun(e.params.map { newType() }, literalType(e.body))
                 else -> newType()
             }
         }
@@ -70,8 +70,8 @@ class Infer {
                 is Expr.Unit -> AExpr.Unit
                 is Expr.Sequence -> AExpr.Sequence(annotateExpr(e.first), annotateExpr(e.second), newType())
                 is Expr.Natural -> AExpr.Natural(e.value)
-                is Expr.Unary -> AExpr.Unary(e.operator, annotateExpr(e.operand), IntType)
-                is Expr.Binary -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), IntType)
+                is Expr.Unary -> AExpr.Unary(e.operator, annotateExpr(e.operand), Type.Int)
+                is Expr.Binary -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), Type.Int)
                 is Expr.Ref -> {
                     val def = e.accept(GetDefinitionVisitor())
                     when (def) {
@@ -117,7 +117,7 @@ class Infer {
                         //otherwise (p was referenced in e.body) use existing
                         paramTypes.add(p.typeInfo!!)
                     }
-                    AExpr.Fun(e.params.map { p -> p.id }, aBody, FunType(paramTypes, newType()))
+                    AExpr.Fun(e.params.map { p -> p.id }, aBody, Type.Fun(paramTypes, newType()))
                 }
                 is Expr.CFun -> AExpr.CFun(e.id, e.sig)
                 else -> TODO("not implemented")
@@ -141,19 +141,19 @@ class Infer {
                 is AExpr.Sequence -> collect(ae.first) + collect(ae.second) + sequenceOf(Constraint(ae.t, ae.second.t))
                 //constraints of operand plus operand t must be int type and ae t must be int type
                 is AExpr.Unary ->
-                    collect(ae.operand) + sequenceOf(Constraint(ae.operand.t, IntType), Constraint(ae.t, IntType))
+                    collect(ae.operand) + sequenceOf(Constraint(ae.operand.t, Type.Int), Constraint(ae.t, Type.Int))
                 //constraints of lhs, rhs plus lhs, rhs t must be int type and ae t must be int type
                 is AExpr.Binary ->
                     collect(ae.lhs) +
                     collect(ae.rhs) +
-                    sequenceOf(Constraint(ae.lhs.t, IntType), Constraint(ae.rhs.t, IntType), Constraint(ae.t, IntType))
+                    sequenceOf(Constraint(ae.lhs.t, Type.Int), Constraint(ae.rhs.t, Type.Int), Constraint(ae.t, Type.Int))
                 //ref expr gives nothing
                 is AExpr.Ref -> emptySequence()
                 //fun expr must have fun type, then add constraints from body, and that ae t is ae.body.t
                 is AExpr.Fun -> {
                     when (ae.t) {
-                        is FunType -> collect(ae.body) +
-                            sequenceOf(Constraint(ae.t, FunType(ae.t.paramTypes, ae.body.t)))
+                        is Type.Fun -> collect(ae.body) +
+                            sequenceOf(Constraint(ae.t, Type.Fun(ae.t.paramTypes, ae.body.t)))
                         else -> throw RuntimeException("not possible")
                     }
                 }
@@ -166,7 +166,7 @@ class Infer {
                 is AExpr.CFun -> emptySequence()
                 is AExpr.Apply -> {
                     when (ae.fn.t) {
-                        is FunType -> {
+                        is Type.Fun -> {
                             if (ae.fn.t.paramTypes.size != ae.args.size)
                                 throw RuntimeException("incorrect number of arguments")
                             //fn constraints plus arg constraints plus ae.t is ae fn return type
@@ -175,8 +175,8 @@ class Infer {
                                 sequenceOf(Constraint(ae.t, ae.fn.t.returnType)) +
                                 ae.fn.t.paramTypes.zip(ae.args).map { p -> Constraint(p.first, p.second.t) }
                         }
-                        is UnknownType -> collect(ae.fn) + collectArgs(ae.args) +
-                            sequenceOf(Constraint(ae.fn.t, FunType(ae.args.map { a -> a.t }, ae.t)))
+                        is Type.Unknown -> collect(ae.fn) + collectArgs(ae.args) +
+                            sequenceOf(Constraint(ae.fn.t, Type.Fun(ae.args.map { a -> a.t }, ae.t)))
                         else -> throw RuntimeException("incorrect function application")
                     }
                 }
@@ -184,11 +184,11 @@ class Infer {
 
         fun substitute(u: Type, x: String, t: Type): Type =
             when (t) {
-                is UnitType -> t
-                is IntType -> t
-                is UnknownType -> if (t.id == x) u else t
-                is FunType -> FunType(t.paramTypes.map { p -> substitute(u, x, p) }, substitute(u, x, t.returnType))
-                is ErrorType -> throw RuntimeException(t.toString())
+                is Type.Unit -> t
+                is Type.Int -> t
+                is Type.Unknown -> if (t.id == x) u else t
+                is Type.Fun -> Type.Fun(t.paramTypes.map { p -> substitute(u, x, p) }, substitute(u, x, t.returnType))
+                is Type.Error -> throw RuntimeException(t.toString())
             }
 
         data class Substitution(val x: String, val u: Type)
@@ -228,12 +228,12 @@ class Infer {
 
         fun unifyOne(t1: Type, t2: Type): Sequence<Substitution> {
             return when {
-                t1 is UnitType && t2 is UnitType -> emptySequence()
-                t1 is IntType && t2 is IntType -> emptySequence()
-                t1 is UnknownType -> sequenceOf(Substitution(t1.id, t2))
-                t2 is UnknownType -> sequenceOf(Substitution(t2.id, t1))
+                t1 is Type.Unit && t2 is Type.Unit -> emptySequence()
+                t1 is Type.Int && t2 is Type.Int -> emptySequence()
+                t1 is Type.Unknown -> sequenceOf(Substitution(t1.id, t2))
+                t2 is Type.Unknown -> sequenceOf(Substitution(t2.id, t1))
                 //both fun types then unify argument types and return type
-                t1 is FunType && t2 is FunType ->
+                t1 is Type.Fun && t2 is Type.Fun ->
                     unify(
                         t1.paramTypes.zip(t2.paramTypes).map { p -> Constraint(p.first, p.second) }.asSequence() +
                             sequenceOf(Constraint(t1.returnType, t2.returnType))
