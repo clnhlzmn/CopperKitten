@@ -6,7 +6,7 @@ class Infer {
     //annotated expr
     sealed class AExpr(val t: Type) {
 
-        class Unit(t: Type): AExpr(t) {
+        object Unit: AExpr(UnitType) {
             override fun toString(): String = "()"
         }
 
@@ -14,7 +14,7 @@ class Infer {
             override fun toString(): String = "{$first; $second}:: $t"
         }
 
-        class Natural(val lit: Long, t: Type): AExpr(t) {
+        class Natural(val lit: Long): AExpr(IntType) {
             override fun toString(): String = "$lit"
         }
 
@@ -31,7 +31,7 @@ class Infer {
         }
 
         class Let(val id: String, val value: AExpr, val body: AExpr, t: Type): AExpr(t) {
-            override fun toString(): String = "{let $id = $value in $body}:: $t"
+            override fun toString(): String = "{let $id = $value; $body}:: $t"
         }
 
         class Fun(val params: List<String>, val body: AExpr, t: Type): AExpr(t) {
@@ -55,12 +55,21 @@ class Infer {
         fun newType(): UnknownType =
             UnknownType("T${i++}")
 
+        fun literalType(e: Expr): Type {
+            return when (e) {
+                is Expr.Unit -> UnitType
+                is Expr.Natural -> IntType
+                is Expr.Fun -> FunType(e.params.map { newType() }, literalType(e.body))
+                else -> newType()
+            }
+        }
+
         //using the "env" built into Exprs using GetDef
         fun annotateExpr(e: Expr): AExpr =
             when (e) {
-                is Expr.Unit -> AExpr.Unit(UnitType)
+                is Expr.Unit -> AExpr.Unit
                 is Expr.Sequence -> AExpr.Sequence(annotateExpr(e.first), annotateExpr(e.second), newType())
-                is Expr.Natural -> AExpr.Natural(e.value, IntType)
+                is Expr.Natural -> AExpr.Natural(e.value)
                 is Expr.Unary -> AExpr.Unary(e.operator, annotateExpr(e.operand), IntType)
                 is Expr.Binary -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), IntType)
                 is Expr.Ref -> {
@@ -73,8 +82,9 @@ class Infer {
                             AExpr.Ref(e.id, def.node.typeInfo!!)
                         }
                         is Definition.Let -> {
-                            if (def.node.typeInfo == null)
-                                def.node.typeInfo = newType()
+                            if (def.node.typeInfo == null) {
+                                def.node.typeInfo = literalType(def.node.value)
+                            }
                             AExpr.Ref(e.id, def.node.typeInfo!!)
                         }
                     }
@@ -86,15 +96,15 @@ class Infer {
                         newType()
                     )
                 is Expr.Let -> {
-                    val aBody = annotateExpr(e.body)
                     val aValue = annotateExpr(e.value)
+                    val aBody = annotateExpr(e.body)
                     if (e.typeInfo == null) {
                         e.typeInfo = newType()
                     }
                     AExpr.Let(e.id, aValue, aBody, e.typeInfo!!)
                 }
                 is Expr.Fun -> {
-                    val abody = annotateExpr(e.body)
+                    val aBody = annotateExpr(e.body)
                     val paramTypes = ArrayList<Type>()
                     e.params.forEach { p ->
                         //if p has no type info then generate it?
@@ -107,7 +117,7 @@ class Infer {
                         //otherwise (p was referenced in e.body) use existing
                         paramTypes.add(p.typeInfo!!)
                     }
-                    AExpr.Fun(e.params.map { p -> p.id }, abody, FunType(paramTypes, newType()))
+                    AExpr.Fun(e.params.map { p -> p.id }, aBody, FunType(paramTypes, newType()))
                 }
                 is Expr.CFun -> AExpr.CFun(e.id, e.sig)
                 else -> TODO("not implemented")
@@ -147,10 +157,11 @@ class Infer {
                         else -> throw RuntimeException("not possible")
                     }
                 }
-                is AExpr.Let ->
+                is AExpr.Let -> {
                     collect(ae.value) +
                     collect(ae.body) +
                     sequenceOf(Constraint(ae.t, ae.body.t))
+                }
                 //cfun doesn't require constraints because the type must be declared
                 is AExpr.CFun -> emptySequence()
                 is AExpr.Apply -> {
@@ -243,8 +254,8 @@ class Infer {
 
         fun applyExpr(subs: Sequence<Substitution>, ae: AExpr): AExpr =
             when (ae) {
-                is AExpr.Unit -> AExpr.Unit(apply(subs, ae.t))
-                is AExpr.Natural -> AExpr.Natural(ae.lit, apply(subs, ae.t))
+                is AExpr.Unit -> AExpr.Unit
+                is AExpr.Natural -> AExpr.Natural(ae.lit)
                 is AExpr.Sequence -> AExpr.Sequence(applyExpr(subs, ae.first), applyExpr(subs, ae.second), apply(subs, ae.t))
                 is AExpr.Unary -> AExpr.Unary(ae.operator, applyExpr(subs, ae.operand), apply(subs, ae.t))
                 is AExpr.Binary -> AExpr.Binary(applyExpr(subs, ae.lhs), ae.op, applyExpr(subs, ae.rhs), apply(subs, ae.t))
