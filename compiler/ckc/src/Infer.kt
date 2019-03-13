@@ -36,11 +36,11 @@ class Infer {
         //using the "env" built into Exprs using GetDef
         fun annotateExpr(e: Expr): AExpr =
             when (e) {
-                is UnitExpr -> AExpr.Unit(UnitType)
-                is NaturalExpr -> AExpr.Natural(e.value, IntType)
-                is UnaryExpr -> AExpr.Unary(e.operator, annotateExpr(e.operand), IntType)
-                is BinaryExpr -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), IntType)
-                is RefExpr -> {
+                is Expr.Unit -> AExpr.Unit(UnitType)
+                is Expr.Natural -> AExpr.Natural(e.value, IntType)
+                is Expr.Unary -> AExpr.Unary(e.operator, annotateExpr(e.operand), IntType)
+                is Expr.Binary -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), IntType)
+                is Expr.Ref -> {
                     val def = e.accept(GetDefinitionVisitor())
                     when (def) {
                         null -> throw RuntimeException("$e not defined")
@@ -56,12 +56,12 @@ class Infer {
                         }
                     }
                 }
-                is ApplyExpr -> AExpr.Apply(
+                is Expr.Apply -> AExpr.Apply(
                     annotateExpr(e.target),
                     e.args.map { a -> annotateExpr(a) },
                     newType()
                 )
-                is FunExpr -> {
+                is Expr.Fun -> {
                     val abody = annotateExpr(e.body)
                     val paramTypes = ArrayList<Type>()
                     e.params.forEach { p ->
@@ -77,7 +77,7 @@ class Infer {
                     }
                     AExpr.Fun(e.params.map{p->p.id}, abody, FunType(paramTypes, newType()))
                 }
-                is CFunExpr -> AExpr.CFun(e.id, e.sig)
+                is Expr.CFun -> AExpr.CFun(e.id, e.sig)
                 else -> TODO("not implemented")
             }
 

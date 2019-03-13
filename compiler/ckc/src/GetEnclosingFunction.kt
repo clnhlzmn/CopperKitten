@@ -1,60 +1,60 @@
 
 
-class GetEnclosingFunction : BaseASTVisitor<FunExpr?>() {
+class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
 
-    override fun visit(e: UnitExpr): FunExpr? {
+    override fun visit(e: Expr.Unit): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: SequenceExpr): FunExpr? {
+    override fun visit(e: Expr.Sequence): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: NaturalExpr): FunExpr? {
+    override fun visit(e: Expr.Natural): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: RefExpr): FunExpr? {
+    override fun visit(e: Expr.Ref): Expr.Fun? {
         return e.enclosingScope?.accept(this)
     }
 
-    override fun visit(e: ApplyExpr): FunExpr? {
+    override fun visit(e: Expr.Apply): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: UnaryExpr): FunExpr? {
+    override fun visit(e: Expr.Unary): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: BinaryExpr): FunExpr? {
+    override fun visit(e: Expr.Binary): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: CondExpr): FunExpr? {
+    override fun visit(e: Expr.Cond): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: AssignExpr): FunExpr? {
+    override fun visit(e: Expr.Assign): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: FunExpr): FunExpr? {
+    override fun visit(e: Expr.Fun): Expr.Fun? {
         return e
     }
 
-    override fun visit(e: LetExpr): FunExpr? {
+    override fun visit(e: Expr.Let): Expr.Fun? {
         return e.enclosingScope?.accept(this)
     }
 
-    override fun visit(e: IfExpr): FunExpr? {
+    override fun visit(e: Expr.If): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: WhileExpr): FunExpr? {
+    override fun visit(e: Expr.While): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: BreakExpr): FunExpr? {
+    override fun visit(e: Expr.Break): Expr.Fun? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

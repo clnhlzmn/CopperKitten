@@ -12,57 +12,57 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
     }
 
     //leaf node, do nothing
-    override fun visit(e: UnitExpr) {
+    override fun visit(e: Expr.Unit) {
         //nothing
     }
 
     //not a ref or an enclosing scope, just have to visit children
-    override fun visit(e: SequenceExpr) {
+    override fun visit(e: Expr.Sequence) {
         e.first.accept(this)
         e.second?.accept(this)
     }
 
-    override fun visit(e: NaturalExpr) {
+    override fun visit(e: Expr.Natural) {
         //nothing
     }
 
-    override fun visit(e: RefExpr) {
+    override fun visit(e: Expr.Ref) {
         //ref first needs to have scope set
         e.enclosingScope = currentScope
     }
 
     //visit children
-    override fun visit(e: ApplyExpr) {
+    override fun visit(e: Expr.Apply) {
         e.target.accept(this)
         e.args.forEach{ a -> a.accept(this) }
     }
 
     //visit children
-    override fun visit(e: UnaryExpr) {
+    override fun visit(e: Expr.Unary) {
         e.operand.accept(this)
     }
 
     //visit children
-    override fun visit(e: BinaryExpr) {
+    override fun visit(e: Expr.Binary) {
         e.lhs.accept(this)
         e.rhs.accept(this)
     }
 
     //visit children
-    override fun visit(e: CondExpr) {
+    override fun visit(e: Expr.Cond) {
         e.cond.accept(this)
         e.csq.accept(this)
         e.alt.accept(this)
     }
 
     //visit children
-    override fun visit(e: AssignExpr) {
+    override fun visit(e: Expr.Assign) {
         e.target.accept(this)
         e.value.accept(this)
     }
 
-    //FunExpr creates a new scope
-    override fun visit(e: FunExpr) {
+    //Expr.Fun creates a new scope
+    override fun visit(e: Expr.Fun) {
         //first save current scope as enclosing scope for e
         e.enclosingScope = currentScope
         //then set the current scope to e
@@ -71,12 +71,12 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
         e.body.accept(this)
     }
 
-    override fun visit(e: CFunExpr) {
+    override fun visit(e: Expr.CFun) {
         //nothing
     }
 
-    //LetExpr creates a new scope
-    override fun visit(e: LetExpr) {
+    //Expr.Let creates a new scope
+    override fun visit(e: Expr.Let) {
         //first save current scope as enclosing scope for e
         e.enclosingScope = currentScope
         //then set the current scope to e
@@ -88,20 +88,20 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
     }
 
     //visit children
-    override fun visit(e: IfExpr) {
+    override fun visit(e: Expr.If) {
         e.cond.accept(this)
         e.csq.accept(this)
         e.alt?.accept(this)
     }
 
     //visit children
-    override fun visit(e: WhileExpr) {
+    override fun visit(e: Expr.While) {
         e.cond.accept(this)
         e.body.accept(this)
     }
 
     //visit children
-    override fun visit(e: BreakExpr) {
+    override fun visit(e: Expr.Break) {
         e.value?.accept(this)
     }
 

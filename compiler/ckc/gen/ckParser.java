@@ -1,4 +1,4 @@
-// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -28,7 +28,7 @@ public class ckParser extends Parser {
 		RULE_types = 10;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"file", "decl", "expr", "args", "sequence", "param", "params", "declType",
+			"file", "decl", "expr", "args", "sequence", "param", "params", "type", 
 			"simpleType", "funType", "types"
 		};
 	}
@@ -434,6 +434,26 @@ public class ckParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
+	public static class CFunExprContext extends ExprContext {
+		public TerminalNode ID() { return getToken(ckParser.ID, 0); }
+		public FunTypeContext funType() {
+			return getRuleContext(FunTypeContext.class,0);
+		}
+		public CFunExprContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof ckListener ) ((ckListener)listener).enterCFunExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof ckListener ) ((ckListener)listener).exitCFunExpr(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ckVisitor ) return ((ckVisitor<? extends T>)visitor).visitCFunExpr(this);
+			else return visitor.visitChildren(this);
+		}
+	}
 	public static class ShiftExprContext extends ExprContext {
 		public ExprContext lhs;
 		public Token op;
@@ -566,26 +586,6 @@ public class ckParser extends Parser {
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof ckVisitor ) return ((ckVisitor<? extends T>)visitor).visitRefExpr(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class CfunExprContext extends ExprContext {
-		public TerminalNode ID() { return getToken(ckParser.ID, 0); }
-		public FunTypeContext funType() {
-			return getRuleContext(FunTypeContext.class,0);
-		}
-		public CfunExprContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ckListener ) ((ckListener)listener).enterCfunExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ckListener ) ((ckListener)listener).exitCfunExpr(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ckVisitor ) return ((ckVisitor<? extends T>)visitor).visitCfunExpr(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -881,7 +881,7 @@ public class ckParser extends Parser {
 				break;
 			case 7:
 				{
-				_localctx = new CfunExprContext(_localctx);
+				_localctx = new CFunExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(55);

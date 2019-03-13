@@ -58,12 +58,12 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return "Label_${count++}"
     }
 
-    override fun visit(e: UnitExpr): List<String> {
+    override fun visit(e: Expr.Unit): List<String> {
         frame.pushTemp(false)
         return listOf("push 0")
     }
 
-    override fun visit(e: SequenceExpr): List<String> {
+    override fun visit(e: Expr.Sequence): List<String> {
         val ret = ArrayList(e.first.accept(this))
         if (e.second != null) {
             ret.add("pop")
@@ -73,12 +73,12 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: NaturalExpr): List<String> {
+    override fun visit(e: Expr.Natural): List<String> {
         frame.pushTemp(false)
         return listOf("push ${e.value}")
     }
 
-    override fun visit(e: RefExpr): List<String> {
+    override fun visit(e: Expr.Ref): List<String> {
         val def = e.accept(GetDefinitionVisitor())
         val isRef = e.accept(GetTypeVisitor()).isRefType()
         when (def) {
@@ -112,7 +112,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         }
     }
 
-    override fun visit(e: ApplyExpr): List<String> {
+    override fun visit(e: Expr.Apply): List<String> {
         val ret = ArrayList<String>()
         //evaluate arguments
         e.args.reversed().forEach{ a ->
@@ -145,7 +145,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: UnaryExpr): List<String> {
+    override fun visit(e: Expr.Unary): List<String> {
         val ret = ArrayList<String>()
         //evaluate operand
         ret.addAll(e.operand.accept(this))
@@ -158,7 +158,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: BinaryExpr): List<String> {
+    override fun visit(e: Expr.Binary): List<String> {
         val ret = ArrayList<String>()
         if (e.operator != "&&" && e.operator != "||") {
             ret.addAll(e.lhs.accept(this))
@@ -207,7 +207,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: CondExpr): List<String> {
+    override fun visit(e: Expr.Cond): List<String> {
         val ret = ArrayList<String>()
         val altLabel = nextLabel()
         val endLabel = nextLabel()
@@ -221,11 +221,11 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: AssignExpr): List<String> {
+    override fun visit(e: Expr.Assign): List<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: FunExpr): List<String> {
+    override fun visit(e: Expr.Fun): List<String> {
         val ret = ArrayList<String>()
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
@@ -265,7 +265,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: CFunExpr): List<String> {
+    override fun visit(e: Expr.CFun): List<String> {
         val ret = ArrayList<String>()
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
@@ -300,7 +300,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: LetExpr): List<String> {
+    override fun visit(e: Expr.Let): List<String> {
         //return var
         val ret = ArrayList<String>()
         //get isLocal index in which to store this value
@@ -319,7 +319,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: IfExpr): List<String> {
+    override fun visit(e: Expr.If): List<String> {
         val ret = ArrayList<String>()
         val altLabel = nextLabel()
         val endLabel = nextLabel()
@@ -338,7 +338,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: WhileExpr): List<String> {
+    override fun visit(e: Expr.While): List<String> {
         val ret = ArrayList<String>()
         val beginLabel = nextLabel()
         val condLabel = nextLabel()
@@ -358,7 +358,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         return ret
     }
 
-    override fun visit(e: BreakExpr): List<String> {
+    override fun visit(e: Expr.Break): List<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

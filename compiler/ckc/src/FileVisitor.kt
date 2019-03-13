@@ -4,10 +4,10 @@ class FileVisitor : ckBaseVisitor<CkFile>() {
     override fun visitFile(ctx: ckParser.FileContext?): CkFile =
         CkFile(
             ctx!!.decl()!!.map { d -> d.accept(DeclsVisitor()) },
-            if (ctx!!.expr() != null)
+            if (ctx.expr() != null)
                 ExprVisitor().visit(ctx.expr())
             else
-                UnitExpr()
+                Expr.Unit
         )
 }
 

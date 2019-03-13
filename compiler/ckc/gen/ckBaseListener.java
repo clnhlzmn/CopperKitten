@@ -1,4 +1,4 @@
-// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -147,6 +147,18 @@ public class ckBaseListener implements ckListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterCFunExpr(ckParser.CFunExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCFunExpr(ckParser.CFunExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterShiftExpr(ckParser.ShiftExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -214,18 +226,6 @@ public class ckBaseListener implements ckListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitRefExpr(ckParser.RefExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterCfunExpr(ckParser.CfunExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitCfunExpr(ckParser.CfunExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

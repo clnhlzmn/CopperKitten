@@ -1,12 +1,12 @@
-// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
  * This interface defines a complete generic visitor for a parse tree produced
  * by {@link ckParser}.
  *
- * @param <T> The return declType of the visit operation. Use {@link Void} for
- * operations with no return declType.
+ * @param <T> The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
  */
 public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	/**
@@ -85,6 +85,13 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBitXorExpr(ckParser.BitXorExprContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code cFunExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCFunExpr(ckParser.CFunExprContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code shiftExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -126,13 +133,6 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitRefExpr(ckParser.RefExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code cfunExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCfunExpr(ckParser.CfunExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ifExpr}
 	 * labeled alternative in {@link ckParser#expr}.

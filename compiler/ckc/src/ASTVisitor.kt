@@ -6,21 +6,21 @@ interface ASTVisitor<T> {
 
     fun visit(c: CFunDecl): T
 
-    fun visit(e: UnitExpr): T
-    fun visit(e: SequenceExpr): T
-    fun visit(e: NaturalExpr): T
-    fun visit(e: RefExpr): T
-    fun visit(e: ApplyExpr): T
-    fun visit(e: UnaryExpr): T
-    fun visit(e: BinaryExpr): T
-    fun visit(e: CondExpr): T
-    fun visit(e: AssignExpr): T
-    fun visit(e: FunExpr): T
-    fun visit(e: CFunExpr): T
-    fun visit(e: LetExpr): T
-    fun visit(e: IfExpr): T
-    fun visit(e: WhileExpr): T
-    fun visit(e: BreakExpr): T
+    fun visit(e: Expr.Unit): T
+    fun visit(e: Expr.Sequence): T
+    fun visit(e: Expr.Natural): T
+    fun visit(e: Expr.Ref): T
+    fun visit(e: Expr.Apply): T
+    fun visit(e: Expr.Unary): T
+    fun visit(e: Expr.Binary): T
+    fun visit(e: Expr.Cond): T
+    fun visit(e: Expr.Assign): T
+    fun visit(e: Expr.Fun): T
+    fun visit(e: Expr.CFun): T
+    fun visit(e: Expr.Let): T
+    fun visit(e: Expr.If): T
+    fun visit(e: Expr.While): T
+    fun visit(e: Expr.Break): T
 }
 
 open class BaseASTVisitor<T> : ASTVisitor<T> {
@@ -33,63 +33,63 @@ open class BaseASTVisitor<T> : ASTVisitor<T> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: UnitExpr): T {
+    override fun visit(e: Expr.Unit): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: SequenceExpr): T {
+    override fun visit(e: Expr.Sequence): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: NaturalExpr): T {
+    override fun visit(e: Expr.Natural): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: RefExpr): T {
+    override fun visit(e: Expr.Ref): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: ApplyExpr): T {
+    override fun visit(e: Expr.Apply): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: UnaryExpr): T {
+    override fun visit(e: Expr.Unary): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: BinaryExpr): T {
+    override fun visit(e: Expr.Binary): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: CondExpr): T {
+    override fun visit(e: Expr.Cond): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: AssignExpr): T {
+    override fun visit(e: Expr.Assign): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: FunExpr): T {
+    override fun visit(e: Expr.Fun): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: CFunExpr): T {
+    override fun visit(e: Expr.CFun): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: LetExpr): T {
+    override fun visit(e: Expr.Let): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: IfExpr): T {
+    override fun visit(e: Expr.If): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: WhileExpr): T {
+    override fun visit(e: Expr.While): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: BreakExpr): T {
+    override fun visit(e: Expr.Break): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

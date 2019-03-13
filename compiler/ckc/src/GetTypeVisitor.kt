@@ -5,12 +5,12 @@
 class GetTypeVisitor : BaseASTVisitor<Type>() {
 
     //unit first has unit declType
-    override fun visit(e: UnitExpr): Type {
+    override fun visit(e: Expr.Unit): Type {
         return UnitType
     }
 
     //check first and then check next
-    override fun visit(e: SequenceExpr): Type {
+    override fun visit(e: Expr.Sequence): Type {
         //get the declType of the first operand
         val type = e.first.accept(this)
         return when (type) {
@@ -31,12 +31,12 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
     }
 
     //natural first has declType Int
-    override fun visit(e: NaturalExpr): Type {
+    override fun visit(e: Expr.Natural): Type {
         return IntType
     }
 
     //ref has declType of it's definition
-    override fun visit(e: RefExpr): Type {
+    override fun visit(e: Expr.Ref): Type {
         val def = e.accept(GetDefinitionVisitor())
         return when(def) {
             is Definition -> {
@@ -50,7 +50,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
     }
 
     //apply first has declType of its target's return declType
-    override fun visit(e: ApplyExpr): Type {
+    override fun visit(e: Expr.Apply): Type {
         //get target declType
         val targetType = e.target.accept(this)
         //get types of arguments
@@ -77,7 +77,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    override fun visit(e: UnaryExpr): Type {
+    override fun visit(e: Expr.Unary): Type {
         val operandType = e.operand.accept(this)
         return when (operandType) {
             is ErrorType -> operandType
@@ -86,7 +86,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    override fun visit(e: BinaryExpr): Type {
+    override fun visit(e: Expr.Binary): Type {
         val lhsType = e.lhs.accept(this)
         val rhsType = e.rhs.accept(this)
         return when {
@@ -97,7 +97,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    override fun visit(e: CondExpr): Type {
+    override fun visit(e: Expr.Cond): Type {
         val condType = e.cond.accept(this)
         val csqType = e.csq.accept(this)
         val altType = e.alt.accept(this)
@@ -118,7 +118,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
 
     //assign has declType of value, target must have same declType
     //and be assignable (var, arrayRef, ...)
-    override fun visit(e: AssignExpr): Type {
+    override fun visit(e: Expr.Assign): Type {
         val targetType = e.target.accept(this)
         val valueType = e.value.accept(this)
         return when {
@@ -130,7 +130,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    override fun visit(e: FunExpr): Type {
+    override fun visit(e: Expr.Fun): Type {
         //function expr has function declType
         val declType = e.type
         val bodyType = e.body.accept(this)
@@ -145,10 +145,10 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    override fun visit(e: CFunExpr): Type =
+    override fun visit(e: Expr.CFun): Type =
         e.sig
 
-    override fun visit(e: LetExpr): Type {
+    override fun visit(e: Expr.Let): Type {
         //let expr has declType of its body, or if no body then unit
         val valueType = e.value.accept(this)
         val bodyType = e.body?.accept(this)
@@ -160,7 +160,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
     }
 
 
-    override fun visit(e: IfExpr): Type {
+    override fun visit(e: Expr.If): Type {
         val condType = e.cond.accept(this)
         val csqType = e.csq.accept(this)
         val altType = e.alt?.accept(this)
@@ -185,7 +185,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
     }
 
     //For now loops return ()
-    override fun visit(e: WhileExpr): Type {
+    override fun visit(e: Expr.While): Type {
         val condType = e.cond.accept(this)
         val bodyType = e.body.accept(this)
         return when {
@@ -199,7 +199,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
     }
 
 
-    override fun visit(e: BreakExpr): Type {
+    override fun visit(e: Expr.Break): Type {
         val valueType = e.value?.accept(this)
         return when (valueType) {
             null -> UnitType

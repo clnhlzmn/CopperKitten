@@ -2,25 +2,25 @@
 
 class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
 
-    var currentFun: FunExpr? = null
+    var currentFun: Expr.Fun? = null
 
-    override fun visit(e: UnitExpr) {
+    override fun visit(e: Expr.Unit) {
         //nothing
     }
 
-    override fun visit(e: SequenceExpr) {
+    override fun visit(e: Expr.Sequence) {
         e.first.accept(this)
         e.second?.accept(this)
     }
 
-    override fun visit(e: NaturalExpr) {
+    override fun visit(e: Expr.Natural) {
         //nothing
     }
 
-    override fun visit(e: RefExpr) {
+    override fun visit(e: Expr.Ref) {
         val def = e.accept(GetDefinitionVisitor())
         //create capture expr
-        val capture = RefExpr(e.id)
+        val capture = Expr.Ref(e.id)
         capture.enclosingScope = currentFun?.enclosingScope
         when {
             //if def is non isLocal then add capture to currentFun
@@ -32,32 +32,32 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
         }
     }
 
-    override fun visit(e: ApplyExpr) {
+    override fun visit(e: Expr.Apply) {
         e.args.forEach { a -> a.accept(this) }
         e.target.accept(this)
     }
 
-    override fun visit(e: UnaryExpr) {
+    override fun visit(e: Expr.Unary) {
         e.operand.accept(this)
     }
 
-    override fun visit(e: BinaryExpr) {
+    override fun visit(e: Expr.Binary) {
         e.lhs.accept(this)
         e.rhs.accept(this)
     }
 
-    override fun visit(e: CondExpr) {
+    override fun visit(e: Expr.Cond) {
         e.cond.accept(this)
         e.csq.accept(this)
         e.alt.accept(this)
     }
 
-    override fun visit(e: AssignExpr) {
+    override fun visit(e: Expr.Assign) {
         e.target.accept(this)
         e.value.accept(this)
     }
 
-    override fun visit(e: FunExpr) {
+    override fun visit(e: Expr.Fun) {
         //save current fun
         val lastFun = currentFun
         //set current fun to e
@@ -70,27 +70,27 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
         e.captures.forEach { c -> c.accept(this) }
     }
 
-    override fun visit(e: CFunExpr) {
+    override fun visit(e: Expr.CFun) {
         //nothing
     }
 
-    override fun visit(e: LetExpr) {
+    override fun visit(e: Expr.Let) {
         e.value.accept(this)
         e.body?.accept(this)
     }
 
-    override fun visit(e: IfExpr) {
+    override fun visit(e: Expr.If) {
         e.cond.accept(this)
         e.csq.accept(this)
         e.alt?.accept(this)
     }
 
-    override fun visit(e: WhileExpr) {
+    override fun visit(e: Expr.While) {
         e.cond.accept(this)
         e.body.accept(this)
     }
 
-    override fun visit(e: BreakExpr) {
+    override fun visit(e: Expr.Break) {
         e.value?.accept(this)
     }
 

@@ -1,174 +1,175 @@
 //Expressions
 
-open class Expr : BaseASTNode()
+sealed class Expr : BaseASTNode() {
 
-class UnitExpr() : Expr() {
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
+    object Unit : Expr() {
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
 
-    override fun toString(): String {
-        return "()"
+        override fun toString(): String {
+            return "()"
+        }
     }
-}
 
-class SequenceExpr(val first: Expr, val second: Expr?) : Expr() {
+    class Sequence(val first: Expr, val second: Expr?) : Expr() {
 
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
 
-    override fun toString(): String =
-        when (second) {
-            null -> "$first"
-            else -> "{$first; $second}"
+        override fun toString(): String =
+            when (second) {
+                null -> "$first"
+                else -> "{$first; $second}"
+            }
+
+    }
+
+    class Natural(val value: Long) : Expr() {
+
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
+
+        override fun toString(): String =
+            value.toString()
+    }
+
+    class Ref(val id: String) : Expr() {
+
+        var enclosingScope: ASTNode? = null
+
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
+
+        override fun toString(): String =
+            id
+    }
+
+    class Apply(val target: Expr, val args: List<Expr>) : Expr() {
+
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
+
+        override fun toString(): String =
+            "{$target}(${args.toString(", ")})"
+    }
+
+    class Unary(val operator: String, val operand: Expr) : Expr() {
+
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
+
+        override fun toString(): String =
+            "$operator $operand"
+    }
+
+    class Binary(val lhs: Expr, val operator: String, val rhs: Expr) : Expr() {
+
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
+
+        override fun toString(): String =
+            "$lhs $operator $rhs"
+    }
+
+    class Cond(val cond: Expr, val csq: Expr, val alt: Expr) : Expr() {
+
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
+
+        override fun toString(): String =
+            "$cond ? $csq : $alt"
+    }
+
+    class Assign(val target: Expr, val value: Expr) : Expr() {
+
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
+
+        override fun toString(): String =
+            "$target = $value"
+    }
+
+    class Fun(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
+
+        class Param(val id: String, val declType: Type) {
+            //for inference
+            var typeInfo: Type? = null
+            override fun toString(): String =
+                "$id: $declType"
         }
 
-}
+        //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
+        val captures = ArrayList<Expr.Ref>()
 
-class NaturalExpr(val value: Long) : Expr() {
+        var enclosingScope: ASTNode? = null
 
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
 
-    override fun toString(): String =
-        value.toString()
-}
-
-class RefExpr(val id: String) : Expr() {
-
-    var enclosingScope: ASTNode? = null
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
-
-    override fun toString(): String =
-        id
-}
-
-class ApplyExpr(val target: Expr, val args: List<Expr>) : Expr() {
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
-
-    override fun toString(): String =
-        "{$target}(${args.toString(", ")})"
-}
-
-class UnaryExpr(val operator: String, val operand: Expr) : Expr() {
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
-
-    override fun toString(): String =
-        "$operator $operand"
-}
-
-class BinaryExpr(val lhs: Expr, val operator: String, val rhs: Expr) : Expr() {
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
-
-    override fun toString(): String =
-        "$lhs $operator $rhs"
-}
-
-class CondExpr(val cond: Expr, val csq: Expr, val alt: Expr) : Expr() {
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
-
-    override fun toString(): String =
-        "$cond ? $csq : $alt"
-}
-
-class AssignExpr(val target: Expr, val value: Expr) : Expr() {
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
-
-    override fun toString(): String =
-        "$target = $value"
-}
-
-class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
-
-    class Param(val id: String, val declType: Type) {
-        //for inference
-        var typeInfo: Type? = null
         override fun toString(): String =
-            "$id: $declType"
+            "(${params.toString(", ")}): $type $body"
     }
 
-    //a list of refExprs that are the variables that this funExpr needs to capture
-    val captures = ArrayList<RefExpr>()
+    class CFun(val id: String, val sig: FunType) : Expr() {
 
-    var enclosingScope: ASTNode? = null
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
 
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
+        override fun toString(): String =
+            "cfun $id $sig"
+    }
 
-    override fun toString(): String =
-        "(${params.toString(", ")}): $type $body"
-}
+    class Let(val id: String, val value: Expr, val body: Expr?) : Expr() {
 
-class CFunExpr(val id: String, val sig: FunType) : Expr() {
+        var enclosingScope: ASTNode? = null
 
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
+        //for declType inference
+        var typeInfo: Type? = null
 
-    override fun toString(): String =
-        "cfun $id $sig"
-}
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
 
-class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr() {
+        override fun toString(): String =
+            if (body == null)
+                "let $id = $value"
+            else
+                "{let $id = $value; $body}"
 
-    var enclosingScope: ASTNode? = null
+    }
 
-    //for declType inference
-    var typeInfo: Type? = null
+    class If(val cond: Expr, val csq: Expr, val alt: Expr?) : Expr() {
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
 
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
+        override fun toString(): String =
+            if (alt == null)
+                "if ($cond) $csq"
+            else
+                "if ($cond) $csq else $alt"
 
-    override fun toString(): String =
-        if (body == null)
-            "let $id = $value"
-        else
-            "{let $id = $value; $body}"
+    }
 
-}
+    class While(val cond: Expr, val body: Expr) : Expr() {
 
-class IfExpr(val cond: Expr, val csq: Expr, val alt: Expr?) : Expr() {
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
 
-    override fun toString(): String =
-        if (alt == null)
-            "if ($cond) $csq"
-        else
-            "if ($cond) $csq else $alt"
+        override fun toString(): String =
+            "while ($cond) $body"
 
-}
+    }
 
-class WhileExpr(val cond: Expr, val body: Expr) : Expr() {
+    class Break(val value: Expr?) : Expr() {
 
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
 
-    override fun toString(): String =
-        "while ($cond) $body"
+        override fun toString(): String =
+            if (value != null)
+                "break $value"
+            else
+                "break"
 
-}
-
-class BreakExpr(val value: Expr?) : Expr() {
-
-    override fun <T> accept(visitor: ASTVisitor<T>): T =
-        visitor.visit(this)
-
-    override fun toString(): String =
-        if (value != null)
-            "break $value"
-        else
-            "break"
-
+    }
 }
 
