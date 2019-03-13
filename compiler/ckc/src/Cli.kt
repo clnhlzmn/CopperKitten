@@ -42,8 +42,9 @@ class Cli(val args: Array<String>) {
                     val res: CkFile = context.accept(FileVisitor())
                     //link enclosingScope fields
                     res.accept(ScopeBuildingVisitor())
-                    //get program declType
+                    //get program type
                     val type: Type = res.expr.accept(GetTypeVisitor())
+                    println(type)
                     println(res.expr)
                     val ae = Infer.infer(res.expr)
                     println(ae)

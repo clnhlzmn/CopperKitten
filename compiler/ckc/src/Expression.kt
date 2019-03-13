@@ -120,7 +120,7 @@ sealed class Expr : BaseASTNode() {
 
         var enclosingScope: ASTNode? = null
 
-        //for declType inference
+        //for type inference
         var typeInfo: Type? = null
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =

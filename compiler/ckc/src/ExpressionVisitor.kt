@@ -156,29 +156,25 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
 class SequenceVisitor : ckBaseVisitor<Expr>() {
     override fun visitSequence(ctx: ckParser.SequenceContext?): Expr {
         val expr = ctx!!.expr()
-        return when (expr) {
-            is ckParser.LetExprContext -> {
-                if (ctx.sequence() == null) {
-                    expr.accept(ExprVisitor())
-                } else {
+        return if (ctx.sequence() == null)
+            //if sequence is null then return expr
+            expr.accept(ExprVisitor())
+        else
+            when (expr) {
+                is ckParser.LetExprContext ->
+                    //if expr is let then make sequence it's body
                     Expr.Let(
                         expr.ID().text,
                         ExprVisitor().visit(expr.value),
                         SequenceVisitor().visit(ctx.sequence())
                     )
-                }
-            }
-            else -> {
-                if (ctx.sequence() == null) {
-                    ctx.expr().accept(ExprVisitor())
-                } else {
+                else ->
+                    //otherwise it's a normal sequence
                     Expr.Sequence(
                         ExprVisitor().visit(ctx.expr()),
                         SequenceVisitor().visit(ctx.sequence())
                     )
-                }
             }
-        }
     }
 }
 

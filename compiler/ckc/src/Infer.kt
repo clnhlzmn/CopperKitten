@@ -79,11 +79,12 @@ class Infer {
                         }
                     }
                 }
-                is Expr.Apply -> AExpr.Apply(
-                    annotateExpr(e.fn),
-                    e.args.map { a -> annotateExpr(a) },
-                    newType()
-                )
+                is Expr.Apply ->
+                    AExpr.Apply(
+                        annotateExpr(e.fn),
+                        e.args.map { a -> annotateExpr(a) },
+                        newType()
+                    )
                 is Expr.Let -> {
                     val aBody = annotateExpr(e.body)
                     val aValue = annotateExpr(e.value)
@@ -146,7 +147,10 @@ class Infer {
                         else -> throw RuntimeException("not possible")
                     }
                 }
-                is AExpr.Let -> collect(ae.value) + collect(ae.body) + sequenceOf(Constraint(ae.t, ae.body.t))
+                is AExpr.Let ->
+                    collect(ae.value) +
+                    collect(ae.body) +
+                    sequenceOf(Constraint(ae.t, ae.body.t))
                 //cfun doesn't require constraints because the type must be declared
                 is AExpr.CFun -> emptySequence()
                 is AExpr.Apply -> {
