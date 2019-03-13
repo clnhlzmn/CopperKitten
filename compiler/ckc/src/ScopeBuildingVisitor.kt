@@ -69,6 +69,8 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
         currentScope = e
         //then visit the body of e with the new current scope set
         e.body.accept(this)
+        //then reset enclosing scope
+        currentScope = e.enclosingScope
     }
 
     override fun visit(e: Expr.CFun) {
@@ -85,6 +87,8 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
         e.value.accept(this)
         //then visit the body of e with the new current scope set
         e.body.accept(this)
+        //then reset enclosing scope
+        currentScope = e.enclosingScope
     }
 
     //visit children
