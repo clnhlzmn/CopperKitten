@@ -182,7 +182,7 @@ class ParamVisitor : ckBaseVisitor<FunExpr.Param>() {
     override fun visitParam(ctx: ckParser.ParamContext?): FunExpr.Param =
         FunExpr.Param(
             id = ctx!!.ID().text,
-            type = TypeVisitor().visit(ctx.type())
+            declType = TypeVisitor().visit(ctx.type())
         )
 }
 
@@ -197,7 +197,7 @@ class TypeVisitor : ckBaseVisitor<Type>() {
         when (ctx!!.TYPEID().text) {
             "Int" -> IntType
             "Unit" -> UnitType
-            else -> ErrorType("unknown type ${ctx.TYPEID().text}") //SimpleType(ctx.TYPEID().text)
+            else -> ErrorType("unknown declType ${ctx.TYPEID().text}") //SimpleType(ctx.TYPEID().text)
         }
 
     override fun visitFunType(ctx: ckParser.FunTypeContext?): FunType =

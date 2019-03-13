@@ -13,6 +13,7 @@ data class UnknownType(val id: String): Type {
     override fun isRefType(): Boolean {
         TODO("not implemented")
     }
+    override fun toString(): String = id
 }
 
 object IntType : Type {

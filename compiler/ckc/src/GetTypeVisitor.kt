@@ -1,27 +1,27 @@
 
 
-//gets the type of the expression it's visiting
+//gets the declType of the expression it's visiting
 //also checks the expression types for correctness
 class GetTypeVisitor : BaseASTVisitor<Type>() {
 
-    //unit first has unit type
+    //unit first has unit declType
     override fun visit(e: UnitExpr): Type {
         return UnitType
     }
 
     //check first and then check next
     override fun visit(e: SequenceExpr): Type {
-        //get the type of the first operand
+        //get the declType of the first operand
         val type = e.first.accept(this)
         return when (type) {
             //if error then return error
             is ErrorType -> type
             //else first is ok, discard
             else -> {
-                //get type of second operand
+                //get declType of second operand
                 val nextType = e.second?.accept(this)
                 when (nextType) {
-                    //if nextType is null then there was no second operand, return type of first
+                    //if nextType is null then there was no second operand, return declType of first
                     null -> type
                     //else return second
                     else -> nextType
@@ -30,28 +30,28 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    //natural first has type Int
+    //natural first has declType Int
     override fun visit(e: NaturalExpr): Type {
         return IntType
     }
 
-    //ref has type of it's definition
+    //ref has declType of it's definition
     override fun visit(e: RefExpr): Type {
         val def = e.accept(GetDefinitionVisitor())
         return when(def) {
             is Definition -> {
                 return when (def) {
                     is Definition.Let -> def.node.value.accept(this)
-                    is Definition.Param -> def.node.type
+                    is Definition.Param -> def.node.declType
                 }
             }
             null -> ErrorType("unbound reference ${e.id}")
         }
     }
 
-    //apply first has type of its target's return type
+    //apply first has declType of its target's return declType
     override fun visit(e: ApplyExpr): Type {
-        //get target type
+        //get target declType
         val targetType = e.target.accept(this)
         //get types of arguments
         val argTypes = e.args.map { a -> a.accept(this) }
@@ -65,10 +65,10 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
                     //num args doesn't match
                     targetType.paramTypes.size != argTypes.size ->
                         ErrorType("incorrect number of arguments in $e")
-                    //argument type mismatch
+                    //argument declType mismatch
                     targetType.paramTypes.zip(argTypes).any { p -> p.first != p.second } ->
-                        ErrorType("argument type mismatch in $e")
-                    //everything ok so return target return type
+                        ErrorType("argument declType mismatch in $e")
+                    //everything ok so return target return declType
                     else -> targetType.returnType
                 }
             }
@@ -101,7 +101,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         val condType = e.cond.accept(this)
         val csqType = e.csq.accept(this)
         val altType = e.alt.accept(this)
-        //cond type must be int
+        //cond declType must be int
         return when (condType) {
             is ErrorType -> condType
             is IntType -> {
@@ -109,14 +109,14 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
                     csqType is ErrorType -> csqType
                     altType is ErrorType -> altType
                     csqType == altType -> csqType
-                    else -> ErrorType("${e.csq} and ${e.alt} must have same type in $e")
+                    else -> ErrorType("${e.csq} and ${e.alt} must have same declType in $e")
                 }
             }
             else -> ErrorType("${e.cond} must be Int in $e")
         }
     }
 
-    //assign has type of value, target must have same type
+    //assign has declType of value, target must have same declType
     //and be assignable (var, arrayRef, ...)
     override fun visit(e: AssignExpr): Type {
         val targetType = e.target.accept(this)
@@ -126,20 +126,20 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
             valueType is ErrorType -> valueType
             //TODO: check that target is assignable
             targetType == valueType -> valueType
-            else -> ErrorType("type mismatch between ${e.target} and ${e.value} in $e")
+            else -> ErrorType("declType mismatch between ${e.target} and ${e.value} in $e")
         }
     }
 
     override fun visit(e: FunExpr): Type {
-        //function expr has function type
+        //function expr has function declType
         val declType = e.type
         val bodyType = e.body.accept(this)
         return when {
             bodyType is ErrorType -> bodyType
-            declType != bodyType -> ErrorType("type mismatch between ${e.type} and $bodyType in $e")
+            declType != bodyType -> ErrorType("declType mismatch between ${e.type} and $bodyType in $e")
             e.params.distinctBy { p -> p.id }.count() != e.params.size -> ErrorType("parameters must be distinct in $e")
             else -> FunType(
-                e.params.map { p -> p.type },
+                e.params.map { p -> p.declType },
                 e.type
             )
         }
@@ -149,7 +149,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         e.sig
 
     override fun visit(e: LetExpr): Type {
-        //let expr has type of its body, or if no body then unit
+        //let expr has declType of its body, or if no body then unit
         val valueType = e.value.accept(this)
         val bodyType = e.body?.accept(this)
         return when {
@@ -168,18 +168,18 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
             //if cond is error return that
             condType is ErrorType -> condType
             //cond must be Int
-            condType !is IntType -> ErrorType("${e.cond} must have type Int in $e")
+            condType !is IntType -> ErrorType("${e.cond} must have declType Int in $e")
             //if csq is error return that
             csqType is ErrorType -> csqType
             //if no alt then csq must be Unit
-            altType == null && csqType !is UnitType -> ErrorType("${e.csq} must have type Unit when no alternate in $e")
+            altType == null && csqType !is UnitType -> ErrorType("${e.csq} must have declType Unit when no alternate in $e")
             //no alt and csq is unit
             altType == null && csqType is UnitType -> UnitType
             //if alt is error return that
             altType is ErrorType -> altType
             //csq and alt must match
-            csqType != altType -> ErrorType("type mismatch between $csqType and $altType in $e")
-            //otherwise it's csq type
+            csqType != altType -> ErrorType("declType mismatch between $csqType and $altType in $e")
+            //otherwise it's csq declType
             else -> csqType
         }
     }
@@ -192,7 +192,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
             condType is ErrorType -> condType
             bodyType is ErrorType -> bodyType
             //cond must be Int
-            condType !is IntType -> ErrorType("${e.cond} must have type Int in $e")
+            condType !is IntType -> ErrorType("${e.cond} must have declType Int in $e")
             //otherwise it's Unit
             else -> UnitType
         }

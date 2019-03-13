@@ -91,9 +91,11 @@ class AssignExpr(val target: Expr, val value: Expr) : Expr() {
 
 class FunExpr(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
 
-    class Param(val id: String, val type: Type) {
+    class Param(val id: String, val declType: Type) {
+        //for inference
+        var typeInfo: Type? = null
         override fun toString(): String =
-            "$id: $type"
+            "$id: $declType"
     }
 
     //a list of refExprs that are the variables that this funExpr needs to capture
@@ -120,6 +122,9 @@ class CFunExpr(val id: String, val sig: FunType) : Expr() {
 class LetExpr(val id: String, val value: Expr, val body: Expr?) : Expr() {
 
     var enclosingScope: ASTNode? = null
+
+    //for declType inference
+    var typeInfo: Type? = null
 
     override fun <T> accept(visitor: ASTVisitor<T>): T =
         visitor.visit(this)
