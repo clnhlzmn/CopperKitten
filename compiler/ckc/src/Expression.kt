@@ -116,7 +116,7 @@ sealed class Expr : BaseASTNode() {
             "cfun $id $sig"
     }
 
-    class Let(val id: String, val value: Expr, val body: Expr?) : Expr() {
+    class Let(val id: String, val value: Expr, val body: Expr) : Expr() {
 
         var enclosingScope: ASTNode? = null
 
@@ -127,10 +127,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            if (body == null)
-                "let $id = $value"
-            else
-                "{let $id = $value; $body}"
+            "{let $id = $value; $body}"
 
     }
 

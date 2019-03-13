@@ -1,3 +1,5 @@
+import kotlin.math.exp
+
 class ExprVisitor : ckBaseVisitor<Expr>() {
 
     override fun visitNaturalExpr(ctx: ckParser.NaturalExprContext?): Expr =
@@ -6,8 +8,9 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     override fun visitSequenceExpr(ctx: ckParser.SequenceExprContext?): Expr =
         SequenceVisitor().visit(ctx!!.sequence())
 
+    //if visiting a let expr by itself then it has no "body" just return value
     override fun visitLetExpr(ctx: ckParser.LetExprContext?): Expr =
-        Expr.Let(ctx!!.ID().text, ctx.value.accept(ExprVisitor()), null)
+        ctx!!.value.accept(ExprVisitor())
 
     override fun visitUnitExpr(ctx: ckParser.UnitExprContext?): Expr =
         Expr.Unit
@@ -156,13 +159,17 @@ class SequenceVisitor : ckBaseVisitor<Expr>() {
     override fun visitSequence(ctx: ckParser.SequenceContext?): Expr {
         val expr = ctx!!.expr()
         return when (expr) {
-            is ckParser.LetExprContext ->
-                Expr.Let(
-                    expr.ID().text,
-                    ExprVisitor().visit(expr.value),
-                    if (ctx.sequence() == null) null
-                    else SequenceVisitor().visit(ctx.sequence())
-                )
+            is ckParser.LetExprContext -> {
+                if (ctx.sequence() == null) {
+                    expr.accept(ExprVisitor())
+                } else {
+                    Expr.Let(
+                        expr.ID().text,
+                        ExprVisitor().visit(expr.value),
+                        SequenceVisitor().visit(ctx.sequence())
+                    )
+                }
+            }
             else -> {
                 if (ctx.sequence() == null) {
                     ctx.expr().accept(ExprVisitor())

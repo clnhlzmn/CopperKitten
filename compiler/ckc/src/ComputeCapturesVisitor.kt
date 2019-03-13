@@ -76,7 +76,7 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
 
     override fun visit(e: Expr.Let) {
         e.value.accept(this)
-        e.body?.accept(this)
+        e.body.accept(this)
     }
 
     override fun visit(e: Expr.If) {

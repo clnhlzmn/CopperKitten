@@ -140,12 +140,11 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         e.sig
 
     override fun visit(e: Expr.Let): Type {
-        //let expr has declType of its body, or if no body then unit
+        //let expr has type of its body, or if no body then unit
         val valueType = e.value.accept(this)
-        val bodyType = e.body?.accept(this)
-        return when {
-            valueType is ErrorType -> valueType
-            bodyType == null -> UnitType
+        val bodyType = e.body.accept(this)
+        return when (valueType) {
+            is ErrorType -> valueType
             else -> bodyType
         }
     }

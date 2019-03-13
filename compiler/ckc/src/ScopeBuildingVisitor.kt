@@ -84,7 +84,7 @@ class ScopeBuildingVisitor : BaseASTVisitor<Unit>() {
         //then visit value of let operand
         e.value.accept(this)
         //then visit the body of e with the new current scope set
-        e.body?.accept(this)
+        e.body.accept(this)
     }
 
     //visit children

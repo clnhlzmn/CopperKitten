@@ -309,9 +309,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         ret.add("lstore $localIndex")
         frame.popTemp()
         //compile body if present
-        if (e.body != null) {
-            ret.addAll(e.body.accept(this))
-        }
+        ret.addAll(e.body.accept(this))
         //remove isLocal now we're done with it
         frame.popLocal()
         return ret
