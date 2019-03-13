@@ -43,7 +43,7 @@ class Infer {
         }
 
         class Apply(val fn: AExpr, val args: List<AExpr>, t: Type): AExpr(t) {
-            override fun toString(): String = "{$fn(${args.toString(", ")})}:: $t"
+            override fun toString(): String = "{$fn}(${args.toString(", ")})}:: $t"
         }
 
     }
@@ -138,21 +138,17 @@ class Infer {
                     sequenceOf(Constraint(ae.lhs.t, IntType), Constraint(ae.rhs.t, IntType), Constraint(ae.t, IntType))
                 //ref expr gives nothing
                 is AExpr.Ref -> emptySequence()
-                //fun expr must have fun type, then add constraints from body, and that ae t is ae.t.returnType
+                //fun expr must have fun type, then add constraints from body, and that ae t is ae.body.t
                 is AExpr.Fun -> {
                     when (ae.t) {
-                        //pretty sure the next line doesn't need the last part
-                        is FunType -> collect(ae.body)// + sequenceOf(Constraint(ae.t, ae.t.returnType))
+                        is FunType -> collect(ae.body) +
+                            sequenceOf(Constraint(ae.t, FunType(ae.t.paramTypes, ae.body.t)))
                         else -> throw RuntimeException("not possible")
                     }
                 }
                 is AExpr.Let -> collect(ae.value) + collect(ae.body) + sequenceOf(Constraint(ae.t, ae.body.t))
-                is AExpr.CFun -> {
-                    when (ae.t) {
-                        is FunType -> sequenceOf(Constraint(ae.t, ae.t.returnType))
-                        else -> throw RuntimeException("not possible")
-                    }
-                }
+                //cfun doesn't require constraints because the type must be declared
+                is AExpr.CFun -> emptySequence()
                 is AExpr.Apply -> {
                     when (ae.fn.t) {
                         is FunType -> {
