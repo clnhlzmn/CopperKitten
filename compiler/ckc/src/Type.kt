@@ -15,6 +15,14 @@ sealed class Type {
         override fun toString(): String = id
     }
 
+    companion object {
+
+        var i = 0
+
+        fun newUnknown(): Unknown =
+            Unknown("T${i++}")
+    }
+
     object Int: Type() {
         override fun isRefType(): Boolean = false
         override fun toString(): String = "Int"

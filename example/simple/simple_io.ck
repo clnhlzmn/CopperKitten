@@ -1,7 +1,6 @@
 
 {
-    let read = cfun native_read ():Int;
-    let foo = (): read;
-    let bar = foo;
-    bar
+    let id = (a): a;
+    id(():42)
 }
+

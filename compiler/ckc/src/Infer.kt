@@ -51,20 +51,17 @@ class Infer {
 
     companion object {
 
-        var i = 0
-
-        fun newType(): Type.Unknown =
-            Type.Unknown("T${i++}")
-
         fun exprType(e: Expr): Type {
             return when (e) {
                 is Expr.Unit -> Type.Unit
                 is Expr.Natural -> Type.Int
-                is Expr.Fun ->
+                is Expr.Fun -> {
+                    val bodyType = e.type ?: exprType(e.body)
                     Type.Fun(
-                        e.params.map { p -> if (p.type == null) newType() else p.type },
-                        if (e.type == null) exprType(e.body) else e.type
+                        e.params.map { p -> if (p.type == null) Type.newUnknown() else p.type },
+                        bodyType
                     )
+                }
                 is Expr.CFun -> e.sig
                 is Expr.Sequence -> exprType(e.second)
                 is Expr.Let ->
@@ -76,14 +73,14 @@ class Infer {
                 is Expr.Assign -> exprType(e.value)
                 is Expr.If -> exprType(e.csq)
                 is Expr.Cond -> exprType(e.csq)
-                is Expr.Apply -> newType()
+                is Expr.Apply -> Type.newUnknown()
                 is Expr.Ref -> {
                     val def = e.accept(GetDefinitionVisitor())
                     when (def) {
                         null -> throw RuntimeException("$e not defined")
                         is Definition.Param -> {
                             if (def.node.typeInfo == null)
-                                def.node.typeInfo = newType()
+                                def.node.typeInfo = Type.newUnknown()
                             def.node.typeInfo!!
                         }
                         is Definition.Let -> {
@@ -97,21 +94,45 @@ class Infer {
             }
         }
 
-        //using the "env" built into Exprs using GetDef
-        fun annotateExpr(e: Expr): AExpr =
-            when (e) {
-                is Expr.Unit -> AExpr.Unit
-                is Expr.Sequence -> AExpr.Sequence(annotateExpr(e.first), annotateExpr(e.second), newType())
-                is Expr.Natural -> AExpr.Natural(e.value)
-                is Expr.Unary -> AExpr.Unary(e.operator, annotateExpr(e.operand), newType())
-                is Expr.Binary -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), newType())
+        fun functionReturnType(e: Expr): Type {
+            return when (e) {
+                is Expr.Fun -> exprType(e.body)
                 is Expr.Ref -> {
                     val def = e.accept(GetDefinitionVisitor())
                     when (def) {
                         null -> throw RuntimeException("$e not defined")
                         is Definition.Param -> {
                             if (def.node.typeInfo == null)
-                                def.node.typeInfo = newType()
+                                def.node.typeInfo = Type.newUnknown()
+                            def.node.typeInfo!!
+                        }
+                        is Definition.Let -> {
+                            if (def.node.typeInfo == null) {
+                                def.node.typeInfo = exprType(def.node.value)
+                            }
+                            def.node.typeInfo!!
+                        }
+                    }
+                }
+                else -> Type.newUnknown()
+            }
+        }
+
+        //using the "env" built into Exprs using GetDef
+        fun annotateExpr(e: Expr): AExpr =
+            when (e) {
+                is Expr.Unit -> AExpr.Unit
+                is Expr.Sequence -> AExpr.Sequence(annotateExpr(e.first), annotateExpr(e.second), Type.newUnknown())
+                is Expr.Natural -> AExpr.Natural(e.value)
+                is Expr.Unary -> AExpr.Unary(e.operator, annotateExpr(e.operand), Type.newUnknown())
+                is Expr.Binary -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), Type.newUnknown())
+                is Expr.Ref -> {
+                    val def = e.accept(GetDefinitionVisitor())
+                    when (def) {
+                        null -> throw RuntimeException("$e not defined")
+                        is Definition.Param -> {
+                            if (def.node.typeInfo == null)
+                                def.node.typeInfo = Type.newUnknown()
                             AExpr.Ref(e.id, def.node.typeInfo!!)
                         }
                         is Definition.Let -> {
@@ -126,11 +147,11 @@ class Infer {
                     AExpr.Apply(
                         annotateExpr(e.fn),
                         e.args.map { a -> annotateExpr(a) },
-                        newType()
+                        Type.newUnknown()
                     )
                 is Expr.Let -> {
-                    val aValue = annotateExpr(e.value)
                     val aBody = annotateExpr(e.body)
+                    val aValue = annotateExpr(e.value)
                     AExpr.Let(e.id, aValue, aBody, aBody.t)
                 }
                 is Expr.Fun -> {
@@ -138,12 +159,12 @@ class Infer {
                     val paramTypes = ArrayList<Type>()
                     e.params.forEach { p ->
                         if (p.typeInfo == null) {
-                            p.typeInfo = newType()
+                            p.typeInfo = Type.newUnknown()
                         }
                         //otherwise (p was referenced in e.body) use existing
                         paramTypes.add(p.typeInfo!!)
                     }
-                    AExpr.Fun(e.params.map { p -> p.id }, aBody, Type.Fun(paramTypes, newType()))
+                    AExpr.Fun(e.params.map { p -> p.id }, aBody, Type.Fun(paramTypes, aBody.t))
                 }
                 is Expr.CFun -> AExpr.CFun(e.id, e.sig)
                 else -> TODO("not implemented")
