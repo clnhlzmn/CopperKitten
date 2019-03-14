@@ -55,20 +55,6 @@ class Infer {
         fun newType(): Type.Unknown =
             Type.Unknown("T${i++}")
 
-        fun exprType(e: Expr): Type {
-            return when (e) {
-//                is Expr.Sequence -> exprType(e.second)
-//                is Expr.Ref -> newType()
-//                is Expr.Unary -> Type.Int
-//                is Expr.Binary -> Type.Int
-                is Expr.Unit -> Type.Unit
-                is Expr.Natural -> Type.Int
-                is Expr.Fun -> Type.Fun(e.params.map { newType() }, exprType(e.body))
-                is Expr.CFun -> e.sig
-                else -> newType()
-            }
-        }
-
         //using the "env" built into Exprs using GetDef
         fun annotateExpr(e: Expr): AExpr =
             when (e) {
