@@ -86,13 +86,14 @@ sealed class Expr : BaseASTNode() {
             "$target = $value"
     }
 
-    class Fun(val params: List<Param>, val type: Type?, val body: Expr) : Expr() {
+//    class Fun(val params: List<Param>, val type: Type?, val body: Expr) : Expr() {
+    class Fun(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
 
-        class Param(val id: String, val type: Type?) {
-            //for inference
-            var typeInfo: Type? = null
+//        class Param(val id: String, val type: Type?) {
+        class Param(val id: String, val type: Type) {
             override fun toString(): String =
-                "$id${if (type == null) "" else ": $type"}"
+//                "$id${if (type == null) "" else ": $type"}"
+                "$id: $type"
         }
 
         //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
@@ -104,7 +105,8 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "(${params.toString(", ")}): ${if (type == null) "" else "$type"} $body"
+//            "(${params.toString(", ")}): ${if (type == null) "" else "$type"} $body"
+            "(${params.toString(", ")}): $type $body"
     }
 
     class CFun(val id: String, val sig: Type.Fun) : Expr() {
@@ -119,9 +121,6 @@ sealed class Expr : BaseASTNode() {
     class Let(val id: String, val value: Expr, val body: Expr) : Expr() {
 
         var enclosingScope: ASTNode? = null
-
-        //for type inference
-        var typeInfo: Type? = null
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
