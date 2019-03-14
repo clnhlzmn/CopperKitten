@@ -125,7 +125,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             else ArrayList()
         return Expr.Fun(
             params = params,
-            type = TypeVisitor().visit(ctx.type()),
+            type = if (ctx.type() == null) null else TypeVisitor().visit(ctx.type()),
             body = ExprVisitor().visit(ctx.expr())
         )
     }
@@ -187,7 +187,7 @@ class ParamVisitor : ckBaseVisitor<Expr.Fun.Param>() {
     override fun visitParam(ctx: ckParser.ParamContext?): Expr.Fun.Param =
         Expr.Fun.Param(
             id = ctx!!.ID().text,
-            declType = TypeVisitor().visit(ctx.type())
+            type = if (ctx.type() == null) null else TypeVisitor().visit(ctx.type())
         )
 }
 

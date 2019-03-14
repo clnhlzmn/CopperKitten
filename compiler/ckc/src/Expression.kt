@@ -86,13 +86,13 @@ sealed class Expr : BaseASTNode() {
             "$target = $value"
     }
 
-    class Fun(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
+    class Fun(val params: List<Param>, val type: Type?, val body: Expr) : Expr() {
 
-        class Param(val id: String, val declType: Type) {
+        class Param(val id: String, val type: Type?) {
             //for inference
             var typeInfo: Type? = null
             override fun toString(): String =
-                "$id: $declType"
+                "$id${if (type == null) "" else ": $type"}"
         }
 
         //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
@@ -104,7 +104,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "(${params.toString(", ")}): $type $body"
+            "(${params.toString(", ")}): ${if (type == null) "" else "$type"} $body"
     }
 
     class CFun(val id: String, val sig: Type.Fun) : Expr() {

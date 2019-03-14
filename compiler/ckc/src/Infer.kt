@@ -1,4 +1,5 @@
 import java.lang.RuntimeException
+import kotlin.math.exp
 
 //based on https://github.com/prakhar1989/type-inference (with corrections and extensions)
 class Infer {
@@ -43,7 +44,7 @@ class Infer {
         }
 
         class Apply(val fn: AExpr, val args: List<AExpr>, t: Type): AExpr(t) {
-            override fun toString(): String = "{$fn}(${args.toString(", ")})}:: $t"
+            override fun toString(): String = "{$fn}(${args.toString(", ")}):: $t"
         }
 
     }
@@ -54,6 +55,47 @@ class Infer {
 
         fun newType(): Type.Unknown =
             Type.Unknown("T${i++}")
+
+        fun exprType(e: Expr): Type {
+            return when (e) {
+                is Expr.Unit -> Type.Unit
+                is Expr.Natural -> Type.Int
+                is Expr.Fun ->
+                    Type.Fun(
+                        e.params.map { p -> if (p.type == null) newType() else p.type },
+                        if (e.type == null) exprType(e.body) else e.type
+                    )
+                is Expr.CFun -> e.sig
+                is Expr.Sequence -> exprType(e.second)
+                is Expr.Let ->
+                    exprType(e.body)
+                is Expr.Binary -> Type.Int
+                is Expr.Unary -> Type.Int
+                is Expr.While -> Type.Unit
+                is Expr.Break -> Type.Unit
+                is Expr.Assign -> exprType(e.value)
+                is Expr.If -> exprType(e.csq)
+                is Expr.Cond -> exprType(e.csq)
+                is Expr.Apply -> newType()
+                is Expr.Ref -> {
+                    val def = e.accept(GetDefinitionVisitor())
+                    when (def) {
+                        null -> throw RuntimeException("$e not defined")
+                        is Definition.Param -> {
+                            if (def.node.typeInfo == null)
+                                def.node.typeInfo = newType()
+                            def.node.typeInfo!!
+                        }
+                        is Definition.Let -> {
+                            if (def.node.typeInfo == null) {
+                                def.node.typeInfo = exprType(def.node.value)
+                            }
+                            def.node.typeInfo!!
+                        }
+                    }
+                }
+            }
+        }
 
         //using the "env" built into Exprs using GetDef
         fun annotateExpr(e: Expr): AExpr =
@@ -74,7 +116,7 @@ class Infer {
                         }
                         is Definition.Let -> {
                             if (def.node.typeInfo == null) {
-                                def.node.typeInfo = newType()
+                                def.node.typeInfo = exprType(def.node.value)
                             }
                             AExpr.Ref(e.id, def.node.typeInfo!!)
                         }
@@ -160,7 +202,8 @@ class Infer {
                                 sequenceOf(Constraint(ae.t, ae.fn.t.returnType)) +
                                 ae.fn.t.paramTypes.zip(ae.args).map { p -> Constraint(p.first, p.second.t) }
                         }
-                        is Type.Unknown -> collect(ae.fn) + collectArgs(ae.args) +
+                        is Type.Unknown ->
+                            collect(ae.fn) + collectArgs(ae.args) +
                             sequenceOf(Constraint(ae.fn.t, Type.Fun(ae.args.map { a -> a.t }, ae.t)))
                         else -> throw RuntimeException("incorrect function application")
                     }

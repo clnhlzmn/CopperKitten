@@ -1,2 +1,7 @@
 
-{ let c = 42; (a:Int, b:Int):Int {a + b + c} }(2, 3)
+{
+    let read = cfun native_read ():Int;
+    let foo = (): read;
+    let bar = foo;
+    bar
+}
