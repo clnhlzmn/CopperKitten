@@ -1,6 +1,6 @@
 import java.lang.RuntimeException
 
-//based on https://github.com/prakhar1989/type-inference
+//based on https://github.com/prakhar1989/type-inference (with corrections and extensions)
 class Infer {
 
     //annotated expr
@@ -19,11 +19,11 @@ class Infer {
         }
 
         class Unary(val operator: String, val operand: AExpr, t: Type): AExpr(t) {
-            override fun toString(): String = "$operator $operand"
+            override fun toString(): String = "{$operator $operand}:: $t"
         }
 
         class Binary(val lhs: AExpr, val op: String, val rhs: AExpr, t: Type): AExpr(t) {
-            override fun toString(): String = "$lhs $op $rhs"
+            override fun toString(): String = "{$lhs $op $rhs}:: $t"
         }
 
         class Ref(val id: String, t: Type): AExpr(t) {
@@ -55,11 +55,16 @@ class Infer {
         fun newType(): Type.Unknown =
             Type.Unknown("T${i++}")
 
-        fun literalType(e: Expr): Type {
+        fun exprType(e: Expr): Type {
             return when (e) {
+//                is Expr.Sequence -> exprType(e.second)
+//                is Expr.Ref -> newType()
+//                is Expr.Unary -> Type.Int
+//                is Expr.Binary -> Type.Int
                 is Expr.Unit -> Type.Unit
                 is Expr.Natural -> Type.Int
-                is Expr.Fun -> Type.Fun(e.params.map { newType() }, literalType(e.body))
+                is Expr.Fun -> Type.Fun(e.params.map { newType() }, exprType(e.body))
+                is Expr.CFun -> e.sig
                 else -> newType()
             }
         }
@@ -70,8 +75,8 @@ class Infer {
                 is Expr.Unit -> AExpr.Unit
                 is Expr.Sequence -> AExpr.Sequence(annotateExpr(e.first), annotateExpr(e.second), newType())
                 is Expr.Natural -> AExpr.Natural(e.value)
-                is Expr.Unary -> AExpr.Unary(e.operator, annotateExpr(e.operand), Type.Int)
-                is Expr.Binary -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), Type.Int)
+                is Expr.Unary -> AExpr.Unary(e.operator, annotateExpr(e.operand), newType())
+                is Expr.Binary -> AExpr.Binary(annotateExpr(e.lhs), e.operator, annotateExpr(e.rhs), newType())
                 is Expr.Ref -> {
                     val def = e.accept(GetDefinitionVisitor())
                     when (def) {
@@ -83,7 +88,7 @@ class Infer {
                         }
                         is Definition.Let -> {
                             if (def.node.typeInfo == null) {
-                                def.node.typeInfo = literalType(def.node.value)
+                                def.node.typeInfo = newType()
                             }
                             AExpr.Ref(e.id, def.node.typeInfo!!)
                         }
@@ -98,19 +103,12 @@ class Infer {
                 is Expr.Let -> {
                     val aValue = annotateExpr(e.value)
                     val aBody = annotateExpr(e.body)
-                    if (e.typeInfo == null) {
-                        e.typeInfo = newType()
-                    }
-                    AExpr.Let(e.id, aValue, aBody, e.typeInfo!!)
+                    AExpr.Let(e.id, aValue, aBody, aBody.t)
                 }
                 is Expr.Fun -> {
                     val aBody = annotateExpr(e.body)
                     val paramTypes = ArrayList<Type>()
                     e.params.forEach { p ->
-                        //if p has no type info then generate it?
-                        //I think the reference source is just failing in this case
-                        //if p doesn't have typeInfo then that means it's not referenced in e.body
-                        //in that case this newType info will not be used?
                         if (p.typeInfo == null) {
                             p.typeInfo = newType()
                         }
@@ -148,7 +146,8 @@ class Infer {
                     collect(ae.rhs) +
                     sequenceOf(Constraint(ae.lhs.t, Type.Int), Constraint(ae.rhs.t, Type.Int), Constraint(ae.t, Type.Int))
                 //ref expr gives nothing
-                is AExpr.Ref -> emptySequence()
+                is AExpr.Ref ->
+                    emptySequence()
                 //fun expr must have fun type, then add constraints from body, and that ae t is ae.body.t
                 is AExpr.Fun -> {
                     when (ae.t) {

@@ -202,7 +202,7 @@ class TypeVisitor : ckBaseVisitor<Type>() {
         when (ctx!!.TYPEID().text) {
             "Int" -> Type.Int
             "Unit" -> Type.Unit
-            else -> Type.Error("unknown declType ${ctx.TYPEID().text}") //SimpleType(ctx.TYPEID().text)
+            else -> Type.Error("unknown type ${ctx.TYPEID().text}") //SimpleType(ctx.TYPEID().text)
         }
 
     override fun visitFunType(ctx: ckParser.FunTypeContext?): Type.Fun =

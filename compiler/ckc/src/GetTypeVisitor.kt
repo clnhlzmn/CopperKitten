@@ -1,10 +1,10 @@
 
 
-//gets the declType of the expression it's visiting
+//gets the type of the expression it's visiting
 //also checks the expression types for correctness
 class GetTypeVisitor : BaseASTVisitor<Type>() {
 
-    //unit first has unit declType
+    //unit first has unit type
     override fun visit(e: Expr.Unit): Type {
         return Type.Unit
     }
@@ -21,12 +21,12 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    //natural first has declType Int
+    //natural first has type Int
     override fun visit(e: Expr.Natural): Type {
         return Type.Int
     }
 
-    //ref has declType of it's definition
+    //ref has type of it's definition
     override fun visit(e: Expr.Ref): Type {
         val def = e.accept(GetDefinitionVisitor())
         return when(def) {
@@ -40,9 +40,9 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         }
     }
 
-    //apply first has declType of its fn's return declType
+    //apply first has type of its fn's return type
     override fun visit(e: Expr.Apply): Type {
-        //get fn declType
+        //get fn type
         val targetType = e.fn.accept(this)
         //get types of arguments
         val argTypes = e.args.map { a -> a.accept(this) }
@@ -56,10 +56,10 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
                     //num args doesn't match
                     targetType.paramTypes.size != argTypes.size ->
                         Type.Error("incorrect number of arguments in $e")
-                    //argument declType mismatch
+                    //argument type mismatch
                     targetType.paramTypes.zip(argTypes).any { p -> p.first != p.second } ->
-                        Type.Error("argument declType mismatch in $e")
-                    //everything ok so return fn return declType
+                        Type.Error("argument type mismatch in $e")
+                    //everything ok so return fn return type
                     else -> targetType.returnType
                 }
             }
@@ -92,7 +92,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
         val condType = e.cond.accept(this)
         val csqType = e.csq.accept(this)
         val altType = e.alt.accept(this)
-        //cond declType must be int
+        //cond type must be int
         return when (condType) {
             is Type.Error -> condType
             is Type.Int -> {
@@ -100,14 +100,14 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
                     csqType is Type.Error -> csqType
                     altType is Type.Error -> altType
                     csqType == altType -> csqType
-                    else -> Type.Error("${e.csq} and ${e.alt} must have same declType in $e")
+                    else -> Type.Error("${e.csq} and ${e.alt} must have same type in $e")
                 }
             }
             else -> Type.Error("${e.cond} must be Int in $e")
         }
     }
 
-    //assign has declType of value, fn must have same declType
+    //assign has type of value, fn must have same type
     //and be assignable (var, arrayRef, ...)
     override fun visit(e: Expr.Assign): Type {
         val targetType = e.target.accept(this)
@@ -117,17 +117,17 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
             valueType is Type.Error -> valueType
             //TODO: check that fn is assignable
             targetType == valueType -> valueType
-            else -> Type.Error("declType mismatch between ${e.target} and ${e.value} in $e")
+            else -> Type.Error("type mismatch between ${e.target} and ${e.value} in $e")
         }
     }
 
     override fun visit(e: Expr.Fun): Type {
-        //function expr has function declType
+        //function expr has function type
         val declType = e.type
         val bodyType = e.body.accept(this)
         return when {
             bodyType is Type.Error -> bodyType
-            declType != bodyType -> Type.Error("declType mismatch between ${e.type} and $bodyType in $e")
+            declType != bodyType -> Type.Error("type mismatch between ${e.type} and $bodyType in $e")
             e.params.distinctBy { p -> p.id }.count() != e.params.size -> Type.Error("parameters must be distinct in $e")
             else -> Type.Fun(
                 e.params.map { p -> p.declType },
@@ -158,18 +158,18 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
             //if cond is error return that
             condType is Type.Error -> condType
             //cond must be Int
-            condType !is Type.Int -> Type.Error("${e.cond} must have declType Int in $e")
+            condType !is Type.Int -> Type.Error("${e.cond} must have type Int in $e")
             //if csq is error return that
             csqType is Type.Error -> csqType
             //if no alt then csq must be Unit
-            altType == null && csqType !is Type.Unit -> Type.Error("${e.csq} must have declType Unit when no alternate in $e")
+            altType == null && csqType !is Type.Unit -> Type.Error("${e.csq} must have type Unit when no alternate in $e")
             //no alt and csq is unit
             altType == null && csqType is Type.Unit -> Type.Unit
             //if alt is error return that
             altType is Type.Error -> altType
             //csq and alt must match
-            csqType != altType -> Type.Error("declType mismatch between $csqType and $altType in $e")
-            //otherwise it's csq declType
+            csqType != altType -> Type.Error("type mismatch between $csqType and $altType in $e")
+            //otherwise it's csq type
             else -> csqType
         }
     }
@@ -182,7 +182,7 @@ class GetTypeVisitor : BaseASTVisitor<Type>() {
             condType is Type.Error -> condType
             bodyType is Type.Error -> bodyType
             //cond must be Int
-            condType !is Type.Int -> Type.Error("${e.cond} must have declType Int in $e")
+            condType !is Type.Int -> Type.Error("${e.cond} must have type Int in $e")
             //otherwise it's Unit
             else -> Type.Unit
         }

@@ -348,7 +348,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         ret.addAll(e.cond.accept(this))
         ret.add("jumpnz $beginLabel")
         frame.popTemp()
-        //value of declType Unit
+        //value of type Unit
         ret.add("push 0")
         frame.pushTemp(false)
         return ret

@@ -1,5 +1,2 @@
 
-{
-    let foo = ():Int 42;
-    foo
-}
+{ let c = 42; (a:Int, b:Int):Int {a + b + c} }
