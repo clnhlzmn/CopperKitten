@@ -43,17 +43,17 @@ class Cli(val args: Array<String>) {
                     //link enclosingScope fields
                     res.accept(ScopeBuildingVisitor())
 
-                    //print expr with unknown types
-//                    println(res.expr.toString())
+                    val typedExpr = Infer.infer(res.expr)
+                    typedExpr.accept(ScopeBuildingVisitor())
                     //infer program types
-                    Infer.infer(res.expr)
+                    val program = CkFile(res.defs, typedExpr)
 
                     //check if error type
-                    if (res.expr.aType !is Type.Error) {
+                    if (program.expr.t !is Type.Error) {
                         //compute function captures
-                        res.expr.accept(ComputeCapturesVisitor())
+                        program.expr.accept(ComputeCapturesVisitor())
                         //compile file
-                        val code: List<String> = compileCkFile(res)
+                        val code: List<String> = compileCkFile(program)
                         //determine output location
                         if (outputFileName != null) {
                             File(outputFileName).printWriter().use { out ->
@@ -64,7 +64,7 @@ class Cli(val args: Array<String>) {
                         }
                     } else {
                         //print error
-                        println(res.expr.aType)
+                        println(program.expr.t)
                     }
                 } else {
                     //parse error

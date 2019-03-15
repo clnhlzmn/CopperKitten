@@ -1,11 +1,8 @@
 //Expressions
 
-sealed class Expr : BaseASTNode() {
+sealed class Expr(val t: Type) : BaseASTNode() {
 
-    //expression annotated type for inference algorithm
-    var aType: Type = Type.newUnknown()
-
-    object Unit : Expr() {
+    object Unit : Expr(Type.Unit) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
@@ -14,17 +11,17 @@ sealed class Expr : BaseASTNode() {
         }
     }
 
-    class Sequence(val first: Expr, val second: Expr) : Expr() {
+    class Sequence(val first: Expr, val second: Expr, t:Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$first; $second}:$aType"
+            "{$first; $second}:$t"
 
     }
 
-    class Natural(val value: Long) : Expr() {
+    class Natural(val value: Long) : Expr(Type.Int) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -33,7 +30,7 @@ sealed class Expr : BaseASTNode() {
             value.toString()
     }
 
-    class Ref(val id: String) : Expr() {
+    class Ref(val id: String, t:Type) : Expr(t) {
 
         var enclosingScope: ASTNode? = null
 
@@ -41,66 +38,63 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "$id:$aType"
+            "$id:$t"
     }
 
-    class Apply(val fn: Expr, val args: List<Expr>) : Expr() {
+    class Apply(val fn: Expr, val args: List<Expr>, t:Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$fn}(${args.toString(", ")}):$aType"
+            "{$fn}(${args.toString(", ")}):$t"
     }
 
-    class Unary(val operator: String, val operand: Expr) : Expr() {
+    class Unary(val operator: String, val operand: Expr, t:Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$operator $operand}:$aType"
+            "{$operator $operand}:$t"
     }
 
-    class Binary(val lhs: Expr, val operator: String, val rhs: Expr) : Expr() {
+    class Binary(val lhs: Expr, val operator: String, val rhs: Expr, t:Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$lhs $operator $rhs}:$aType"
+            "{$lhs $operator $rhs}:$t"
     }
 
-    class Cond(val cond: Expr, val csq: Expr, val alt: Expr) : Expr() {
+    class Cond(val cond: Expr, val csq: Expr, val alt: Expr, t:Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$cond ? $csq : $alt}:$aType"
+            "{$cond ? $csq : $alt}:$t"
     }
 
-    class Assign(val target: Expr, val value: Expr) : Expr() {
+    class Assign(val target: Expr, val value: Expr, t:Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$target = $value}:$aType"
+            "{$target = $value}:$t"
     }
 
-    class Fun(val params: List<Param>, val declType: Type?, val body: Expr) : Expr() {
-//    class Fun(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
+    class Fun(val params: List<Param>, val declType: Type?, val body: Expr, t:Type) : Expr(t) {
 
-        class Param(val id: String, val declType: Type?) {
-//        class Param(val id: String, val type: Type) {
+        class Param(val id: String, val declType: Type?, val t: Type) {
 
             //expression annotated type for inference algorithm
-            var aType: Type = Type.newUnknown()
+//            var t: Type = Type.newUnknown()
 
             override fun toString(): String =
-//                "$id${if (type == null) "" else ": $type"}"
-                "$id:$aType"
+                "$id:$t"
         }
 
         //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
@@ -112,11 +106,10 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-//            "(${params.toString(", ")}): ${if (type == null) "" else "$type"} $body"
-            "{(${params.toString(", ")}): $body}:$aType"
+            "{(${params.toString(", ")}): $body}:$t"
     }
 
-    class CFun(val id: String, val sig: Type.Fun) : Expr() {
+    class CFun(val id: String, val sig: Type.Fun, t:Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -125,7 +118,7 @@ sealed class Expr : BaseASTNode() {
             "cfun $id $sig"
     }
 
-    class Let(val id: String, val value: Expr, val body: Expr) : Expr() {
+    class Let(val id: String, val value: Expr, val body: Expr, t:Type) : Expr(t) {
 
         var enclosingScope: ASTNode? = null
 
@@ -133,11 +126,11 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{let $id:${value.aType} = $value; $body}:$aType"
+            "{let $id:${value.t} = $value; $body}:$t"
 
     }
 
-    class If(val cond: Expr, val csq: Expr, val alt: Expr?) : Expr() {
+    class If(val cond: Expr, val csq: Expr, val alt: Expr?, t:Type) : Expr(t) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
@@ -149,7 +142,7 @@ sealed class Expr : BaseASTNode() {
 
     }
 
-    class While(val cond: Expr, val body: Expr) : Expr() {
+    class While(val cond: Expr, val body: Expr, t:Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -159,7 +152,7 @@ sealed class Expr : BaseASTNode() {
 
     }
 
-    class Break(val value: Expr?) : Expr() {
+    class Break(val value: Expr?, t:Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)

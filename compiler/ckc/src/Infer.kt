@@ -1,6 +1,3 @@
-import java.lang.RuntimeException
-import javax.lang.model.type.ErrorType
-
 class Infer {
 
     data class Constraint(val t1: Type, val t2: Type) {
@@ -17,50 +14,50 @@ class Infer {
         //recursively generate a set of constraints from an expr
         fun collect(e: Expr): Sequence<Constraint> =
             when (e) {
-                Expr.Unit -> sequenceOf(Constraint(e.aType, Type.Unit))
-                is Expr.Sequence -> collect(e.first) + collect(e.second) + sequenceOf(Constraint(e.aType, e.second.aType))
-                is Expr.Natural -> sequenceOf(Constraint(e.aType, Type.Int))
+                Expr.Unit -> sequenceOf(Constraint(e.t, Type.Unit))
+                is Expr.Sequence -> collect(e.first) + collect(e.second) + sequenceOf(Constraint(e.t, e.second.t))
+                is Expr.Natural -> sequenceOf(Constraint(e.t, Type.Int))
                 is Expr.Ref -> {
                     val def = e.accept(GetDefinitionVisitor())
                     when (def) {
                         null -> sequenceOf(Constraint(Type.newUnknown(), Type.Error("$e is undefined")))
-                        is Definition.Let -> sequenceOf(Constraint(e.aType, def.node.value.aType))
-                        is Definition.Param -> sequenceOf(Constraint(e.aType, def.node.aType))
+                        is Definition.Let -> sequenceOf(Constraint(e.t, def.node.value.t))
+                        is Definition.Param -> sequenceOf(Constraint(e.t, def.node.t))
                     }
                 }
                 is Expr.Apply ->
                     collect(e.fn) + collect(e.args) +
-                        sequenceOf(Constraint(e.fn.aType, Type.Fun(e.args.map { a -> a.aType }, e.aType)))
+                        sequenceOf(Constraint(e.fn.t, Type.Fun(e.args.map { a -> a.t }, e.t)))
                 is Expr.Unary ->
                     collect(e.operand) +
-                        sequenceOf(Constraint(e.aType, Type.Int), Constraint(e.operand.aType, Type.Int))
+                        sequenceOf(Constraint(e.t, Type.Int), Constraint(e.operand.t, Type.Int))
                 is Expr.Binary ->
                     collect(e.lhs) + collect(e.rhs) +
                         sequenceOf(
-                            Constraint(e.aType, Type.Int),
-                            Constraint(e.lhs.aType, Type.Int), Constraint(e.rhs.aType, Type.Int)
+                            Constraint(e.t, Type.Int),
+                            Constraint(e.lhs.t, Type.Int), Constraint(e.rhs.t, Type.Int)
                         )
                 is Expr.Cond -> collect(e.cond) + collect(e.csq) + collect(e.alt) +
-                    sequenceOf(Constraint(e.cond.aType, Type.Int), Constraint(e.csq.aType, e.alt.aType),
-                        Constraint(e.aType, e.csq.aType), Constraint(e.aType, e.alt.aType)
+                    sequenceOf(Constraint(e.cond.t, Type.Int), Constraint(e.csq.t, e.alt.t),
+                        Constraint(e.t, e.csq.t), Constraint(e.t, e.alt.t)
                     )
                 is Expr.Assign -> TODO()
                 is Expr.Fun -> collect(e.body) +
-                    sequenceOf(Constraint(e.aType, Type.Fun(e.params.map { p -> p.aType }, e.body.aType)))
-                is Expr.CFun -> sequenceOf(Constraint(e.aType, e.sig))
-                is Expr.Let -> collect(e.value) + collect(e.body) + sequenceOf(Constraint(e.aType, e.body.aType))
+                    sequenceOf(Constraint(e.t, Type.Fun(e.params.map { p -> p.t }, e.body.t)))
+                is Expr.CFun -> sequenceOf(Constraint(e.t, e.sig))
+                is Expr.Let -> collect(e.value) + collect(e.body) + sequenceOf(Constraint(e.t, e.body.t))
                 is Expr.If ->
                     if (e.alt == null)
                         collect(e.cond) + collect(e.csq) +
-                            sequenceOf(Constraint(e.aType, Type.Unit), Constraint(e.csq.aType, Type.Unit))
+                            sequenceOf(Constraint(e.t, Type.Unit), Constraint(e.csq.t, Type.Unit))
                     else
                         collect(e.cond) + collect(e.csq) + collect(e.alt) +
-                            sequenceOf(Constraint(e.aType, e.csq.aType), Constraint(e.aType, e.alt.aType),
-                                Constraint(e.csq.aType, e.alt.aType))
+                            sequenceOf(Constraint(e.t, e.csq.t), Constraint(e.t, e.alt.t),
+                                Constraint(e.csq.t, e.alt.t))
                 is Expr.While ->
                     collect(e.cond) + collect(e.body) +
-                        sequenceOf(Constraint(e.cond.aType, Type.Int), Constraint(e.body.aType, Type.Unit),
-                            Constraint(e.aType, Type.Unit)
+                        sequenceOf(Constraint(e.cond.t, Type.Int), Constraint(e.body.t, Type.Unit),
+                            Constraint(e.t, Type.Unit)
                         )
                 is Expr.Break -> TODO()
             }
@@ -115,79 +112,49 @@ class Infer {
             }
         }
 
-        fun applyExpr(subs: Sequence<Substitution>, e: Expr) {
-            when (e) {
-                is Expr.Unit -> e.aType = apply(subs, e.aType)
-                is Expr.Natural -> e.aType = apply(subs, e.aType)
-                is Expr.Sequence -> {
-                    applyExpr(subs, e.first)
-                    applyExpr(subs, e.second)
-                    e.aType = apply(subs, e.aType)
-                }
-                is Expr.Unary -> {
-                    applyExpr(subs, e.operand)
-                    e.aType = apply(subs, e.aType)
-                }
-                is Expr.Binary -> {
-                    applyExpr(subs, e.lhs)
-                    applyExpr(subs, e.rhs)
-                    e.aType = apply(subs, e.aType)
-                }
-                is Expr.Ref -> e.aType = apply(subs, e.aType)
-                is Expr.Let -> {
-                    applyExpr(subs, e.value)
-                    applyExpr(subs, e.body)
-                    e.aType = apply(subs, e.aType)
-                }
-                is Expr.Fun -> {
-                    applyExpr(subs, e.body)
-                    e.params.forEach { p -> p.aType = apply(subs, p.aType) }
-                    e.aType = apply(subs, e.aType)
-                }
-                is Expr.CFun -> e.aType = apply(subs, e.aType)
-                is Expr.Apply -> {
-                    applyExpr(subs, e.fn)
-                    e.args.forEach { a ->
-                        applyExpr(subs, a)
-                    }
-                    e.aType = apply(subs, e.aType)
-                }
-                is Expr.Cond -> {
-                    applyExpr(subs, e.cond)
-                    applyExpr(subs, e.csq)
-                    applyExpr(subs, e.alt)
-                    e.aType = apply(subs, e.aType)
-                }
+        fun applyExpr(subs: Sequence<Substitution>, e: Expr): Expr {
+            return when (e) {
+                is Expr.Unit -> e
+                is Expr.Natural -> e
+                is Expr.Sequence ->
+                    Expr.Sequence(applyExpr(subs, e.first), applyExpr(subs, e.second), apply(subs, e.t))
+                is Expr.Unary ->
+                    Expr.Unary(e.operator, applyExpr(subs, e.operand), apply(subs, e.t))
+                is Expr.Binary ->
+                    Expr.Binary(applyExpr(subs, e.lhs), e.operator, applyExpr(subs, e.rhs), apply(subs, e.t))
+                is Expr.Ref -> Expr.Ref(e.id, apply(subs, e.t))
+                is Expr.Let ->
+                    Expr.Let(e.id, applyExpr(subs, e.value), applyExpr(subs, e.body), apply(subs, e.t))
+                is Expr.Fun ->
+                    Expr.Fun(e.params.map { p -> Expr.Fun.Param(p.id, p.declType, apply(subs, p.t)) },
+                        e.declType, applyExpr(subs, e.body), apply(subs, e.t))
+                is Expr.CFun -> Expr.CFun(e.id, e.sig, apply(subs, e.t))
+                is Expr.Apply ->
+                    Expr.Apply(applyExpr(subs, e.fn), e.args.map { a -> applyExpr(subs, a)}, apply(subs, e.t))
+                is Expr.Cond ->
+                    Expr.Cond(applyExpr(subs, e.cond), applyExpr(subs, e.csq), applyExpr(subs, e.alt), apply(subs, e.t))
                 is Expr.Assign -> TODO()
-                is Expr.If -> {
-                    applyExpr(subs, e.cond)
-                    applyExpr(subs, e.csq)
-                    if (e.alt != null) applyExpr(subs, e.alt)
-                    e.aType = apply(subs, e.aType)
-                }
-                is Expr.While -> {
-                    applyExpr(subs, e.body)
-                    applyExpr(subs, e.cond)
-                    e.aType = apply(subs, e.aType)
-                }
+                is Expr.If ->
+                    Expr.If(applyExpr(subs, e.cond), applyExpr(subs, e.csq),
+                        if (e.alt != null) applyExpr(subs, e.alt) else null, apply(subs, e.t))
+                is Expr.While ->
+                    Expr.While(applyExpr(subs, e.cond), applyExpr(subs, e.body), apply(subs, e.t))
                 is Expr.Break -> TODO()
             }
         }
 
         //env included in e
-        fun infer(e: Expr) {
-            if (e.aType !is Type.Unknown) {
-                e.aType = Type.Error("inference failed")
-                return
+        fun infer(e: Expr): Expr {
+            if (e.t !is Type.Unknown) {
+                return Expr.Ref("error", Type.Error("inference failed"))
             }
             val constraints = collect(e)
             val subs = unify(constraints)
             val errors = subs.filter { s -> s.u is Type.Error }.map { s -> s.u as Type.Error }
             if (errors.toList().isNotEmpty()) {
-                e.aType = Type.Error(errors.map { e -> e.what }.toList().toString(", "))
-                return
+                return Expr.Ref("error", Type.Error(errors.map { e -> e.what }.toList().toString(", ")))
             }
-            applyExpr(subs, e)
+            return applyExpr(subs, e)
         }
 
     }

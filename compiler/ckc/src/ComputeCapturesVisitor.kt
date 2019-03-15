@@ -20,9 +20,8 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
     override fun visit(e: Expr.Ref) {
         val def = e.accept(GetDefinitionVisitor())
         //create capture expr
-        val capture = Expr.Ref(e.id)
+        val capture = Expr.Ref(e.id, e.t)
         capture.enclosingScope = currentFun?.enclosingScope
-        capture.aType = e.aType
         when {
             //if def is non isLocal then add capture to currentFun
             def is Definition && !def.local -> {

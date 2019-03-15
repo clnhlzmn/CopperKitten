@@ -78,7 +78,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
 
     override fun visit(e: Expr.Ref): List<String> {
         val def = e.accept(GetDefinitionVisitor())
-        val isRef = e.aType.isRefType()
+        val isRef = e.t.isRefType()
         when (def) {
             is Definition -> {
                 if (def.local) {
@@ -139,7 +139,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         //load return value
         ret.add("load")
         //push temp (return value)
-        frame.pushTemp(e.aType.isRefType())
+        frame.pushTemp(e.t.isRefType())
         return ret
     }
 
@@ -232,7 +232,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         //push size of captures + 1 for function address
         ret.add("push ${e.captures.size + 1}")
         //capture layout is indices of captures where isRefType() is true + 1 because function address is first element
-        val captureLayout = (1..e.captures.size).filter { i -> e.captures[i - 1].aType.isRefType() }
+        val captureLayout = (1..e.captures.size).filter { i -> e.captures[i - 1].t.isRefType() }
         //alloc function array
         ret.add("alloc [${captureLayout.map { ci -> ci.toString() }.toString(", ")}]")
         frame.pushTemp(true)
@@ -302,7 +302,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
         //return var
         val ret = ArrayList<String>()
         //get local index in which to store this value
-        val localIndex = frame.pushLocal(e.id, e.value.aType.isRefType())
+        val localIndex = frame.pushLocal(e.id, e.value.t.isRefType())
         //compile the value expr
         ret.addAll(e.value.accept(this))
         //store value in isLocal
