@@ -20,7 +20,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$first; $second}::$aType"
+            "{$first; $second}:$aType"
 
     }
 
@@ -41,7 +41,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "$id::$aType"
+            "$id:$aType"
     }
 
     class Apply(val fn: Expr, val args: List<Expr>) : Expr() {
@@ -50,7 +50,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$fn}(${args.toString(", ")})::$aType"
+            "{$fn}(${args.toString(", ")}):$aType"
     }
 
     class Unary(val operator: String, val operand: Expr) : Expr() {
@@ -59,7 +59,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$operator $operand}::$aType"
+            "{$operator $operand}:$aType"
     }
 
     class Binary(val lhs: Expr, val operator: String, val rhs: Expr) : Expr() {
@@ -68,7 +68,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$lhs $operator $rhs}::$aType"
+            "{$lhs $operator $rhs}:$aType"
     }
 
     class Cond(val cond: Expr, val csq: Expr, val alt: Expr) : Expr() {
@@ -77,7 +77,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$cond ? $csq : $alt}::$aType"
+            "{$cond ? $csq : $alt}:$aType"
     }
 
     class Assign(val target: Expr, val value: Expr) : Expr() {
@@ -86,7 +86,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$target = $value}::$aType"
+            "{$target = $value}:$aType"
     }
 
     class Fun(val params: List<Param>, val type: Type?, val body: Expr) : Expr() {
@@ -100,7 +100,7 @@ sealed class Expr : BaseASTNode() {
 
             override fun toString(): String =
 //                "$id${if (type == null) "" else ": $type"}"
-                "$id::$aType"
+                "$id:$aType"
         }
 
         //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
@@ -113,7 +113,7 @@ sealed class Expr : BaseASTNode() {
 
         override fun toString(): String =
 //            "(${params.toString(", ")}): ${if (type == null) "" else "$type"} $body"
-            "{(${params.toString(", ")}): $body}::$aType"
+            "{(${params.toString(", ")}): $body}:$aType"
     }
 
     class CFun(val id: String, val sig: Type.Fun) : Expr() {
@@ -133,7 +133,7 @@ sealed class Expr : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{let $id::${value.aType} = $value; $body}::$aType"
+            "{let $id:${value.aType} = $value; $body}:$aType"
 
     }
 
