@@ -20,7 +20,7 @@ sealed class Type {
         var i = 0
 
         fun newUnknown(): Unknown =
-            Unknown("T${i++}")
+            Unknown("t${i++}")
     }
 
     object Int: Type() {
