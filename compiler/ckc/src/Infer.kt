@@ -107,11 +107,14 @@ class Infer {
                 t1 is Type.Unknown -> sequenceOf(Substitution(t1.id, t2))
                 t2 is Type.Unknown -> sequenceOf(Substitution(t2.id, t1))
                 //both fun types then unify argument types and return type
-                t1 is Type.Fun && t2 is Type.Fun ->
+                t1 is Type.Fun && t2 is Type.Fun -> {
+                    if (t1.paramTypes.size != t2.paramTypes.size)
+                        throw RuntimeException("mismatched types $t1 and $t2")
                     unify(
                         t1.paramTypes.zip(t2.paramTypes).map { p -> Constraint(p.first, p.second) }.asSequence() +
                             sequenceOf(Constraint(t1.returnType, t2.returnType))
                     )
+                }
                 else -> throw RuntimeException("mismatched types $t1 and $t2")
             }
         }
