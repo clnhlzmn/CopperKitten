@@ -43,7 +43,7 @@ class Cli(val args: Array<String>) {
                     //link enclosingScope fields
                     res.accept(ScopeBuildingVisitor())
 
-                    println(res.expr.toStringAnnotated())
+                    println(res.expr.toString())
                     val constraints = Infer.collect(res.expr)
                     println(constraints.toList().toString(", "))
 

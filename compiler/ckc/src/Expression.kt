@@ -2,12 +2,8 @@
 
 sealed class Expr : BaseASTNode() {
 
-    fun toStringAnnotated():String {
-        return "{$this}::$t"
-    }
-
     //expression annotated type for inference algorithm
-    var t = Type.newUnknown()
+    var aType: Type = Type.newUnknown()
 
     object Unit : Expr() {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
@@ -100,7 +96,7 @@ sealed class Expr : BaseASTNode() {
         class Param(val id: String, val type: Type) {
 
             //expression annotated type for inference algorithm
-            var t = Type.newUnknown()
+            var aType: Type = Type.newUnknown()
 
             override fun toString(): String =
 //                "$id${if (type == null) "" else ": $type"}"
@@ -131,7 +127,8 @@ sealed class Expr : BaseASTNode() {
 
     class Let(val id: String, val value: Expr, val body: Expr) : Expr() {
 
-        var bindingT = Type.newUnknown()
+        //binding type annotation for inference
+        var bType: Type = Type.newUnknown()
 
         var enclosingScope: ASTNode? = null
 
