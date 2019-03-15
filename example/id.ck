@@ -1,5 +1,5 @@
 {
-    let add = (a, b): a + b;
-    let double = (a): add(a, a);
-    double(1, 2)
+    let id = (a): a;
+    id (42);
+    id ((): 42)
 }
