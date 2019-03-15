@@ -22,6 +22,7 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
         //create capture expr
         val capture = Expr.Ref(e.id)
         capture.enclosingScope = currentFun?.enclosingScope
+        capture.aType = e.aType
         when {
             //if def is non isLocal then add capture to currentFun
             def is Definition && !def.local -> {

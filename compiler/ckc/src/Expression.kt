@@ -127,16 +127,13 @@ sealed class Expr : BaseASTNode() {
 
     class Let(val id: String, val value: Expr, val body: Expr) : Expr() {
 
-        //binding type annotation for inference
-        var bType: Type = Type.newUnknown()
-
         var enclosingScope: ASTNode? = null
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            "{let $id::$bType = $value; $body}::$aType"
+            "{let $id::${value.aType} = $value; $body}::$aType"
 
     }
 

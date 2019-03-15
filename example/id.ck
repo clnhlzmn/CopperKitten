@@ -1,4 +1,4 @@
 {
     let add = (a, b): a + b;
-    (a): add(a)
+    while (1) add(1, 2)
 }

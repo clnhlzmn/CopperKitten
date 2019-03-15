@@ -43,27 +43,29 @@ class Cli(val args: Array<String>) {
                     //link enclosingScope fields
                     res.accept(ScopeBuildingVisitor())
 
-                    println(res.expr.toString())
+                    //print expr with unknown types
+//                    println(res.expr.toString())
+                    //infer program types
                     Infer.infer(res.expr)
 
-                    //get program type
-//                    val type: Type = res.expr.accept(GetTypeVisitor())
-//                    //println(type)
-//                    if (type !is Type.Error) {
-//                        //compute function captures
-//                        res.expr.accept(ComputeCapturesVisitor())
-//                        val code: List<String> = compileCkFile(res)
-//                        if (outputFileName != null) {
-//                            File(outputFileName).printWriter().use { out ->
-//                                out.print(code.toString("\n"))
-//                            }
-//                        } else {
-//                            println(code.toString("\n"))
-//                        }
-//                    } else {
-//                        //print error
-//                        println(type)
-//                    }
+                    //check if error type
+                    if (res.expr.aType !is Type.Error) {
+                        //compute function captures
+                        res.expr.accept(ComputeCapturesVisitor())
+                        //compile file
+                        val code: List<String> = compileCkFile(res)
+                        //determine output location
+                        if (outputFileName != null) {
+                            File(outputFileName).printWriter().use { out ->
+                                out.print(code.toString("\n"))
+                            }
+                        } else {
+                            println(code.toString("\n"))
+                        }
+                    } else {
+                        //print error
+                        println(res.expr.aType)
+                    }
                 } else {
                     //parse error
                     println(parseError.toString("\n"))
