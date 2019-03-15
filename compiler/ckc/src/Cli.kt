@@ -44,8 +44,7 @@ class Cli(val args: Array<String>) {
                     res.accept(ScopeBuildingVisitor())
 
                     println(res.expr.toString())
-                    val constraints = Infer.collect(res.expr)
-                    println(constraints.toList().toString(", "))
+                    Infer.infer(res.expr)
 
                     //get program type
                     val type: Type = res.expr.accept(GetTypeVisitor())

@@ -128,8 +128,8 @@ class Infer {
 
         fun applyExpr(subs: Sequence<Substitution>, e: Expr) {
             when (e) {
-                is Expr.Unit -> e.aType = Type.Unit
-                is Expr.Natural -> e.aType = Type.Int
+                is Expr.Unit -> e.aType = apply(subs, e.aType)
+                is Expr.Natural -> e.aType = apply(subs, e.aType)
                 is Expr.Sequence -> {
                     applyExpr(subs, e.first)
                     applyExpr(subs, e.second)
@@ -152,14 +152,33 @@ class Infer {
                     e.aType = apply(subs, e.aType)
                 }
                 is Expr.Fun -> {
-                    //TODO:
+                    applyExpr(subs, e.body)
+                    e.params.forEach { p -> p.aType = apply(subs, p.aType) }
+                    e.aType = apply(subs, e.aType)
                 }
-                is Expr.CFun -> AExpr.CFun(ae.id, apply(subs, ae.t))
-                is Expr.Apply -> AExpr.Apply(
-                    applyExpr(subs, ae.fn),
-                    ae.args.map { a -> applyExpr(subs, a) },
-                    apply(subs, ae.t)
-                )
+                is Expr.CFun -> e.aType = apply(subs, e.aType)
+                is Expr.Apply -> {
+                    applyExpr(subs, e.fn)
+                    e.args.forEach { a ->
+                        applyExpr(subs, a)
+                    }
+                    e.aType = apply(subs, e.aType)
+                }
+                is Expr.Cond -> {
+                    applyExpr(subs, e.cond)
+                    applyExpr(subs, e.csq)
+                    applyExpr(subs, e.alt)
+                    e.aType = apply(subs, e.aType)
+                }
+                is Expr.Assign -> TODO()
+                is Expr.If -> {
+                    applyExpr(subs, e.cond)
+                    applyExpr(subs, e.csq)
+                    if (e.alt != null) applyExpr(subs, e.alt)
+                    e.aType = apply(subs, e.aType)
+                }
+                is Expr.While -> TODO()
+                is Expr.Break -> TODO()
             }
         }
 
@@ -177,7 +196,8 @@ class Infer {
             val constraints = collect(e)
             println(constraints.toList().toString(" "))
             val subs = unify(constraints)
-            return applyExpr(subs, ae)
+            applyExpr(subs, e)
+            println(e)
         }
 
     }
