@@ -1,4 +1,4 @@
 {
-    let id = (a): a;
-    id(():42)
+    let add = (a, b): a + b;
+    (a, b): add(a, b)
 }

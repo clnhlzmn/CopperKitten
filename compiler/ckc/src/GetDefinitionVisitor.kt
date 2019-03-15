@@ -13,6 +13,10 @@ class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
 
     var id: String? = null
 
+    override fun visit(f: CkFile): Definition? {
+        return null
+    }
+
     override fun visit(e: Expr.Unit): Definition? {
         return null
     }
