@@ -23,7 +23,7 @@ class Infer {
                 is Expr.Ref -> {
                     val def = e.accept(GetDefinitionVisitor())
                     when (def) {
-                        null -> sequenceOf(Constraint(e.aType, Type.Error("$e is undefined")))
+                        null -> sequenceOf(Constraint(Type.newUnknown(), Type.Error("$e is undefined")))
                         is Definition.Let -> sequenceOf(Constraint(e.aType, def.node.value.aType))
                         is Definition.Param -> sequenceOf(Constraint(e.aType, def.node.aType))
                     }
@@ -94,12 +94,12 @@ class Infer {
 
         fun unifyOne(t1: Type, t2: Type): Sequence<Substitution> {
             return when {
-                t1 is Type.Error -> emptySequence()
-                t2 is Type.Error -> emptySequence()
                 t1 is Type.Unit && t2 is Type.Unit -> emptySequence()
                 t1 is Type.Int && t2 is Type.Int -> emptySequence()
-                t1 is Type.Unknown -> sequenceOf(Substitution(t1.id, t2))
-                t2 is Type.Unknown -> sequenceOf(Substitution(t2.id, t1))
+                t1 is Type.Unknown ->
+                    sequenceOf(Substitution(t1.id, t2))
+                t2 is Type.Unknown ->
+                    sequenceOf(Substitution(t2.id, t1))
                 //both fun types then unify argument types and return type
                 t1 is Type.Fun && t2 is Type.Fun -> {
                     if (t1.paramTypes.size != t2.paramTypes.size)
@@ -109,6 +109,8 @@ class Infer {
                             sequenceOf(Constraint(t1.returnType, t2.returnType))
                     )
                 }
+                t2 is Type.Error -> emptySequence()
+                t1 is Type.Error -> emptySequence()
                 else -> sequenceOf(Substitution(Type.newUnknown().id, Type.Error("mismatched types between $t1 and $t2")))
             }
         }
