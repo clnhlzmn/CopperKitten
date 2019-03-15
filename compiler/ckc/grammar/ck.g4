@@ -31,7 +31,7 @@ expr
     | lhs=expr '||' rhs=expr                                            #orExpr
     | <assoc=right> cond=expr '?' con=expr ':' alt=expr                 #condExpr
     | <assoc=right> target=expr '=' value=expr                          #assignExpr
-    | '(' params? ')' ':' type expr                                     #funExpr
+    | '(' params? ')' ':' type? expr                                    #funExpr
     | 'cfun' ID funType                                                 #cFunExpr
     | 'let' ID '=' value=expr                                           #letExpr
     | 'if' '(' cond=expr ')' csq=expr ( 'else' alt=expr )?              #ifExpr
@@ -49,7 +49,7 @@ sequence
     ;
 
 param
-    : ID ':' type
+    : ID (':' type)?
     ;
 
 params

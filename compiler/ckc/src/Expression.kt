@@ -89,11 +89,11 @@ sealed class Expr : BaseASTNode() {
             "{$target = $value}::$aType"
     }
 
-//    class Fun(val params: List<Param>, val type: Type?, val body: Expr) : Expr() {
-    class Fun(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
+    class Fun(val params: List<Param>, val type: Type?, val body: Expr) : Expr() {
+//    class Fun(val params: List<Param>, val type: Type, val body: Expr) : Expr() {
 
-//        class Param(val id: String, val type: Type?) {
-        class Param(val id: String, val type: Type) {
+        class Param(val id: String, val type: Type?) {
+//        class Param(val id: String, val type: Type) {
 
             //expression annotated type for inference algorithm
             var aType: Type = Type.newUnknown()

@@ -47,23 +47,23 @@ class Cli(val args: Array<String>) {
                     Infer.infer(res.expr)
 
                     //get program type
-                    val type: Type = res.expr.accept(GetTypeVisitor())
-                    //println(type)
-                    if (type !is Type.Error) {
-                        //compute function captures
-                        res.expr.accept(ComputeCapturesVisitor())
-                        val code: List<String> = compileCkFile(res)
-                        if (outputFileName != null) {
-                            File(outputFileName).printWriter().use { out ->
-                                out.print(code.toString("\n"))
-                            }
-                        } else {
-                            println(code.toString("\n"))
-                        }
-                    } else {
-                        //print error
-                        println(type)
-                    }
+//                    val type: Type = res.expr.accept(GetTypeVisitor())
+//                    //println(type)
+//                    if (type !is Type.Error) {
+//                        //compute function captures
+//                        res.expr.accept(ComputeCapturesVisitor())
+//                        val code: List<String> = compileCkFile(res)
+//                        if (outputFileName != null) {
+//                            File(outputFileName).printWriter().use { out ->
+//                                out.print(code.toString("\n"))
+//                            }
+//                        } else {
+//                            println(code.toString("\n"))
+//                        }
+//                    } else {
+//                        //print error
+//                        println(type)
+//                    }
                 } else {
                     //parse error
                     println(parseError.toString("\n"))
