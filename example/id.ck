@@ -1,5 +1,5 @@
 {
-    let id = (a, a): a;
+    let id = (a): a;
     id (42)
     //;
     //id ((): 42)

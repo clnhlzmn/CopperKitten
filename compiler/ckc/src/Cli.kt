@@ -40,12 +40,10 @@ class Cli(val args: Array<String>) {
                 if (parseError.isEmpty()) {
                     //get AST
                     val res: CkFile = context.accept(FileVisitor())
-                    //link enclosingScope fields
-//                    res.accept(ScopeBuildingVisitor())
 
                     val typedExpr = Infer.infer(res.expr)
                     println(typedExpr.t)
-//                    typedExpr.accept(ScopeBuildingVisitor())
+                    typedExpr.accept(ScopeBuildingVisitor())
                     //infer program types
                     val program = CkFile(res.defs, typedExpr)
 

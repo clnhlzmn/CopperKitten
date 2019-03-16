@@ -16,7 +16,8 @@ class Infer {
         fun collect(env: Env<Type>?, e: Expr): Sequence<Constraint> =
             when (e) {
                 Expr.Unit -> sequenceOf(Constraint(e.t, Type.Unit))
-                is Expr.Sequence -> collect(env, e.first) + collect(env, e.second) + sequenceOf(Constraint(e.t, e.second.t))
+                is Expr.Sequence -> collect(env, e.first) + collect(env, e.second) +
+                    sequenceOf(Constraint(e.t, e.second.t))
                 is Expr.Natural -> sequenceOf(Constraint(e.t, Type.Int))
                 is Expr.Ref -> {
                     val refT = if (env == null) null else Env.lookup(e.id, env)
@@ -140,7 +141,7 @@ class Infer {
                     Expr.Apply(applyExpr(subs, e.fn), e.args.map { a -> applyExpr(subs, a)}, apply(subs, e.t))
                 is Expr.Cond ->
                     Expr.Cond(applyExpr(subs, e.cond), applyExpr(subs, e.csq), applyExpr(subs, e.alt), apply(subs, e.t))
-                is Expr.Assign -> TODO()
+                is Expr.Assign -> Expr.Assign(applyExpr(subs, e.target), applyExpr(subs, e.value), apply(subs, e.t))
                 is Expr.If ->
                     Expr.If(applyExpr(subs, e.cond), applyExpr(subs, e.csq),
                         if (e.alt != null) applyExpr(subs, e.alt) else null, apply(subs, e.t))

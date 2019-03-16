@@ -1,7 +1,6 @@
 //Expressions
 
 sealed class Expr(val t: Type) : BaseASTNode() {
-
     object Unit : Expr(Type.Unit) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -11,8 +10,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
         }
     }
 
-    class Sequence(val first: Expr, val second: Expr, t:Type) : Expr(t) {
-
+    class Sequence(val first: Expr, val second: Expr, t: Type) : Expr(t) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
@@ -30,7 +28,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
             value.toString()
     }
 
-    class Ref(val id: String, t:Type) : Expr(t) {
+    class Ref(val id: String, t: Type) : Expr(t) {
 
         var enclosingScope: ASTNode? = null
 
@@ -41,7 +39,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
             "$id:$t"
     }
 
-    class Apply(val fn: Expr, val args: List<Expr>, t:Type) : Expr(t) {
+    class Apply(val fn: Expr, val args: List<Expr>, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -50,7 +48,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
             "{$fn}(${args.toString(", ")}):$t"
     }
 
-    class Unary(val operator: String, val operand: Expr, t:Type) : Expr(t) {
+    class Unary(val operator: String, val operand: Expr, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -59,7 +57,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
             "{$operator $operand}:$t"
     }
 
-    class Binary(val lhs: Expr, val operator: String, val rhs: Expr, t:Type) : Expr(t) {
+    class Binary(val lhs: Expr, val operator: String, val rhs: Expr, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -68,7 +66,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
             "{$lhs $operator $rhs}:$t"
     }
 
-    class Cond(val cond: Expr, val csq: Expr, val alt: Expr, t:Type) : Expr(t) {
+    class Cond(val cond: Expr, val csq: Expr, val alt: Expr, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -77,7 +75,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
             "{$cond ? $csq : $alt}:$t"
     }
 
-    class Assign(val target: Expr, val value: Expr, t:Type) : Expr(t) {
+    class Assign(val target: Expr, val value: Expr, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -86,13 +84,9 @@ sealed class Expr(val t: Type) : BaseASTNode() {
             "{$target = $value}:$t"
     }
 
-    class Fun(val params: List<Param>, val declType: Type?, val body: Expr, t:Type) : Expr(t) {
+    class Fun(val params: List<Param>, val declType: Type?, val body: Expr, t: Type) : Expr(t) {
 
         class Param(val id: String, val declType: Type?, val t: Type) {
-
-            //expression annotated type for inference algorithm
-//            var t: Type = Type.newUnknown()
-
             override fun toString(): String =
                 "$id:$t"
         }
@@ -109,7 +103,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
             "{(${params.toString(", ")}): $body}:$t"
     }
 
-    class CFun(val id: String, val sig: Type.Fun, t:Type) : Expr(t) {
+    class CFun(val id: String, val sig: Type.Fun, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -118,7 +112,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
             "cfun $id $sig"
     }
 
-    class Let(val id: String, val value: Expr, val body: Expr, t:Type) : Expr(t) {
+    class Let(val id: String, val value: Expr, val body: Expr, t: Type) : Expr(t) {
 
         var enclosingScope: ASTNode? = null
 
@@ -130,7 +124,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
 
     }
 
-    class If(val cond: Expr, val csq: Expr, val alt: Expr?, t:Type) : Expr(t) {
+    class If(val cond: Expr, val csq: Expr, val alt: Expr?, t: Type) : Expr(t) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
@@ -142,7 +136,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
 
     }
 
-    class While(val cond: Expr, val body: Expr, t:Type) : Expr(t) {
+    class While(val cond: Expr, val body: Expr, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -152,7 +146,7 @@ sealed class Expr(val t: Type) : BaseASTNode() {
 
     }
 
-    class Break(val value: Expr?, t:Type) : Expr(t) {
+    class Break(val value: Expr?, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
