@@ -1,3 +1,4 @@
+
 class Infer {
 
     data class Constraint(val t1: Type, val t2: Type) {
@@ -8,54 +9,60 @@ class Infer {
     companion object {
 
         //collect constraints from a list of expr
-        fun collect(la: List<Expr>): Sequence<Constraint> =
-            la.map { a -> collect(a) }.fold(emptySequence<Constraint>()) { acc, seq -> acc + seq }
+        fun collect(env: Env<Type>?, la: List<Expr>): Sequence<Constraint> =
+            la.map { a -> collect(env, a) }.fold(emptySequence()) { acc, seq -> acc + seq }
 
         //recursively generate a set of constraints from an expr
-        fun collect(e: Expr): Sequence<Constraint> =
+        fun collect(env: Env<Type>?, e: Expr): Sequence<Constraint> =
             when (e) {
                 Expr.Unit -> sequenceOf(Constraint(e.t, Type.Unit))
-                is Expr.Sequence -> collect(e.first) + collect(e.second) + sequenceOf(Constraint(e.t, e.second.t))
+                is Expr.Sequence -> collect(env, e.first) + collect(env, e.second) + sequenceOf(Constraint(e.t, e.second.t))
                 is Expr.Natural -> sequenceOf(Constraint(e.t, Type.Int))
                 is Expr.Ref -> {
-                    val def = e.accept(GetDefinitionVisitor())
-                    when (def) {
-                        null -> sequenceOf(Constraint(Type.newUnknown(), Type.Error("$e is undefined")))
-                        is Definition.Let -> sequenceOf(Constraint(e.t, def.node.value.t))
-                        is Definition.Param -> sequenceOf(Constraint(e.t, def.node.t))
-                    }
+                    val refT = if (env == null) null else Env.lookup(e.id, env)
+                    if (refT == null)
+                        sequenceOf(Constraint(Type.newUnknown(), Type.Error("$e is undefined")))
+                    else
+                        sequenceOf(Constraint(e.t, refT))
                 }
                 is Expr.Apply ->
-                    collect(e.fn) + collect(e.args) +
+                    collect(env, e.fn) + collect(env, e.args) +
                         sequenceOf(Constraint(e.fn.t, Type.Fun(e.args.map { a -> a.t }, e.t)))
                 is Expr.Unary ->
-                    collect(e.operand) +
+                    collect(env, e.operand) +
                         sequenceOf(Constraint(e.t, Type.Int), Constraint(e.operand.t, Type.Int))
                 is Expr.Binary ->
-                    collect(e.lhs) + collect(e.rhs) +
+                    collect(env, e.lhs) + collect(env, e.rhs) +
                         sequenceOf(
                             Constraint(e.t, Type.Int),
                             Constraint(e.lhs.t, Type.Int), Constraint(e.rhs.t, Type.Int)
                         )
-                is Expr.Cond -> collect(e.cond) + collect(e.csq) + collect(e.alt) +
+                is Expr.Cond -> collect(env, e.cond) + collect(env, e.csq) + collect(env, e.alt) +
                     sequenceOf(Constraint(e.cond.t, Type.Int), Constraint(e.csq.t, e.alt.t),
                         Constraint(e.t, e.csq.t), Constraint(e.t, e.alt.t)
                     )
-                is Expr.Assign -> TODO()
-                is Expr.Fun -> collect(e.body) +
-                    sequenceOf(Constraint(e.t, Type.Fun(e.params.map { p -> p.t }, e.body.t)))
+                is Expr.Assign -> collect(env, e.target) + collect(env, e.value) +
+                    sequenceOf(Constraint(e.target.t, e.value.t), Constraint(e.t, e.value.t))
+                is Expr.Fun ->
+                    if (e.params.distinctBy { p -> p.id }.count() != e.params.size)
+                        sequenceOf(Constraint(Type.newUnknown(), Type.Error("$e must have distinct parameter names")))
+                    else
+                        collect(Env.extend(e.params.map { p -> Pair(p.id, p.t) }, env), e.body) +
+                            sequenceOf(Constraint(e.t, Type.Fun(e.params.map { p -> p.t }, e.body.t)))
                 is Expr.CFun -> sequenceOf(Constraint(e.t, e.sig))
-                is Expr.Let -> collect(e.value) + collect(e.body) + sequenceOf(Constraint(e.t, e.body.t))
+                is Expr.Let ->
+                    collect(env, e.value) + collect(Env.extend(e.id, e.value.t, env), e.body) +
+                        sequenceOf(Constraint(e.t, e.body.t))
                 is Expr.If ->
                     if (e.alt == null)
-                        collect(e.cond) + collect(e.csq) +
+                        collect(env, e.cond) + collect(env, e.csq) +
                             sequenceOf(Constraint(e.t, Type.Unit), Constraint(e.csq.t, Type.Unit))
                     else
-                        collect(e.cond) + collect(e.csq) + collect(e.alt) +
+                        collect(env, e.cond) + collect(env, e.csq) + collect(env, e.alt) +
                             sequenceOf(Constraint(e.t, e.csq.t), Constraint(e.t, e.alt.t),
                                 Constraint(e.csq.t, e.alt.t))
                 is Expr.While ->
-                    collect(e.cond) + collect(e.body) +
+                    collect(env, e.cond) + collect(env, e.body) +
                         sequenceOf(Constraint(e.cond.t, Type.Int), Constraint(e.body.t, Type.Unit),
                             Constraint(e.t, Type.Unit)
                         )
@@ -76,7 +83,7 @@ class Infer {
         data class Substitution(val x: String, val u: Type)
 
         fun apply(subs: Sequence<Substitution>, t: Type): Type =
-            subs.toList().foldRight(t){ sub, t -> substitute(sub.u, sub.x, t) }
+            subs.toList().foldRight(t){ sub, tAcc -> substitute(sub.u, sub.x, tAcc) }
 
         fun unify(constraints: Sequence<Constraint>): Sequence<Substitution> {
             val first = constraints.firstOrNull()
@@ -148,11 +155,11 @@ class Infer {
             if (e.t !is Type.Unknown) {
                 return Expr.Ref("error", Type.Error("inference failed"))
             }
-            val constraints = collect(e)
+            val constraints = collect(null, e)
             val subs = unify(constraints)
             val errors = subs.filter { s -> s.u is Type.Error }.map { s -> s.u as Type.Error }
             if (errors.toList().isNotEmpty()) {
-                return Expr.Ref("error", Type.Error(errors.map { e -> e.what }.toList().toString(", ")))
+                return Expr.Ref("error", Type.Error(errors.map { err -> err.what }.toList().toString(", ")))
             }
             return applyExpr(subs, e)
         }

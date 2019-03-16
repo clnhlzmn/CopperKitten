@@ -41,27 +41,28 @@ class Cli(val args: Array<String>) {
                     //get AST
                     val res: CkFile = context.accept(FileVisitor())
                     //link enclosingScope fields
-                    res.accept(ScopeBuildingVisitor())
+//                    res.accept(ScopeBuildingVisitor())
 
                     val typedExpr = Infer.infer(res.expr)
-                    typedExpr.accept(ScopeBuildingVisitor())
+                    println(typedExpr.t)
+//                    typedExpr.accept(ScopeBuildingVisitor())
                     //infer program types
                     val program = CkFile(res.defs, typedExpr)
 
                     //check if error type
                     if (program.expr.t !is Type.Error) {
-                        //compute function captures
-                        program.expr.accept(ComputeCapturesVisitor())
-                        //compile file
-                        val code: List<String> = compileCkFile(program)
-                        //determine output location
-                        if (outputFileName != null) {
-                            File(outputFileName).printWriter().use { out ->
-                                out.print(code.toString("\n"))
-                            }
-                        } else {
-                            println(code.toString("\n"))
-                        }
+//                        //compute function captures
+//                        program.expr.accept(ComputeCapturesVisitor())
+//                        //compile file
+//                        val code: List<String> = compileCkFile(program)
+//                        //determine output location
+//                        if (outputFileName != null) {
+//                            File(outputFileName).printWriter().use { out ->
+//                                out.print(code.toString("\n"))
+//                            }
+//                        } else {
+//                            println(code.toString("\n"))
+//                        }
                     } else {
                         //print error
                         println(program.expr.t)
