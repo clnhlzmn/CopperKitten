@@ -1,6 +1,6 @@
-//map: \/a, b: ([a], ([a]):[b]): [b] 
+//map: \/A, B: ([A], (A):B): [B] 
 
-let map = (l, f): 
+let map = <A, B>: (l:[A], f:(A):B): [B]
     if (l == ()) 
         () 
     else 
