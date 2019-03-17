@@ -9,22 +9,22 @@ class Infer {
     companion object {
 
         //collect constraints from a list of expr
-        fun collect(env: Env<Type>?, la: List<Expr>): Sequence<Constraint> =
+        fun collect(env: Sequence<Pair<String, Type>>, la: List<Expr>): Sequence<Constraint> =
             la.map { a -> collect(env, a) }.fold(emptySequence()) { acc, seq -> acc + seq }
 
         //recursively generate a set of constraints from an expr
-        fun collect(env: Env<Type>?, e: Expr): Sequence<Constraint> =
+        fun collect(env: Sequence<Pair<String, Type>>, e: Expr): Sequence<Constraint> =
             when (e) {
                 Expr.Unit -> sequenceOf(Constraint(e.t, Type.Unit))
                 is Expr.Sequence -> collect(env, e.first) + collect(env, e.second) +
                     sequenceOf(Constraint(e.t, e.second.t))
                 is Expr.Natural -> sequenceOf(Constraint(e.t, Type.Int))
                 is Expr.Ref -> {
-                    val refT = if (env == null) null else Env.lookup(e.id, env)
+                    val refT = env.lastOrNull{ p -> p.first == e.id }
                     if (refT == null)
                         sequenceOf(Constraint(Type.newVar(), Type.Error("$e is undefined")))
                     else
-                        sequenceOf(Constraint(e.t, refT))
+                        sequenceOf(Constraint(e.t, refT.second))
                 }
                 is Expr.Apply ->
                     collect(env, e.fn) + collect(env, e.args) +
@@ -48,11 +48,11 @@ class Infer {
                     if (e.params.distinctBy { p -> p.id }.count() != e.params.size)
                         sequenceOf(Constraint(Type.newVar(), Type.Error("$e must have distinct parameter names")))
                     else
-                        collect(Env.extend(e.params.map { p -> Pair(p.id, p.t) }, env), e.body) +
+                        collect(env + e.params.map { p -> Pair(p.id, p.t) }, e.body) +
                             sequenceOf(Constraint(e.t, Type.Fun(e.params.map { p -> p.t }, e.body.t)))
                 is Expr.CFun -> sequenceOf(Constraint(e.t, e.sig))
                 is Expr.Let ->
-                    collect(env, e.value) + collect(Env.extend(e.id, e.value.t, env), e.body) +
+                    collect(env, e.value) + collect(env + sequenceOf(Pair(e.id, e.value.t)), e.body) +
                         sequenceOf(Constraint(e.t, e.body.t))
                 is Expr.If ->
                     if (e.alt == null)
@@ -79,6 +79,7 @@ class Infer {
                 is Type.Var -> if (t.id == x) u else t
                 is Type.Fun -> Type.Fun(t.paramTypes.map { p -> substitute(u, x, p) }, substitute(u, x, t.returnType))
                 is Type.Error -> t
+                is Type.ForAll -> TODO()
             }
 
         data class Substitution(val x: String, val u: Type)
@@ -156,7 +157,7 @@ class Infer {
             if (e.t !is Type.Var) {
                 return Expr.Ref("error", Type.Error("inference failed"))
             }
-            val constraints = collect(null, e)
+            val constraints = collect(emptySequence(), e)
             val subs = unify(constraints)
             val errors = subs.filter { s -> s.u is Type.Error }.map { s -> s.u as Type.Error }
             if (errors.toList().isNotEmpty()) {
