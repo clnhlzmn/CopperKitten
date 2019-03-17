@@ -68,6 +68,7 @@ class Infer {
                             Constraint(e.t, Type.Unit)
                         )
                 is Expr.Break -> TODO()
+                is Expr.Error -> TODO()
             }
 
         fun substitute(u: Type, x: String, t: Type): Type =
@@ -79,7 +80,6 @@ class Infer {
                 is Type.Var -> if (t.id == x) u else t
                 is Type.Fun -> Type.Fun(t.paramTypes.map { p -> substitute(u, x, p) }, substitute(u, x, t.returnType))
                 is Type.Error -> t
-                is Type.ForAll -> TODO()
             }
 
         data class Substitution(val x: String, val u: Type)
@@ -149,6 +149,7 @@ class Infer {
                 is Expr.While ->
                     Expr.While(applyExpr(subs, e.cond), applyExpr(subs, e.body), apply(subs, e.t))
                 is Expr.Break -> TODO()
+                is Expr.Error -> TODO()
             }
         }
 

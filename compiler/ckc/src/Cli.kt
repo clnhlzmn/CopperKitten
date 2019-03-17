@@ -41,14 +41,15 @@ class Cli(val args: Array<String>) {
                     //get AST
                     val res: CkFile = context.accept(FileVisitor())
 
-                    val typedExpr = Infer.infer(res.expr)
-                    println(typedExpr.t)
-                    typedExpr.accept(ScopeBuildingVisitor())
+//                    val typedExpr = Infer.infer(res.expr)
+                    val exprType = Analyze.analyze(res.expr, null, null)
+                    println(Analyze.prune(exprType))
+//                    typedExpr.accept(ScopeBuildingVisitor())
                     //infer program types
-                    val program = CkFile(res.defs, typedExpr)
+//                    val program = CkFile(res.defs, typedExpr)
 
                     //check if error type
-                    if (program.expr.t !is Type.Error) {
+//                    if (program.expr.t !is Type.Error) {
 //                        //compute function captures
 //                        program.expr.accept(ComputeCapturesVisitor())
 //                        //compile file
@@ -61,10 +62,10 @@ class Cli(val args: Array<String>) {
 //                        } else {
 //                            println(code.toString("\n"))
 //                        }
-                    } else {
-                        //print error
-                        println(program.expr.t)
-                    }
+//                    } else {
+//                        //print error
+//                        println(program.expr.t)
+//                    }
                 } else {
                     //parse error
                     println(parseError.toString("\n"))

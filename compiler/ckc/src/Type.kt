@@ -9,6 +9,7 @@ sealed class Type {
     }
 
     data class Var(val id: String): Type() {
+        var instance: Type? = null
         override fun isRefType(): Boolean {
             TODO("not implemented")
         }
@@ -40,11 +41,5 @@ sealed class Type {
         override fun isRefType(): Boolean = true
         override fun toString(): String =
             "(${paramTypes.toString(", ")}): $returnType"
-    }
-
-    data class ForAll(val params: List<String>, val type: Type): Type() {
-        override fun isRefType(): Boolean = TODO("not implemented")
-        override fun toString(): String =
-            "∀ ${params.toString(", ")}: $type"
     }
 }

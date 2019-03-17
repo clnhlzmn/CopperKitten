@@ -1,6 +1,13 @@
 //Expressions
 
 sealed class Expr(val t: Type) : BaseASTNode() {
+
+    class Error(val what: String): Expr(Type.Error(what)) {
+        override fun toString(): String {
+            return "Error: $what"
+        }
+    }
+
     object Unit : Expr(Type.Unit) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
