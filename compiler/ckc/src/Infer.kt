@@ -22,7 +22,7 @@ class Infer {
                 is Expr.Ref -> {
                     val refT = if (env == null) null else Env.lookup(e.id, env)
                     if (refT == null)
-                        sequenceOf(Constraint(Type.newUnknown(), Type.Error("$e is undefined")))
+                        sequenceOf(Constraint(Type.newVar(), Type.Error("$e is undefined")))
                     else
                         sequenceOf(Constraint(e.t, refT))
                 }
@@ -46,7 +46,7 @@ class Infer {
                     sequenceOf(Constraint(e.target.t, e.value.t), Constraint(e.t, e.value.t))
                 is Expr.Fun ->
                     if (e.params.distinctBy { p -> p.id }.count() != e.params.size)
-                        sequenceOf(Constraint(Type.newUnknown(), Type.Error("$e must have distinct parameter names")))
+                        sequenceOf(Constraint(Type.newVar(), Type.Error("$e must have distinct parameter names")))
                     else
                         collect(Env.extend(e.params.map { p -> Pair(p.id, p.t) }, env), e.body) +
                             sequenceOf(Constraint(e.t, Type.Fun(e.params.map { p -> p.t }, e.body.t)))
@@ -76,7 +76,7 @@ class Infer {
             else when (t) {
                 is Type.Unit -> t
                 is Type.Int -> t
-                is Type.Unknown -> if (t.id == x) u else t
+                is Type.Var -> if (t.id == x) u else t
                 is Type.Fun -> Type.Fun(t.paramTypes.map { p -> substitute(u, x, p) }, substitute(u, x, t.returnType))
                 is Type.Error -> t
             }
@@ -101,14 +101,14 @@ class Infer {
             return when {
                 t1 is Type.Unit && t2 is Type.Unit -> emptySequence()
                 t1 is Type.Int && t2 is Type.Int -> emptySequence()
-                t1 is Type.Unknown ->
+                t1 is Type.Var ->
                     sequenceOf(Substitution(t1.id, t2))
-                t2 is Type.Unknown ->
+                t2 is Type.Var ->
                     sequenceOf(Substitution(t2.id, t1))
                 //both fun types then unify argument types and return type
                 t1 is Type.Fun && t2 is Type.Fun -> {
                     if (t1.paramTypes.size != t2.paramTypes.size)
-                        return sequenceOf(Substitution(Type.newUnknown().id, Type.Error("mismatched number of arguments between $t1 and $t2")))
+                        return sequenceOf(Substitution(Type.newVar().id, Type.Error("mismatched number of arguments between $t1 and $t2")))
                     unify(
                         t1.paramTypes.zip(t2.paramTypes).map { p -> Constraint(p.first, p.second) }.asSequence() +
                             sequenceOf(Constraint(t1.returnType, t2.returnType))
@@ -116,7 +116,7 @@ class Infer {
                 }
                 t2 is Type.Error -> emptySequence()
                 t1 is Type.Error -> emptySequence()
-                else -> sequenceOf(Substitution(Type.newUnknown().id, Type.Error("mismatched types between $t1 and $t2")))
+                else -> sequenceOf(Substitution(Type.newVar().id, Type.Error("mismatched types between $t1 and $t2")))
             }
         }
 
@@ -153,7 +153,7 @@ class Infer {
 
         //env included in e
         fun infer(e: Expr): Expr {
-            if (e.t !is Type.Unknown) {
+            if (e.t !is Type.Var) {
                 return Expr.Ref("error", Type.Error("inference failed"))
             }
             val constraints = collect(null, e)
