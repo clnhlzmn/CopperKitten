@@ -145,7 +145,10 @@ class Analyze {
             when (e) {
                 is Expr.Error -> TODO()
                 Expr.Unit -> Type.Unit
-                is Expr.Sequence -> TODO()
+                is Expr.Sequence -> {
+                    analyze(e.first, env, list)
+                    analyze(e.second, env, list)
+                }
                 is Expr.Natural -> Type.Int
                 is Expr.Ref -> {
                     retrieve(e.id, env, list)
