@@ -8,7 +8,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         }
     }
 
-    object Unit : Expr(Type.Unit) {
+    object Unit : Expr(Type.Op("Unit", emptyList())) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
@@ -26,7 +26,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
     }
 
-    class Natural(val value: Long) : Expr(Type.Int) {
+    class Natural(val value: Long) : Expr(Type.Op("Int", emptyList())) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -110,7 +110,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             "{(${params.toString(", ")}): $body}:$t"
     }
 
-    class CFun(val id: String, val sig: Type.Fun, t: Type) : Expr(t) {
+    class CFun(val id: String, val sig: Type, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)

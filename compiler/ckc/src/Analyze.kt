@@ -36,10 +36,10 @@ class Analyze {
                     } else {
                         pType
                     }
-                is Type.Fun -> {
-                    Type.Fun(
-                        pType.paramTypes.map { p -> fresh(p, list, env) },
-                        fresh(pType.returnType, list, env)
+                is Type.Op -> {
+                    Type.Op(
+                        pType.operator,
+                        pType.params.map { p -> fresh(p, list, env) }
                     )
                 }
                 else -> pType
@@ -90,10 +90,7 @@ class Analyze {
             return when (ptExp) {
                 is Type.Error -> false
                 is Type.Var -> ptExp == tVar
-                Type.Int -> ptExp == tVar
-                Type.Unit -> ptExp == tVar
-                is Type.Fun -> ptExp.paramTypes.any { pt -> occursInType(tVar, pt) }
-                    || occursInType(tVar, ptExp.returnType)
+                is Type.Op -> ptExp.params.any { pt -> occursInType(tVar, pt) }
             }
         }
 
@@ -109,28 +106,15 @@ class Analyze {
                     else
                         //pt1 is var and does not occur in pt2, extend env with pt1.id = pt2
                         pt1.instance = pt2
-                Type.Int ->
+                is Type.Op ->
                     when (pt2) {
                         is Type.Var -> unifyType(pt2, pt1)
-                        is Type.Int -> {}
-                        else -> {}
-                    }
-                Type.Unit ->
-                    when (pt2) {
-                        is Type.Var -> unifyType(pt2, pt1)
-                        is Type.Unit -> {}
-                        else -> throw RuntimeException("type mismatch between $pt1 and $pt2")
-                    }
-                is Type.Fun ->
-                    when (pt2) {
-                        is Type.Var -> unifyType(pt2, pt1)
-                        is Type.Fun -> {
-                            if (pt1.paramTypes.size != pt2.paramTypes.size)
+                        is Type.Op -> {
+                            if (pt1.params.size != pt2.params.size)
                                 throw RuntimeException("type mismatch between $pt1 and $pt2")
                             else {
-                                pt1.paramTypes.zip(pt2.paramTypes)
+                                pt1.params.zip(pt2.params)
                                     .forEach { pair -> unifyType(pair.first, pair.second) }
-                                unifyType(pt1.returnType, pt2.returnType)
                             }
                         }
                         else -> throw RuntimeException("type mismatch between $pt1 and $pt2")
@@ -151,8 +135,8 @@ class Analyze {
         fun analyze(e: Expr, env: Env?, list: NonGenericTypes?): Type =
             when (e) {
                 is Expr.Error -> e.t
-                Expr.Unit -> Type.Unit
-                is Expr.Natural -> Type.Int
+                Expr.Unit -> e.t
+                is Expr.Natural -> e.t
                 is Expr.Sequence -> {
                     analyze(e.first, env, list)
                     e.t = analyze(e.second, env, list)
@@ -166,7 +150,7 @@ class Analyze {
                     val fnType: Type = analyze(e.fn, env, list)
                     val argTypes: List<Type> = e.args.map { a -> analyze(a, env, list) }
                     val retType: Type = Type.newVar()
-                    unifyType(fnType, Type.Fun(argTypes, retType))
+                    unifyType(fnType, Type.Op("Fun", argTypes + retType))
                     e.t = retType
                     e.t
                 }
@@ -185,7 +169,7 @@ class Analyze {
                     //analyze body
                     val bodyType: Type = analyze(e.body, bodyEnv, bodyList)
                     //return fun type
-                    e.t = Type.Fun(paramTypes, bodyType)
+                    e.t = Type.Op("Fun", paramTypes + bodyType)
                     e.t
                 }
                 is Expr.CFun -> TODO()

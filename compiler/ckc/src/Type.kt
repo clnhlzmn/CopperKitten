@@ -29,19 +29,19 @@ sealed class Type {
             Var(newId())
     }
 
-    object Int: Type() {
-        override fun isRefType(): Boolean = false
-        override fun toString(): String = "Int"
-    }
+    data class Op(val operator: String, val params: List<Type>): Type() {
 
-    object Unit: Type() {
-        override fun isRefType(): Boolean = false
-        override fun toString(): String = "Unit"
-    }
+        override fun isRefType(): Boolean =
+            when (operator) {
+                "Int" -> false
+                "Unit" -> false
+                else -> true
+            }
 
-    data class Fun(val paramTypes: List<Type>, val returnType: Type): Type() {
-        override fun isRefType(): Boolean = true
         override fun toString(): String =
-            "(${paramTypes.toString(", ")}): $returnType"
+            if (operator == "Fun")
+                "(${params.take(params.size - 1).toString(", ")}): ${params.last()}"
+            else
+                "$operator ${params.toString(", ")}"
     }
 }

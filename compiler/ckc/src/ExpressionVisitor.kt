@@ -130,7 +130,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     override fun visitCFunExpr(ctx: ckParser.CFunExprContext?): Expr =
         Expr.CFun(
             ctx!!.ID().text,
-            ctx.funType().accept(TypeVisitor()) as Type.Fun,
+            ctx.funType().accept(TypeVisitor()),
             t = Type.newVar()
         )
 
@@ -221,19 +221,17 @@ class TypeVisitor : ckBaseVisitor<Type>() {
 
     override fun visitSimpleType(ctx: ckParser.SimpleTypeContext?): Type =
         when (ctx!!.TYPEID().text) {
-            "Int" -> Type.Int
-            "Unit" -> Type.Unit
+            "Int" -> Type.Op("Int", emptyList())
+            "Unit" -> Type.Op("Unit", emptyList())
             else -> Type.Error("unknown type ${ctx.TYPEID().text}") //SimpleType(ctx.TYPEID().text)
         }
 
-    override fun visitFunType(ctx: ckParser.FunTypeContext?): Type.Fun =
-        Type.Fun(
-            paramTypes =
-            if (ctx!!.types() != null)
-                TypesVisitor().visit(ctx.types())
-            else
-                ArrayList(),
-            returnType = TypeVisitor().visit(ctx.type())
+    override fun visitFunType(ctx: ckParser.FunTypeContext?): Type =
+        Type.Op(
+            "Fun",
+            if (ctx!!.types() != null) TypesVisitor().visit(ctx.types())
+            else emptyList<Type>()
+            + TypeVisitor().visit(ctx.type())
         )
 }
 
