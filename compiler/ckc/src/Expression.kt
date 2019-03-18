@@ -1,6 +1,6 @@
 //Expressions
 
-sealed class Expr(val t: Type) : BaseASTNode() {
+sealed class Expr(var t: Type) : BaseASTNode() {
 
     class Error(val what: String): Expr(Type.Error(what)) {
         override fun toString(): String {

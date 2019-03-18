@@ -13,7 +13,9 @@ sealed class Type {
         override fun isRefType(): Boolean {
             TODO("not implemented")
         }
-        override fun toString(): String = id
+        override fun toString(): String =
+            if (instance != null) "$instance"
+            else id
     }
 
     companion object {

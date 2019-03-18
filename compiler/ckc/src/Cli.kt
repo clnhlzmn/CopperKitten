@@ -44,6 +44,7 @@ class Cli(val args: Array<String>) {
 //                    val typedExpr = Infer.infer(res.expr)
                     val exprType = Analyze.analyze(res.expr, null, null)
                     println(Analyze.prune(exprType))
+                    println(res.expr)
 //                    typedExpr.accept(ScopeBuildingVisitor())
                     //infer program types
 //                    val program = CkFile(res.defs, typedExpr)
