@@ -11,20 +11,12 @@ class Analyze {
 
     companion object {
 
-        /**returns a new environment extended with [type] bound to [id]*/
-        fun extend(id: String, type: Type, env: Env?): Env =
-            Env(id, type, env)
-
-        /**returns a new [CopyEnv] extended with [old] and [new]*/
-        fun extendCopyEnv(old: Type, new: Type, env: CopyEnv?): CopyEnv =
-            CopyEnv(old, new, env)
-
         /**creates a new [Type.Var], TODO: how does this use [scan] and [env]*/
         fun freshVar(type: Type, scan: CopyEnv?, env: Array<CopyEnv?>): Type {
             if (scan == null) {
                 /**if [scan] is empty then create a new var and extend original [env]*/
                 val newTypeVar = Type.newVar()
-                env[0] = extendCopyEnv(type, newTypeVar, env[0])
+                env[0] = CopyEnv(type, newTypeVar, env[0])
                 return newTypeVar
             } else if (type == scan.old) {
                 /**return what is found in [scan] and don't change [env]*/
@@ -187,7 +179,7 @@ class Analyze {
                     val paramTypes: List<Type> = e.params.map { Type.newVar() }
                     //extend env with mapping from param names to types
                     val bodyEnv: Env? =
-                        e.params.zip(paramTypes).foldRight(env){ pair, acc -> extend(pair.first.id, pair.second, acc) }
+                        e.params.zip(paramTypes).foldRight(env){ pair, acc -> Env(pair.first.id, pair.second, acc) }
                     //add param types to non generics
                     val bodyList: NonGenericTypes? = paramTypes.foldRight(list) { type, acc -> NonGenericTypes(type, acc) }
                     //analyze body
@@ -199,7 +191,7 @@ class Analyze {
                 is Expr.CFun -> TODO()
                 is Expr.Let -> {
                     //extend body with binding, value is evaluated in current env
-                    val bodyEnv = extend(e.id, analyze(e.value, env, list), env)
+                    val bodyEnv = Env(e.id, analyze(e.value, env, list), env)
                     //then analyze body with new env
                     e.t = analyze(e.body, bodyEnv, list)
                     e.t
