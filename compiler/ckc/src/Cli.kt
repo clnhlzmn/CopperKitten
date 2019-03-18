@@ -45,28 +45,26 @@ class Cli(val args: Array<String>) {
                     val exprType = Analyze.analyze(res.expr, null, null)
                     println(Analyze.prune(exprType))
                     println(res.expr)
-//                    typedExpr.accept(ScopeBuildingVisitor())
-                    //infer program types
-//                    val program = CkFile(res.defs, typedExpr)
+                    res.expr.accept(ScopeBuildingVisitor())
 
-                    //check if error type
-//                    if (program.expr.t !is Type.Error) {
-//                        //compute function captures
-//                        program.expr.accept(ComputeCapturesVisitor())
-//                        //compile file
-//                        val code: List<String> = compileCkFile(program)
-//                        //determine output location
-//                        if (outputFileName != null) {
-//                            File(outputFileName).printWriter().use { out ->
-//                                out.print(code.toString("\n"))
-//                            }
-//                        } else {
-//                            println(code.toString("\n"))
-//                        }
-//                    } else {
-//                        //print error
-//                        println(program.expr.t)
-//                    }
+//                    check if error type
+                    if (res.expr.t !is Type.Error) {
+                        //compute function captures
+                        res.expr.accept(ComputeCapturesVisitor())
+                        //compile file
+                        val code: List<String> = compileCkFile(res)
+                        //determine output location
+                        if (outputFileName != null) {
+                            File(outputFileName).printWriter().use { out ->
+                                out.print(code.toString("\n"))
+                            }
+                        } else {
+                            println(code.toString("\n"))
+                        }
+                    } else {
+                        //print error
+                        println(res.expr.t)
+                    }
                 } else {
                     //parse error
                     println(parseError.toString("\n"))

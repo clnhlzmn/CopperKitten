@@ -22,7 +22,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$first; $second}:$t"
+            "{$first; $second}"
 
     }
 
@@ -43,7 +43,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "$id:$t"
+            id
     }
 
     class Apply(val fn: Expr, val args: List<Expr>, t: Type) : Expr(t) {
@@ -52,7 +52,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$fn}(${args.toString(", ")}):$t"
+            "{$fn}(${args.toString(", ")})"
     }
 
     class Unary(val operator: String, val operand: Expr, t: Type) : Expr(t) {
@@ -61,7 +61,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$operator $operand}:$t"
+            "{$operator $operand}"
     }
 
     class Binary(val lhs: Expr, val operator: String, val rhs: Expr, t: Type) : Expr(t) {
@@ -70,7 +70,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$lhs $operator $rhs}:$t"
+            "{$lhs $operator $rhs}"
     }
 
     class Cond(val cond: Expr, val csq: Expr, val alt: Expr, t: Type) : Expr(t) {
@@ -79,7 +79,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$cond ? $csq : $alt}:$t"
+            "{$cond ? $csq : $alt}"
     }
 
     class Assign(val target: Expr, val value: Expr, t: Type) : Expr(t) {
@@ -88,14 +88,14 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$target = $value}:$t"
+            "{$target = $value}"
     }
 
     class Fun(val params: List<Param>, val declType: Type?, val body: Expr, t: Type) : Expr(t) {
 
         class Param(val id: String, val declType: Type?, val t: Type) {
             override fun toString(): String =
-                "$id:$t"
+                id
         }
 
         //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
@@ -107,7 +107,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{(${params.toString(", ")}): $body}:$t"
+            "{(${params.toString(", ")}): $body}"
     }
 
     class CFun(val id: String, val sig: Type, t: Type) : Expr(t) {
@@ -127,7 +127,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{let $id:${value.t} = $value; $body}:$t"
+            "{let $id = $value; $body}"
 
     }
 
