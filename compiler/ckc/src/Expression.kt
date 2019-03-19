@@ -83,7 +83,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         }
     }
 
-    class Ref(val id: String, t: Type) : Expr(t) {
+    class Ref(var id: String, t: Type) : Expr(t) {
 
         var enclosingScope: ASTNode? = null
 
@@ -275,6 +275,9 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
         val captures = ArrayList<Expr.Ref>()
+
+        //a list of instances that this function will be compiled to
+        val instances = ArrayList<Type>()
 
         var enclosingScope: ASTNode? = null
 

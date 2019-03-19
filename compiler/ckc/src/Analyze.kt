@@ -88,9 +88,9 @@ sealed class Analyze {
         fun occursInType(tVar: Type, tExp: Type): Boolean {
             val ptExp = prune(tExp)
             return when (ptExp) {
-                is Type.Error -> false
                 is Type.Var -> ptExp == tVar
                 is Type.Op -> ptExp.params.any { pt -> occursInType(tVar, pt) }
+                else -> false
             }
         }
 

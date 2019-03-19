@@ -2,14 +2,17 @@
 
 sealed class Type {
     abstract fun isRefType(): Boolean
+    abstract fun isPolyType(): Boolean
 
     data class Error(val what: String): Type() {
+        override fun isPolyType(): Boolean = false
         override fun isRefType(): Boolean = false
         override fun toString(): String = "Error: $what"
     }
 
     data class Var(val id: String): Type() {
         var instance: Type? = null
+        override fun isPolyType(): Boolean = instance == null
         override fun isRefType(): Boolean {
             TODO("not implemented")
         }
@@ -30,6 +33,8 @@ sealed class Type {
     }
 
     data class Op(val operator: String, val params: List<Type>): Type() {
+
+        override fun isPolyType(): Boolean = params.any { p -> p.isPolyType() }
 
         constructor(operator: String): this(operator, emptyList())
 
