@@ -1,45 +1,43 @@
+import org.antlr.v4.runtime.BailErrorStrategy
+import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CodePointCharStream
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.misc.ParseCancellationException
+import org.funktionale.either.Either
 
 object Parse {
 
     data class Error(val what: String)
 
-    fun getParser(stream: CodePointCharStream): ckParser {
+    fun getParser(stream: CharStream): ckParser {
         val lexer = ckLexer(stream)
         val tokens = CommonTokenStream(lexer)
         val ckParser = ckParser(tokens)
+        ckParser.removeErrorListeners()
+        ckParser.addErrorListener(ThrowingErrorListener.INSTANCE)
         return ckParser
     }
 
-    fun addErrorListener(parser: ckParser, errors: MutableList<String>) {
-        parser.removeErrorListeners()
-        parser.addErrorListener(DescriptiveErrorListener(errors))
-    }
-
-    fun expr(stream: CodePointCharStream): Result<Error, Expr> {
+    fun expr(stream: CodePointCharStream): Either<Error, Expr> {
         val parser = getParser(stream)
-        val errors = ArrayList<String>()
-        addErrorListener(parser, errors)
-        val context = parser.expr()
-        return if (errors.isNotEmpty())
-            Result.Error(Error(errors.toString(", ")))
-        else
-            Result.Value(context.accept(ExprVisitor()))
+        return try {
+            val context = parser.expr()
+            Either.right(context.accept(ExprVisitor()))
+        } catch (e: ParseCancellationException) {
+            Either.left(Error(e.localizedMessage))
+        }
     }
 
-    fun file(stream: CodePointCharStream): Result<Error, Expr> {
-        val lexer = ckLexer(stream)
-        val tokens = CommonTokenStream(lexer)
-        val ckParser = ckParser(tokens)
-        val parseError:MutableList<String> = ArrayList()
-        ckParser.removeErrorListeners()
-        ckParser.addErrorListener(DescriptiveErrorListener(parseError))
-        val context = ckParser.expr()
-        return if (parseError.isNotEmpty())
-            Result.Error(Error(parseError.toString(", ")))
-        else
-            Result.Value(context.accept(ExprVisitor()))
+    fun file(stream: CodePointCharStream): Either<Error, CkFile> {
+        val parser = getParser(stream)
+        return try {
+            val context = parser.file()
+            Either.right(context.accept(FileVisitor()))
+        } catch (e: ParseCancellationException) {
+            Either.left(Error(e.localizedMessage))
+        }
     }
+
+
 
 }

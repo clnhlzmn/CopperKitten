@@ -6,6 +6,21 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         override fun toString(): String {
             return "Error: $what"
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Error
+
+            if (what != other.what) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return what.hashCode()
+        }
     }
 
     object Unit : Expr(Type.Op("Unit", emptyList())) {
@@ -24,6 +39,24 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         override fun toString(): String =
             "{$first; $second}"
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Sequence
+
+            if (first != other.first) return false
+            if (second != other.second) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = first.hashCode()
+            result = 31 * result + second.hashCode()
+            return result
+        }
+
     }
 
     class Natural(val value: Long) : Expr(Type.Op("Int", emptyList())) {
@@ -33,6 +66,21 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             value.toString()
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Natural
+
+            if (value != other.value) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return value.hashCode()
+        }
     }
 
     class Ref(val id: String, t: Type) : Expr(t) {
@@ -44,6 +92,21 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             id
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Ref
+
+            if (id != other.id) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return id.hashCode()
+        }
     }
 
     class Apply(val fn: Expr, val args: List<Expr>, t: Type) : Expr(t) {
@@ -53,6 +116,24 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             "{$fn}(${args.toString(", ")})"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Apply
+
+            if (fn != other.fn) return false
+            if (args != other.args) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = fn.hashCode()
+            result = 31 * result + args.hashCode()
+            return result
+        }
     }
 
     class Unary(val operator: String, val operand: Expr, t: Type) : Expr(t) {
@@ -62,6 +143,24 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             "{$operator $operand}"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Unary
+
+            if (operator != other.operator) return false
+            if (operand != other.operand) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = operator.hashCode()
+            result = 31 * result + operand.hashCode()
+            return result
+        }
     }
 
     class Binary(val lhs: Expr, val operator: String, val rhs: Expr, t: Type) : Expr(t) {
@@ -71,6 +170,26 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             "{$lhs $operator $rhs}"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Binary
+
+            if (lhs != other.lhs) return false
+            if (operator != other.operator) return false
+            if (rhs != other.rhs) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = lhs.hashCode()
+            result = 31 * result + operator.hashCode()
+            result = 31 * result + rhs.hashCode()
+            return result
+        }
     }
 
     class Cond(val cond: Expr, val csq: Expr, val alt: Expr, t: Type) : Expr(t) {
@@ -80,6 +199,26 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             "{$cond ? $csq : $alt}"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Cond
+
+            if (cond != other.cond) return false
+            if (csq != other.csq) return false
+            if (alt != other.alt) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = cond.hashCode()
+            result = 31 * result + csq.hashCode()
+            result = 31 * result + alt.hashCode()
+            return result
+        }
     }
 
     class Assign(val target: Expr, val value: Expr, t: Type) : Expr(t) {
@@ -89,6 +228,24 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             "{$target = $value}"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Assign
+
+            if (target != other.target) return false
+            if (value != other.value) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = target.hashCode()
+            result = 31 * result + value.hashCode()
+            return result
+        }
     }
 
     class Fun(val params: List<Param>, val declType: Type?, val body: Expr, t: Type) : Expr(t) {
@@ -108,6 +265,26 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             "{(${params.toString(", ")}): $body}"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Fun
+
+            if (params != other.params) return false
+            if (declType != other.declType) return false
+            if (body != other.body) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = params.hashCode()
+            result = 31 * result + (declType?.hashCode() ?: 0)
+            result = 31 * result + body.hashCode()
+            return result
+        }
     }
 
     class CFun(val id: String, val sig: Type, t: Type) : Expr(t) {
@@ -117,6 +294,24 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             "cfun $id $sig"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as CFun
+
+            if (id != other.id) return false
+            if (sig != other.sig) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = id.hashCode()
+            result = 31 * result + sig.hashCode()
+            return result
+        }
     }
 
     class Let(val id: String, val value: Expr, val body: Expr, t: Type) : Expr(t) {
@@ -128,6 +323,26 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             "{let $id = $value; $body}"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Let
+
+            if (id != other.id) return false
+            if (value != other.value) return false
+            if (body != other.body) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = id.hashCode()
+            result = 31 * result + value.hashCode()
+            result = 31 * result + body.hashCode()
+            return result
+        }
 
     }
 
@@ -141,6 +356,26 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             else
                 "if ($cond) $csq else $alt"
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as If
+
+            if (cond != other.cond) return false
+            if (csq != other.csq) return false
+            if (alt != other.alt) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = cond.hashCode()
+            result = 31 * result + csq.hashCode()
+            result = 31 * result + (alt?.hashCode() ?: 0)
+            return result
+        }
+
     }
 
     class While(val cond: Expr, val body: Expr, t: Type) : Expr(t) {
@@ -150,6 +385,24 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun toString(): String =
             "while ($cond) $body"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as While
+
+            if (cond != other.cond) return false
+            if (body != other.body) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = cond.hashCode()
+            result = 31 * result + body.hashCode()
+            return result
+        }
 
     }
 
@@ -163,6 +416,21 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                 "break $value"
             else
                 "break"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Break
+
+            if (value != other.value) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return value?.hashCode() ?: 0
+        }
 
     }
 }
