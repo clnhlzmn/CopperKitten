@@ -5,9 +5,19 @@ import org.junit.jupiter.api.Test
 internal class AnalyzeTest {
     @Test
     fun test() {
-        var input = "{let a = 42; a}"
+        var input = "()"
         var expr = Parse.expr(CharStreams.fromString(input)).right().get()
         Analyze.analyze(expr, null, null)
-        assertEquals(expr.t, Type.Op("Int"))
+        assertEquals(Analyze.prune(expr.t), Type.Op("Unit"))
+
+        input = "{let a = 42; a}"
+        expr = Parse.expr(CharStreams.fromString(input)).right().get()
+        Analyze.analyze(expr, null, null)
+        assertEquals(Analyze.prune(expr.t), Type.Op("Int"))
+
+        input = "{let id = (a): a; id(42)}"
+        expr = Parse.expr(CharStreams.fromString(input)).right().get()
+        Analyze.analyze(expr, null, null)
+        assertEquals(Analyze.prune(expr.t), Type.Op("Int"))
     }
 }
