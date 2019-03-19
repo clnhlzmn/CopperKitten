@@ -253,6 +253,24 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         class Param(val id: String, val declType: Type?, val t: Type) {
             override fun toString(): String =
                 id
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Param
+
+                if (id != other.id) return false
+                if (declType != other.declType) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                var result = id.hashCode()
+                result = 31 * result + (declType?.hashCode() ?: 0)
+                return result
+            }
         }
 
         //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
