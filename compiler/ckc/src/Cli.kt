@@ -30,6 +30,7 @@ class Cli(val args: Array<String>) {
                 val outputFileName = cmd.getOptionValue("o")
 
                 val stream = CharStreams.fromFileName(inputFileName)
+
                 val lexer = ckLexer(stream)
                 val tokens = CommonTokenStream(lexer)
                 val ckParser = ckParser(tokens)
