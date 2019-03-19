@@ -31,6 +31,8 @@ sealed class Type {
 
     data class Op(val operator: String, val params: List<Type>): Type() {
 
+        constructor(operator: String): this(operator, emptyList())
+
         override fun isRefType(): Boolean =
             when (operator) {
                 "Int" -> false
