@@ -5,39 +5,41 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.funktionale.either.Either
 
-object Parse {
+sealed class Parse {
 
     data class Error(val what: String)
 
-    fun getParser(stream: CharStream): ckParser {
-        val lexer = ckLexer(stream)
-        val tokens = CommonTokenStream(lexer)
-        val ckParser = ckParser(tokens)
-        ckParser.removeErrorListeners()
-        ckParser.addErrorListener(ThrowingErrorListener.INSTANCE)
-        return ckParser
-    }
+    companion object {
 
-    fun expr(stream: CodePointCharStream): Either<Error, Expr> {
-        val parser = getParser(stream)
-        return try {
-            val context = parser.expr()
-            Either.right(context.accept(ExprVisitor()))
-        } catch (e: ParseCancellationException) {
-            Either.left(Error(e.localizedMessage))
+        fun getParser(stream: CharStream): ckParser {
+            val lexer = ckLexer(stream)
+            val tokens = CommonTokenStream(lexer)
+            val ckParser = ckParser(tokens)
+            ckParser.removeErrorListeners()
+            ckParser.addErrorListener(ThrowingErrorListener.INSTANCE)
+            return ckParser
         }
-    }
 
-    fun file(stream: CodePointCharStream): Either<Error, CkFile> {
-        val parser = getParser(stream)
-        return try {
-            val context = parser.file()
-            Either.right(context.accept(FileVisitor()))
-        } catch (e: ParseCancellationException) {
-            Either.left(Error(e.localizedMessage))
+        fun expr(stream: CodePointCharStream): Either<Error, Expr> {
+            val parser = getParser(stream)
+            return try {
+                val context = parser.expr()
+                Either.right(context.accept(ExprVisitor()))
+            } catch (e: ParseCancellationException) {
+                Either.left(Error(e.localizedMessage))
+            }
         }
+
+        fun file(stream: CodePointCharStream): Either<Error, CkFile> {
+            val parser = getParser(stream)
+            return try {
+                val context = parser.file()
+                Either.right(context.accept(FileVisitor()))
+            } catch (e: ParseCancellationException) {
+                Either.left(Error(e.localizedMessage))
+            }
+        }
+
     }
-
-
 
 }
