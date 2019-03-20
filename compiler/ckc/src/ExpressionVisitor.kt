@@ -1,43 +1,51 @@
-class ExprVisitor : ckBaseVisitor<Expr>() {
+import arrow.core.Either
 
-    override fun visitNaturalExpr(ctx: ckParser.NaturalExprContext?): Expr =
-        Expr.Natural(ctx!!.text.toLong())
+class ExprVisitor : ckBaseVisitor<Either<Error, Expr>>() {
 
-    override fun visitSequenceExpr(ctx: ckParser.SequenceExprContext?): Expr =
-        SequenceVisitor().visit(ctx!!.sequence())
+    override fun visitNaturalExpr(ctx: ckParser.NaturalExprContext?): Either<Error, Expr> =
+        Either.right(Expr.Natural(ctx!!.text.toLong()))
+
+    override fun visitSequenceExpr(ctx: ckParser.SequenceExprContext?): Either<Error, Expr> =
+        Either.right(SequenceVisitor().visit(ctx!!.sequence()))
 
     //if visiting a let expr by itself then it has no "body" just return value
-    override fun visitLetExpr(ctx: ckParser.LetExprContext?): Expr =
-        ctx!!.value.accept(ExprVisitor())
+    override fun visitLetExpr(ctx: ckParser.LetExprContext?): Either<Error, Expr> =
+        ctx!!.value.accept(this)
 
-    override fun visitUnitExpr(ctx: ckParser.UnitExprContext?): Expr =
-        Expr.Unit
+    override fun visitUnitExpr(ctx: ckParser.UnitExprContext?): Either<Error, Expr> =
+        Either.right(Expr.Unit)
 
-    override fun visitRefExpr(ctx: ckParser.RefExprContext?): Expr =
-        Expr.Ref(ctx!!.text, Type.newVar())
+    override fun visitRefExpr(ctx: ckParser.RefExprContext?): Either<Error, Expr> =
+        Either.right(Expr.Ref(ctx!!.text, Type.newVar()))
 
-    override fun visitApplyExpr(ctx: ckParser.ApplyExprContext?): Expr =
-        Expr.Apply(
-            fn = ExprVisitor().visit(ctx!!.expr()),
-            args =
-                if (ctx.args() != null) ArgsVisitor().visit(ctx.args())
-                else ArrayList(),
-            t = Type.newVar()
-        )
+    override fun visitApplyExpr(ctx: ckParser.ApplyExprContext?): Either<Error, Expr> {
+        val fn = ctx!!.expr().accept(this)
+        val args =
+            if (ctx.args() != null) ArgsVisitor().visit(ctx.args())
+            else ArrayList()
+        return fn.map {
+            Expr.Apply(it, args, Type.newVar())
+        }
+    }
 
-    override fun visitUnaryExpr(ctx: ckParser.UnaryExprContext?): Expr =
-        Expr.Unary(
-            operator = ctx!!.op.text,
-            operand = ExprVisitor().visit(ctx.expr()),
-            t = Type.newVar()
-        )
+    override fun visitUnaryExpr(ctx: ckParser.UnaryExprContext?): Either<Error, Expr> {
+        val operator = ctx!!.expr().accept(this)
+        return operator.map { op ->
+            Expr.Unary(ctx.op.text, op, Type.newVar())
+        }
+    }
 
-    override fun visitMultExpr(ctx: ckParser.MultExprContext?): Expr =
-        Expr.Binary(
-            lhs = ExprVisitor().visit(ctx!!.lhs),
-            operator = ctx.op.text,
-            rhs = ExprVisitor().visit(ctx.rhs),
-            t = Type.newVar()
+    override fun visitMultExpr(ctx: ckParser.MultExprContext?): Either<Error, Expr> =
+        ctx!!.lhs.accept(this).fold(
+            { err -> Either.left(err) },
+            { lhs ->
+                ctx.rhs.accept(this).fold (
+                    { err -> Either.left(err) },
+                    { rhs ->
+                        Either.right(Expr.Binary(lhs, ctx.op.text, rhs, Type.newVar()))
+                    }
+                )
+            }
         )
 
     override fun visitAddExpr(ctx: ckParser.AddExprContext?): Expr =
