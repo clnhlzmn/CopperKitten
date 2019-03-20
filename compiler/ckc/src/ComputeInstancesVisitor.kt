@@ -4,7 +4,18 @@ class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
 
     companion object {
 
-
+        //add an actual type to a polymorphic definition
+        fun addInstance(e: Expr, t: Type) {
+            if (e is Expr.Ref) {
+                val def = e.accept(GetDefinitionVisitor())
+                if (def is Definition.Let) {
+                    //TODO: simplify t and make instances a set
+                    def.node.instances.add(t)
+                    e.id = "${e.id}<${def.node.instances.size - 1}>"
+                    addInstance(def.node.value, t)
+                }
+            }
+        }
 
     }
 
@@ -30,10 +41,11 @@ class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
     }
 
     override fun visit(e: Expr.Apply) {
-        //
-        //e.fn must be Expr.Ref or Expr.Fun
-        //if Expr.Fun then we don't care, it's not polymorphic
-        //if Expr.Ref then
+        //if e.fn.t is ref then look at its def
+        //if def.value.t is poly then add actual type of
+        //e.fn.t to def.instances and adjust e.fn.id accordingly
+        //then recurse on def.value (to look at its def if its ref and so on)
+        addInstance(e.fn, e.fn.t)
         e.fn.accept(this)
         e.args.forEach { a -> a.accept(this) }
     }
