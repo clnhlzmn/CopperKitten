@@ -1,3 +1,5 @@
+import java.lang.Error
+
 //Types
 
 sealed class Type {
@@ -15,50 +17,58 @@ sealed class Type {
         fun newVar(): Var =
             Var(newId())
 
-        fun distinctVars(t: Type): Set<Type> {
-            return if (!t.isPolyType())
-                emptySet()
-            else {
-                val distinct = HashSet<Type>()
-                when (t) {
-                    is Var -> distinct.add(t)
-                    is Op -> t.params.forEach { p -> distinct.addAll(distinctVars(p)) }
-                }
-                distinct
+        //take a type and return a simple version of it
+        //where types are either Unit or Ref
+        fun simplify(t: Type): Type {
+            return when {
+                t is Op && (t.operator == "Int" || t.operator == "Unit") -> Op("Unit")
+                t is Op -> Op("Ref", t.params.map { p -> simplify(p) })
+                else -> Error("bad argument to simplify")
             }
-        }
-
-        fun instances(t: Type): List<Type> {
-            val distinct = distinctVars(t)
-            //create 2^(distinct.size) instances
-
-            return emptyList()
         }
 
     }
 
     data class Error(val what: String): Type() {
-        override fun isPolyType(): Boolean = false
-        override fun isRefType(): Boolean = false
-        override fun toString(): String = "Error: $what"
-    }
 
-    data class Var(val id: String): Type() {
-        var instance: Type? = null
-        override fun isPolyType(): Boolean = instance == null
+        override fun isPolyType(): Boolean {
+            TODO("not implemented")
+        }
+
         override fun isRefType(): Boolean {
             TODO("not implemented")
         }
+
+        override fun toString(): String = "Error: $what"
+
+    }
+
+    data class Var(val id: String): Type() {
+        //TODO: eliminate instance and store type var assignments in env
+
+        var instance: Type? = null
+
+        override fun isPolyType(): Boolean =
+            if (instance == null)
+                true
+            else
+                instance!!.isPolyType()
+
+        override fun isRefType(): Boolean {
+            TODO("not implemented")
+        }
+
         override fun toString(): String =
             if (instance != null) "$instance"
             else id
+
     }
 
     data class Op(val operator: String, val params: List<Type>): Type() {
 
-        override fun isPolyType(): Boolean = params.any { p -> p.isPolyType() }
-
         constructor(operator: String): this(operator, emptyList())
+
+        override fun isPolyType(): Boolean = params.any { p -> p.isPolyType() }
 
         override fun isRefType(): Boolean =
             when (operator) {

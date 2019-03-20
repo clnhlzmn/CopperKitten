@@ -337,7 +337,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         var enclosingScope: ASTNode? = null
 
         //a list of instances that this id will be compiled to, in the case that value is a polymorphic function
-        val instances = ArrayList<Type>()
+        val instances = HashSet<Type>()
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)

@@ -9,10 +9,14 @@ class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
             if (e is Expr.Ref) {
                 val def = e.accept(GetDefinitionVisitor())
                 if (def is Definition.Let) {
-                    //TODO: simplify t and make instances a set
-                    def.node.instances.add(t)
-                    e.id = "${e.id}<${def.node.instances.size - 1}>"
-                    addInstance(def.node.value, t)
+                    if (!t.isPolyType()) {
+                        //if t is not a polytype then add as instance
+                        def.node.instances.add(t)
+                        //adjust e.id
+                        e.id = "${e.id}<${def.node.instances.size - 1}>"
+                        //recurse on def value
+                        addInstance(def.node.value, t)
+                    }
                 }
             }
         }
@@ -45,7 +49,7 @@ class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
         //if def.value.t is poly then add actual type of
         //e.fn.t to def.instances and adjust e.fn.id accordingly
         //then recurse on def.value (to look at its def if its ref and so on)
-        addInstance(e.fn, e.fn.t)
+        addInstance(e.fn, Analyze.prune(e.fn.t))
         e.fn.accept(this)
         e.args.forEach { a -> a.accept(this) }
     }
