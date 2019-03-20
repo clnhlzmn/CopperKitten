@@ -1,8 +1,41 @@
 //Types
 
 sealed class Type {
+
     abstract fun isRefType(): Boolean
     abstract fun isPolyType(): Boolean
+
+    companion object {
+
+        var i = 0
+
+        fun newId(): String =
+            "${i++}"
+
+        fun newVar(): Var =
+            Var(newId())
+
+        fun distinctVars(t: Type): Set<Type> {
+            return if (!t.isPolyType())
+                emptySet()
+            else {
+                val distinct = HashSet<Type>()
+                when (t) {
+                    is Var -> distinct.add(t)
+                    is Op -> t.params.forEach { p -> distinct.addAll(distinctVars(p)) }
+                }
+                distinct
+            }
+        }
+
+        fun instances(t: Type): List<Type> {
+            val distinct = distinctVars(t)
+            //create 2^(distinct.size) instances
+
+            return emptyList()
+        }
+
+    }
 
     data class Error(val what: String): Type() {
         override fun isPolyType(): Boolean = false
@@ -19,17 +52,6 @@ sealed class Type {
         override fun toString(): String =
             if (instance != null) "$instance"
             else id
-    }
-
-    companion object {
-
-        var i = 0
-
-        fun newId(): String =
-            "${i++}"
-
-        fun newVar(): Var =
-            Var(newId())
     }
 
     data class Op(val operator: String, val params: List<Type>): Type() {
@@ -51,4 +73,5 @@ sealed class Type {
             else
                 "$operator ${params.toString(", ")}"
     }
+
 }

@@ -4,30 +4,7 @@ class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
 
     companion object {
 
-        fun setInstance(fn: Expr, inst: Type): Int {
-            val ret: Int
-            if (fn is Expr.Ref) {
-                val def = fn.accept(GetDefinitionVisitor())
-                ret = if (def is Definition.Let) {
-                    when (def.node.value) {
-                        is Expr.Fun -> {
-                            //TODO: don't add duplicate instances (based on Type.isRef)
-                            def.node.value.instances.add(inst)
-                            def.node.value.instances.size - 1
-                        }
-                        else -> setInstance(def.node.value, inst)
-                    }
-                } else {
-                    -1
-                }
-                //adjust ref expr id based on instance
-                fn.id = fn.id + ret
-            } else {
-                //fn is function expr and not polymorphic
-                ret = -1
-            }
-            return ret
-        }
+
 
     }
 
@@ -53,8 +30,12 @@ class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
     }
 
     override fun visit(e: Expr.Apply) {
-        val fn = e.fn
-        setInstance(e.fn, e.fn.t)
+        //
+        //e.fn must be Expr.Ref or Expr.Fun
+        //if Expr.Fun then we don't care, it's not polymorphic
+        //if Expr.Ref then
+        e.fn.accept(this)
+        e.args.forEach { a -> a.accept(this) }
     }
 
     override fun visit(e: Expr.Unary) {
@@ -86,7 +67,6 @@ class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
     }
 
     override fun visit(e: Expr.Let) {
-        //TODO: this
         e.value.accept(this)
         e.body.accept(this)
     }

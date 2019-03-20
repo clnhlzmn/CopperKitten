@@ -276,9 +276,6 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
         val captures = ArrayList<Expr.Ref>()
 
-        //a list of instances that this function will be compiled to
-        val instances = ArrayList<Type>()
-
         var enclosingScope: ASTNode? = null
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
@@ -338,6 +335,9 @@ sealed class Expr(var t: Type) : BaseASTNode() {
     class Let(val id: String, val value: Expr, val body: Expr, t: Type) : Expr(t) {
 
         var enclosingScope: ASTNode? = null
+
+        //a list of instances that this id will be compiled to, in the case that value is a polymorphic function
+        val instances = ArrayList<Type>()
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
