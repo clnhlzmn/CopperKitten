@@ -504,14 +504,19 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                     if (instance == null) {
                         Let(e.id, expand(e.value), expand(e.body), e.t)
                     } else {
-                        //get subs
+                        //get subs (to create value with concrete type)
                         val subs = Type.getSubstitutions(Type.simplify(e.value.t), instance)
-                        //apply to value
+                        //apply to value (so value has concrete type)
                         val value = Expr.apply(subs, e.value)
-                        //create body (a new let expr with instances - first
-                        val body = Let(e.id, e.value, e.body, e.t)
-                        body.instances.addAll(e.instances.drop(1))
-                        Let(e.id, expand(value), expand(body), e.t)
+                        if (e.instances.count() == 0) {
+                            Let(e.id, expand(value), expand(e.body), e.t)
+                        } else {
+                            //create body (a new let expr with instances - first)
+                            val body = Let(e.id, e.value, e.body, e.t)
+                            body.instances.addAll(e.instances.drop(1))
+                            //return Let with expanded value and expanded body
+                            Let(e.id, expand(value), expand(body), e.t)
+                        }
                     }
                 }
                 is If -> TODO()
