@@ -50,6 +50,8 @@ class Cli(val args: Array<String>) {
 
                     res.expr.accept(ComputeInstancesVisitor())
 
+                    println(res.expr)
+
 //                  check if error type
                     if (res.expr.t !is Type.Error) {
 //                        //compute function captures

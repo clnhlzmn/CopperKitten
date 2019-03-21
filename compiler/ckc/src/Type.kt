@@ -18,12 +18,13 @@ sealed class Type {
             Var(newId())
 
         //take a type and return a simple version of it
-        //where types are either Unit or Ref
+        //where vars have been replaced by their instances
         fun simplify(t: Type): Type {
             return when {
-                t is Op && (t.operator == "Int" || t.operator == "Unit") -> Op("Unit")
-                t is Op -> Op("Ref", t.params.map { p -> simplify(p) })
-                else -> Error("bad argument to simplify")
+                t is Var && t.instance == null -> t
+                t is Var -> simplify(t.instance!!)
+                t is Op -> Op(t.operator, t.params.map { p -> simplify(p) })
+                else -> t
             }
         }
 

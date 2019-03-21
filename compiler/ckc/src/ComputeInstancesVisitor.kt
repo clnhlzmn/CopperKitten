@@ -50,7 +50,7 @@ class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
         //if def.value.t is poly then add actual type of
         //e.fn.t to def.instances and adjust e.fn.id accordingly
         //then recurse on def.value (to look at its def if its ref and so on)
-        addInstance(e.fn, Analyze.pruneAll(e.fn.t))
+        addInstance(e.fn, Type.simplify(e.fn.t))
         e.fn.accept(this)
         e.args.forEach { a -> a.accept(this) }
     }
