@@ -188,7 +188,10 @@ sealed class Analyze {
                     e.t = Type.Op("Fun", paramTypes + bodyType)
                     e.t
                 }
-                is Expr.CFun -> TODO()
+                is Expr.CFun -> {
+                    unifyType(e.sig, e.t)
+                    e.t
+                }
                 is Expr.Let -> {
                     //extend body with binding, value is evaluated in current env
                     val bodyEnv = Env(e.id, analyze(e.value, env, list), env)
