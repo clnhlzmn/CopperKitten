@@ -10,7 +10,7 @@ internal class ParseTest {
 
         var input = "a"
         var expr = Parse.expr(CharStreams.fromString(input))
-        assertEquals(expr.right().get(), Expr.Ref("a", Type.newVar()))
+        assertEquals(expr.right()!!, Expr.Ref("a", Type.newVar()))
 
         input = "Oops"
         expr = Parse.expr(CharStreams.fromString(input))
@@ -19,7 +19,7 @@ internal class ParseTest {
         input = "(a): a"
         expr = Parse.expr(CharStreams.fromString(input))
         assertEquals(
-            expr.right().get(),
+            expr.right()!!,
             Expr.Fun(
                 listOf(Expr.Fun.Param("a", null, Type.newVar())),
                 null,

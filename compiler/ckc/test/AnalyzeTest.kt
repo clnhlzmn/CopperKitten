@@ -6,7 +6,7 @@ internal class AnalyzeTest {
 
     companion object {
         fun getType(input: String): Type {
-            val expr = Parse.expr(CharStreams.fromString(input)).right().get()
+            val expr = Parse.expr(CharStreams.fromString(input)).right()!!
             Analyze.analyze(expr, null, null)
             return Analyze.prune(expr.t)
         }

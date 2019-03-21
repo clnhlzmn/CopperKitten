@@ -24,6 +24,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="arrow-core-0.8.2" level="project" />
   </component>
 </module>
