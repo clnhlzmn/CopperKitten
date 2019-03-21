@@ -508,7 +508,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                         val subs = Type.getSubstitutions(Type.simplify(e.value.t), instance)
                         //apply to value (so value has concrete type)
                         val value = Expr.apply(subs, e.value)
-                        if (e.instances.count() == 0) {
+                        if (e.instances.drop(1).count() == 0) {
                             Let(e.id, expand(value), expand(e.body), e.t)
                         } else {
                             //create body (a new let expr with instances - first)
