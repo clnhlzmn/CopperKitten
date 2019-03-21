@@ -68,6 +68,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
 
     override fun visit(e: Expr.Ref): List<String> {
         val def = e.accept(GetDefinitionVisitor())
+        //TODO: compile ref for correct instance
         val isRef = Type.simplify(e.t).isRefType()
         when (def) {
             is Definition -> {
@@ -291,14 +292,22 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
     override fun visit(e: Expr.Let): List<String> {
         //return var
         val ret = ArrayList<String>()
-        //get local index in which to store this value
-        val localIndex = frame.push(e.id, Type.simplify(e.value.t).isRefType())
-        //compile the value expr
-        ret.add("//${e.value}")
-        ret.addAll(e.value.accept(this))
-        //store value in local
-        ret.add("lstore $localIndex //${e.id}")
-        frame.pop()
+        e.instances.forEachIndexed { index, instance ->
+            //TODO: this doesn't work because enclosingScope fields are not linked correctly
+            //TODO: have to create a completely new expr with correct instances
+            //get subs
+            val subs = Type.getSubstitutions(Type.simplify(e.value.t), instance)
+            //apply to value
+            val value = Expr.apply(subs, e.value)
+            //get local index (adjusted for instance #) in which to store this value
+            val localIndex = frame.push(e.id + "<$index>", value.t.isRefType())
+            //compile the value expr
+            ret.add("//$value")
+            ret.addAll(value.accept(this))
+            //store value in local
+            ret.add("lstore $localIndex //${e.id}<$index>")
+            frame.pop()
+        }
         //compile body if present
         ret.add("//${e.body}")
         ret.addAll(e.body.accept(this))
