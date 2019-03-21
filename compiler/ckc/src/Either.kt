@@ -38,3 +38,15 @@ sealed class Either<A, B> {
     }
 
 }
+
+fun<A, B> Collection<Either<A, B>>.foldEither(l: (A) -> A, r: (List<B>) -> B): Either<A, B> {
+    val acc = arrayListOf<B>()
+    for (item in this) {
+        if (item.isRight())
+            acc.add(item.right()!!)
+        else {
+            return Either.left(l(item.left()!!))
+        }
+    }
+    return Either.right(r(acc))
+}
