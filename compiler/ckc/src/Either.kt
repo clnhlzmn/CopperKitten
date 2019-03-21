@@ -10,7 +10,7 @@ sealed class Either<A, B> {
 
     abstract fun<C> mapLeft(f: (A) -> C): Either<C, B>
     abstract fun<C> mapRight(f: (B) -> C): Either<A, C>
-    abstract fun fold(l: (A) -> Either<A, B>, r: (B) -> Either<A, B>): Either<A, B>
+    abstract fun<C, D> map(l: (A) -> C, r: (B) -> D): Either<C, D>
 
     data class Left<A, B>(val left: A): Either<A, B>() {
         override fun left(): A? = left
@@ -19,7 +19,7 @@ sealed class Either<A, B> {
         override fun isRight(): Boolean = false
         override fun <C> mapLeft(f: (A) -> C): Either<C, B> = Left(f(left))
         override fun <C> mapRight(f: (B) -> C): Either<A, C> = Left(left)
-        override fun fold(l: (A) -> Either<A, B>, r: (B) -> Either<A, B>): Either<A, B> = l(left)
+        override fun <C, D> map(l: (A) -> C, r: (B) -> D): Either<C, D> = Left(l(left))
     }
 
     data class Right<A, B>(val right: B): Either<A, B>() {
@@ -29,7 +29,7 @@ sealed class Either<A, B> {
         override fun isRight(): Boolean = true
         override fun <C> mapLeft(f: (A) -> C): Either<C, B> = Right(right)
         override fun <C> mapRight(f: (B) -> C): Either<A, C> = Right(f(right))
-        override fun fold(l: (A) -> Either<A, B>, r: (B) -> Either<A, B>): Either<A, B> = r(right)
+        override fun <C, D> map(l: (A) -> C, r: (B) -> D): Either<C, D> = Right(r(right))
     }
 
     companion object {

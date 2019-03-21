@@ -5,6 +5,21 @@ internal class EitherTest {
 
     @Test
     fun eitherTest() {
+
+        var either = Either.left<String, Int>("oops")
+        assertEquals(either.left()!!, "oops")
+        assertEquals(either.right(), null)
+
+        assertEquals(either.map({l -> l.toUpperCase()}, { r -> r * 2}).left()!!, "OOPS")
+        assertEquals(either.map({l -> l.toUpperCase()}, { r -> r * 2}).right(), null)
+
+        either = Either.right(42)
+        assertEquals(either.right()!!, 42)
+        assertEquals(either.left(), null)
+
+        assertEquals(either.map({l -> l.toUpperCase()}, { r -> r * 2}).right()!!, 84)
+        assertEquals(either.map({l -> l.toUpperCase()}, { r -> r * 2}).left(), null)
+
         var items = listOf<Either<String, Int>>(Either.right(42), Either.right(2), Either.left("oops"))
         var res = items.foldEither(
             { l -> "error" },
