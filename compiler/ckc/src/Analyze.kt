@@ -85,6 +85,22 @@ sealed class Analyze {
                 else -> t
             }
 
+        fun pruneAll(t: Type): Type =
+            when (t) {
+                is Type.Var -> {
+                    if (t.instance == null) t
+                    else {
+                        t.instance = pruneAll(t.instance!!)
+                        t.instance!!
+                    }
+                }
+                is Type.Op -> {
+                    t.params.forEach { p -> pruneAll(p) }
+                    t
+                }
+                else -> t
+            }
+
         fun occursInType(tVar: Type, tExp: Type): Boolean {
             val ptExp = prune(tExp)
             return when (ptExp) {
