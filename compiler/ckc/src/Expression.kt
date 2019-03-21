@@ -456,6 +456,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
     }
 
     companion object {
+
         fun apply(subs: List<Pair<String, Type>>, e: Expr): Expr =
             when (e) {
                 is Error -> e
@@ -483,6 +484,42 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                 is While -> TODO()
                 is Break -> TODO()
             }
+
+        fun expand(e: Expr): Expr {
+            return when (e) {
+                is Error -> e
+                Unit -> e
+                is Sequence -> Sequence(expand(e.first), expand(e.second), e.t)
+                is Natural -> e
+                is Ref -> e
+                is Apply -> Apply(expand(e.fn), e.args.map { a -> expand(a) }, e.t)
+                is Unary -> TODO()
+                is Binary -> TODO()
+                is Cond -> TODO()
+                is Assign -> TODO()
+                is Fun -> Fun(e.params, e.declType, expand(e.body), e.t)
+                is CFun -> e
+                is Let -> {
+                    val instance = e.instances.firstOrNull()
+                    if (instance == null) {
+                        Let(e.id, expand(e.value), expand(e.body), e.t)
+                    } else {
+                        //get subs
+                        val subs = Type.getSubstitutions(Type.simplify(e.value.t), instance)
+                        //apply to value
+                        val value = Expr.apply(subs, e.value)
+                        //create body (a new let expr with instances - first
+                        val body = Let(e.id, e.value, e.body, e.t)
+                        body.instances.addAll(e.instances.drop(1))
+                        Let(e.id, expand(value), expand(body), e.t)
+                    }
+                }
+                is If -> TODO()
+                is While -> TODO()
+                is Break -> TODO()
+            }
+        }
+
     }
 }
 

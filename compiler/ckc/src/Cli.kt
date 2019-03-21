@@ -52,6 +52,8 @@ class Cli(val args: Array<String>) {
 
                     println(res.expr)
 
+                    val expanded = Expr.expand(res.expr)
+
 //                  check if error type
                     if (res.expr.t !is Type.Error) {
                         //compute function captures
