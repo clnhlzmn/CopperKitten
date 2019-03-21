@@ -19,14 +19,35 @@ sealed class Type {
 
         //take a type and return a simple version of it
         //where vars have been replaced by their instances
-        fun simplify(t: Type): Type {
-            return when {
+        fun simplify(t: Type): Type =
+            when {
                 t is Var && t.instance == null -> t
                 t is Var -> simplify(t.instance!!)
                 t is Op -> Op(t.operator, t.params.map { p -> simplify(p) })
                 else -> t
             }
-        }
+
+        //takes a simplified type for t1 and t2,
+        //returns a list of substitutions formed by
+        //associating Vars in t1 with matching types in t2
+        fun getSubstitutions(t1: Type, t2: Type): List<Pair<String, Type>> =
+            when {
+                t1 is Var -> listOf(Pair(t1.id, t2))
+                t1 is Op && t2 is Op && t1.params.size == t2.params.size ->
+                    t1.params.zip(t2.params).flatMap{ p -> getSubstitutions(p.first, p.second) }
+                else -> emptyList()
+            }
+
+        //takes substitutions from getSubstitutions and applies them to a simplified type t
+        fun apply(subs: List<Pair<String, Type>>, t: Type): Type =
+            when (t) {
+                is Var -> {
+                    val found = subs.find { p -> p.first == t.id }
+                    found?.second ?: t
+                }
+                is Op -> Op(t.operator, t.params.map { p -> apply(subs, p) })
+                else -> t
+            }
 
     }
 

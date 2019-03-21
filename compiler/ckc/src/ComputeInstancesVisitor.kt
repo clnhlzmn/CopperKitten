@@ -5,18 +5,15 @@ class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
     companion object {
 
         //add an actual type to a polymorphic definition
-        fun addInstance(e: Expr, t: Type, adjustRef: Boolean = true) {
+        fun addInstance(e: Expr, t: Type) {
             if (e is Expr.Ref) {
                 val def = e.accept(GetDefinitionVisitor())
                 if (def is Definition.Let) {
                     if (!t.isPolyType()) {
                         //if t is not a polytype then add as instance
                         def.node.instances.add(t)
-                        //adjust e.id
-                        if (adjustRef)
-                            e.id = "${e.id}<${def.node.instances.size - 1}>"
                         //recurse on def value
-                        addInstance(def.node.value, t, false)
+                        addInstance(def.node.value, t)
                     }
                 }
             }

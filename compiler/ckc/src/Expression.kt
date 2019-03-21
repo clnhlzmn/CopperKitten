@@ -454,5 +454,35 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         }
 
     }
+
+    companion object {
+        fun apply(subs: List<Pair<String, Type>>, e: Expr): Expr =
+            when (e) {
+                is Error -> e
+                Unit -> Unit
+                is Sequence -> Sequence(apply(subs, e.first), apply(subs, e.second), Type.apply(subs, Type.simplify(e.t)))
+                is Natural -> Natural(e.value)
+                is Ref -> Ref(e.id, Type.apply(subs, Type.simplify(e.t)))
+                is Apply -> Apply(apply(subs, e.fn), e.args.map { a -> apply(subs, a) }, Type.apply(subs, Type.simplify(e.t)))
+                is Unary -> TODO()
+                is Binary -> TODO()
+                is Cond -> TODO()
+                is Assign -> TODO()
+                is Fun ->
+                    Fun(
+                        e.params.map { p -> Fun.Param(p.id, p.declType, Type.apply(subs, Type.simplify(p.t))) },
+                        e.declType,
+                        apply(subs, e.body),
+                        Type.apply(subs, Type.simplify(e.t))
+                    )
+                is CFun -> e
+                is Let -> {
+                    Let(e.id, apply(subs, e.value), apply(subs, e.body), Type.apply(subs, Type.simplify(e.t)))
+                }
+                is If -> TODO()
+                is While -> TODO()
+                is Break -> TODO()
+            }
+    }
 }
 

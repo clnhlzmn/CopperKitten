@@ -21,14 +21,14 @@ internal class EitherTest {
         assertEquals(either.map({l -> l.toUpperCase()}, { r -> r * 2}).left(), null)
 
         var items = listOf<Either<String, Int>>(Either.right(42), Either.right(2), Either.left("oops"))
-        var res = items.foldEither(
+        var res = items.foldRightEither(
             { l -> "error" },
             { r -> r[0] + r[1] }
         )
         assertEquals(res.left()!!, "error")
 
         items = listOf(Either.right(42), Either.right(2), Either.right(3))
-        res = items.foldEither(
+        res = items.foldRightEither(
             { l -> "error" },
             { r -> r.sum() }
         )
