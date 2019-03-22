@@ -1,4 +1,4 @@
-
+import ck.ast.BaseASTVisitor
 
 fun compileCkFile(ckFile: CkFile): List<String> {
     val program = ArrayList<String>()
@@ -29,7 +29,7 @@ fun compileFunctionBody(body: Expr): List<String> {
     return ret
 }
 
-class CompilationVisitor() : BaseASTVisitor<List<String>>() {
+class CompilationVisitor : BaseASTVisitor<List<String>>() {
 
     //to keep track of locals and temps on the stack
     //(to be able to generate layout [] instructions)
@@ -38,13 +38,13 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
     //to adjust the corresponding frame element. similarly
     //when we emit an enter or leave instruction we need
     //to create a new, or restore the last, StackFrame object
-    val frame:StackFrame = StackFrame()
+    val frame: StackFrame = StackFrame()
 
     companion object {
-        var count:Int = 0
+        var count: Int = 0
     }
 
-    private fun nextLabel():String {
+    private fun nextLabel(): String {
         return "Label_${count++}"
     }
 
@@ -92,7 +92,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
                     }
                 } else {
                     val enclosingFun = e.accept(GetEnclosingFunction())!!
-                    val captureIndex = enclosingFun.captures.indexOfFirst{c -> c.id == e.id }
+                    val captureIndex = enclosingFun.captures.indexOfFirst { c -> c.id == e.id }
                     frame.push("*", isRef)
                     return listOf("cload $captureIndex //${e.id}")
                 }
@@ -104,7 +104,7 @@ class CompilationVisitor() : BaseASTVisitor<List<String>>() {
     override fun visit(e: Expr.Apply): List<String> {
         val ret = ArrayList<String>()
         //evaluate arguments
-        e.args.reversed().forEach{ a ->
+        e.args.reversed().forEach { a ->
             ret.addAll(a.accept(this))
         }
         //then evaluate function

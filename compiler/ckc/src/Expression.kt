@@ -1,8 +1,12 @@
+import ck.ast.ASTNode
+import ck.ast.ASTVisitor
+import ck.ast.BaseASTNode
+
 //Expressions
 
 sealed class Expr(var t: Type) : BaseASTNode() {
 
-    class Error(val what: String): Expr(Type.Error(what)) {
+    class Error(val what: String) : Expr(Type.Error(what)) {
         override fun toString(): String {
             return "Error: $what"
         }
@@ -461,10 +465,18 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             when (e) {
                 is Error -> e
                 Unit -> Unit
-                is Sequence -> Sequence(apply(subs, e.first), apply(subs, e.second), Type.apply(subs, Type.simplify(e.t)))
+                is Sequence -> Sequence(
+                    apply(subs, e.first),
+                    apply(subs, e.second),
+                    Type.apply(subs, Type.simplify(e.t))
+                )
                 is Natural -> Natural(e.value)
                 is Ref -> Ref(e.id, Type.apply(subs, Type.simplify(e.t)))
-                is Apply -> Apply(apply(subs, e.fn), e.args.map { a -> apply(subs, a) }, Type.apply(subs, Type.simplify(e.t)))
+                is Apply -> Apply(
+                    apply(subs, e.fn),
+                    e.args.map { a -> apply(subs, a) },
+                    Type.apply(subs, Type.simplify(e.t))
+                )
                 is Unary -> TODO()
                 is Binary -> TODO()
                 is Cond -> TODO()

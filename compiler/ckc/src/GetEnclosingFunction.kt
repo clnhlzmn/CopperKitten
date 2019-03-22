@@ -1,4 +1,4 @@
-
+import ck.ast.BaseASTVisitor
 
 class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
 

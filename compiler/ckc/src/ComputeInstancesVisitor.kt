@@ -1,6 +1,6 @@
+import ck.ast.BaseASTVisitor
 
-
-class ComputeInstancesVisitor: BaseASTVisitor<Unit>() {
+class ComputeInstancesVisitor : BaseASTVisitor<Unit>() {
 
     companion object {
 

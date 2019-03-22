@@ -1,4 +1,4 @@
-package ckBaseVisitors
+package ck.grammar.visitors
 
 import Expr
 import Type
@@ -144,8 +144,8 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     override fun visitFunExpr(ctx: ckParser.FunExprContext?): Expr {
         return Expr.Fun(
             params =
-                if (ctx!!.params() != null) ctx.params().accept(ckBaseVisitors.ParamsVisitor())
-                else ArrayList(),
+            if (ctx!!.params() != null) ctx.params().accept(ParamsVisitor())
+            else ArrayList(),
             declType = if (ctx.type() == null) null else TypeVisitor().visit(ctx.type()),
             body = ExprVisitor().visit(ctx.expr()),
             t = Type.newVar()
@@ -180,7 +180,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
 //TODO: for some reason I can't put these classes in their own files...
 class ParamsVisitor : ckBaseVisitor<List<Expr.Fun.Param>>() {
     override fun visitParams(ctx: ckParser.ParamsContext?): List<Expr.Fun.Param> =
-        ctx!!.param().map { p -> ckBaseVisitors.ParamVisitor().visit(p) }
+        ctx!!.param().map { p -> ParamVisitor().visit(p) }
 }
 
 class ParamVisitor : ckBaseVisitor<Expr.Fun.Param>() {

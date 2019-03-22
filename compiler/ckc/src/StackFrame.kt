@@ -1,5 +1,3 @@
-import kotlin.math.max
-
 class StackFrame {
 
     private val locals = ArrayList<Pair<String, Boolean>>()
@@ -10,7 +8,7 @@ class StackFrame {
         return ret
     }
 
-    fun push(id: String, isRef: Boolean):Int {
+    fun push(id: String, isRef: Boolean): Int {
         locals.add(Pair(id, isRef))
         return locals.size - 1
     }

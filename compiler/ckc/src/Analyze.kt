@@ -1,5 +1,3 @@
-import java.lang.RuntimeException
-
 //adapted from "Basic Polymorphic Type Checking" by Luca Cardelli
 sealed class Analyze {
 
@@ -49,7 +47,7 @@ sealed class Analyze {
         /**Make a copy of [type]; the generic variables are copied,
          * while the non-generic variables are shared*/
         fun freshType(type: Type, list: NonGenericTypes?): Type {
-            val env: Array<CopyEnv?> = Array(1) {null}
+            val env: Array<CopyEnv?> = Array(1) { null }
             return fresh(type, list, env)
         }
 
@@ -135,7 +133,8 @@ sealed class Analyze {
                         }
                         else -> throw RuntimeException("type mismatch between $pt1 and $pt2")
                     }
-                else -> {}
+                else -> {
+                }
             }
         }
 
@@ -181,9 +180,10 @@ sealed class Analyze {
                     val paramTypes: List<Type> = e.params.map { p -> p.t }
                     //extend env with mapping from param names to types
                     val bodyEnv: Env? =
-                        e.params.zip(paramTypes).foldRight(env){ pair, acc -> Env(pair.first.id, pair.second, acc) }
+                        e.params.zip(paramTypes).foldRight(env) { pair, acc -> Env(pair.first.id, pair.second, acc) }
                     //add param types to non generics
-                    val bodyList: NonGenericTypes? = paramTypes.foldRight(list) { type, acc -> NonGenericTypes(type, acc) }
+                    val bodyList: NonGenericTypes? =
+                        paramTypes.foldRight(list) { type, acc -> NonGenericTypes(type, acc) }
                     //analyze body
                     val bodyType: Type = analyze(e.body, bodyEnv, bodyList)
                     //return fun type

@@ -1,6 +1,6 @@
+import ck.ast.BaseASTVisitor
 
-
-sealed class Definition private constructor (val local: Boolean) {
+sealed class Definition(val local: Boolean) {
     class Let(val node: Expr.Let, local: Boolean) : Definition(local)
     class Param(val node: Expr.Fun.Param, local: Boolean) : Definition(local)
 }

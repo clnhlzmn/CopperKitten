@@ -1,5 +1,3 @@
-import java.lang.Error
-
 //Types
 
 sealed class Type {
@@ -34,7 +32,7 @@ sealed class Type {
             when {
                 t1 is Var -> setOf(Pair(t1.id, t2))
                 t1 is Op && t2 is Op && t1.params.size == t2.params.size ->
-                    t1.params.zip(t2.params).flatMap{ p -> getSubstitutions(p.first, p.second) }.toSet()
+                    t1.params.zip(t2.params).flatMap { p -> getSubstitutions(p.first, p.second) }.toSet()
                 else -> emptySet()
             }
 
@@ -51,7 +49,7 @@ sealed class Type {
 
     }
 
-    data class Error(val what: String): Type() {
+    data class Error(val what: String) : Type() {
 
         override fun isPolyType(): Boolean {
             TODO("not implemented")
@@ -65,7 +63,7 @@ sealed class Type {
 
     }
 
-    data class Var(val id: String): Type() {
+    data class Var(val id: String) : Type() {
         //TODO: eliminate instance and store type var assignments in env
 
         var instance: Type? = null
@@ -86,9 +84,9 @@ sealed class Type {
 
     }
 
-    data class Op(val operator: String, val params: List<Type>): Type() {
+    data class Op(val operator: String, val params: List<Type>) : Type() {
 
-        constructor(operator: String): this(operator, emptyList())
+        constructor(operator: String) : this(operator, emptyList())
 
         override fun isPolyType(): Boolean = params.any { p -> p.isPolyType() }
 

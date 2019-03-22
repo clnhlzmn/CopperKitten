@@ -1,8 +1,7 @@
-
+import ck.grammar.visitors.FileVisitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import org.apache.commons.cli.*;
-import java.io.File
+import org.apache.commons.cli.*
 
 class Cli(val args: Array<String>) {
 
@@ -34,7 +33,7 @@ class Cli(val args: Array<String>) {
                 val lexer = ckLexer(stream)
                 val tokens = CommonTokenStream(lexer)
                 val ckParser = ckParser(tokens)
-                val parseError:MutableList<String> = ArrayList()
+                val parseError: MutableList<String> = ArrayList()
                 ckParser.removeErrorListeners()
                 ckParser.addErrorListener(DescriptiveErrorListener(parseError))
                 val context: ckParser.FileContext = ckParser.file()

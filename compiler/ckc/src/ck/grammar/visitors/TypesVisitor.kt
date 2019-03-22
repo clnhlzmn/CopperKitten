@@ -1,4 +1,4 @@
-package ckBaseVisitors
+package ck.grammar.visitors
 
 import Type
 import ckBaseVisitor

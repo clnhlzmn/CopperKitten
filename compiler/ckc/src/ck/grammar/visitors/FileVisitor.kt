@@ -1,4 +1,9 @@
-import ckBaseVisitors.ExprVisitor
+package ck.grammar.visitors
+
+import CkFile
+import Expr
+import ckBaseVisitor
+import ckParser
 
 //ck File visitor
 

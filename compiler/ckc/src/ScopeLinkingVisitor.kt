@@ -1,4 +1,5 @@
-
+import ck.ast.ASTNode
+import ck.ast.BaseASTVisitor
 
 //TODO: add enclosingLoop field to break expr and link it up here
 class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
@@ -34,7 +35,7 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
     //visit children
     override fun visit(e: Expr.Apply) {
         e.fn.accept(this)
-        e.args.forEach{ a -> a.accept(this) }
+        e.args.forEach { a -> a.accept(this) }
     }
 
     //visit children

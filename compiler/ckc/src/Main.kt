@@ -1,5 +1,4 @@
-
 fun main(args: Array<String>) {
-    Cli(args).parse();
+    Cli(args).parse()
 }
 
