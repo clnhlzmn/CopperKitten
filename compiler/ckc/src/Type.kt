@@ -30,16 +30,16 @@ sealed class Type {
         //takes a simplified type for t1 and t2,
         //returns a list of substitutions formed by
         //associating Vars in t1 with matching types in t2
-        fun getSubstitutions(t1: Type, t2: Type): List<Pair<String, Type>> =
+        fun getSubstitutions(t1: Type, t2: Type): Set<Pair<String, Type>> =
             when {
-                t1 is Var -> listOf(Pair(t1.id, t2))
+                t1 is Var -> setOf(Pair(t1.id, t2))
                 t1 is Op && t2 is Op && t1.params.size == t2.params.size ->
-                    t1.params.zip(t2.params).flatMap{ p -> getSubstitutions(p.first, p.second) }
-                else -> emptyList()
+                    t1.params.zip(t2.params).flatMap{ p -> getSubstitutions(p.first, p.second) }.toSet()
+                else -> emptySet()
             }
 
         //takes substitutions from getSubstitutions and applies them to a simplified type t
-        fun apply(subs: List<Pair<String, Type>>, t: Type): Type =
+        fun apply(subs: Set<Pair<String, Type>>, t: Type): Type =
             when (t) {
                 is Var -> {
                     val found = subs.find { p -> p.first == t.id }

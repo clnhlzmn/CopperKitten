@@ -176,7 +176,9 @@ sealed class Analyze {
                 is Expr.Assign -> TODO()
                 is Expr.Fun -> {
                     //create new types for params
-                    val paramTypes: List<Type> = e.params.map { Type.newVar() }
+//                    val paramTypes: List<Type> = e.params.map { Type.newVar() }
+                    //params should already have new types here
+                    val paramTypes: List<Type> = e.params.map { p -> p.t }
                     //extend env with mapping from param names to types
                     val bodyEnv: Env? =
                         e.params.zip(paramTypes).foldRight(env){ pair, acc -> Env(pair.first.id, pair.second, acc) }

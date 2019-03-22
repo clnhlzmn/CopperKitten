@@ -457,7 +457,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
     companion object {
 
-        fun apply(subs: List<Pair<String, Type>>, e: Expr): Expr =
+        fun apply(subs: Set<Pair<String, Type>>, e: Expr): Expr =
             when (e) {
                 is Error -> e
                 Unit -> Unit
