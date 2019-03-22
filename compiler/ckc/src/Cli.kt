@@ -2,6 +2,7 @@ import ck.grammar.visitors.FileVisitor
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.commons.cli.*
+import java.io.File
 
 class Cli(val args: Array<String>) {
 
@@ -41,37 +42,37 @@ class Cli(val args: Array<String>) {
                     //get AST
                     val res: CkFile = context.accept(FileVisitor())
 
-//                    val typedExpr = Infer.infer(res.expr)
                     val exprType = Analyze.analyze(res.expr, null, null)
-                    println(Analyze.prune(exprType))
-                    println(res.expr)
+//                    println(Analyze.prune(exprType))
+//                    println(res.expr)
                     res.expr.accept(ScopeLinkingVisitor())
-
                     res.expr.accept(ComputeInstancesVisitor())
 
-                    println(res.expr)
+//                    println(res.expr)
 
                     val expanded = Expr.expand(res.expr)
 
-                    expanded.accept(ScopeLinkingVisitor())
+                    val file = CkFile(res.defs, expanded)
+
+                    file.accept(ScopeLinkingVisitor())
 
 //                  check if error type
-                    if (res.expr.t !is Type.Error) {
-//                        //compute function captures
-//                        res.expr.accept(ComputeCapturesVisitor())
-//                        //compile file
-//                        val code: List<String> = compileCkFile(res)
-//                        //determine output location
-//                        if (outputFileName != null) {
-//                            File(outputFileName).printWriter().use { out ->
-//                                out.print(code.toString("\n"))
-//                            }
-//                        } else {
-//                            println(code.toString("\n"))
-//                        }
+                    if (file.expr.t !is Type.Error) {
+                        //compute function captures
+                        file.expr.accept(ComputeCapturesVisitor())
+                        //compile file
+                        val code: List<String> = compileCkFile(file)
+                        //determine output location
+                        if (outputFileName != null) {
+                            File(outputFileName).printWriter().use { out ->
+                                out.print(code.toString("\n"))
+                            }
+                        } else {
+                            println(code.toString("\n"))
+                        }
                     } else {
                         //print error
-                        println(res.expr.t)
+                        println(file.expr.t)
                     }
                 } else {
                     //parse error

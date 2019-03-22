@@ -49,7 +49,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
     }
 
     override fun visit(e: Expr.Unit): List<String> {
-        frame.push("*", false)
+        frame.push("*", Type.Op("Unit"))
         return listOf("push 0")
     }
 
@@ -62,14 +62,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
     }
 
     override fun visit(e: Expr.Natural): List<String> {
-        frame.push("*", false)
+        frame.push("*", Type.Op("Int"))
         return listOf("push ${e.value}")
     }
 
     override fun visit(e: Expr.Ref): List<String> {
         val def = e.accept(GetDefinitionVisitor())
-        //TODO: compile ref for correct instance
-        val isRef = Type.simplify(e.t).isRefType()
+        val type = Type.simplify(e.t)
         when (def) {
             is Definition -> {
                 if (def.local) {
@@ -77,13 +76,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
                         is Definition.Param -> {
                             val enclosingFun = e.accept(GetEnclosingFunction())!!
                             val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
-                            frame.push("*", isRef)
+                            frame.push("*", type)
                             return listOf("aload $paramIndex //${e.id}")
                         }
                         is Definition.Let -> {
-                            val localIndex = frame.lookup(e.id)
+                            val localIndex = frame.lookup(e.id, type)
                             if (localIndex != null) {
-                                frame.push("*", isRef)
+                                frame.push("*", type)
                                 return listOf("lload $localIndex //${e.id}")
                             } else {
                                 TODO("error")
@@ -93,7 +92,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
                 } else {
                     val enclosingFun = e.accept(GetEnclosingFunction())!!
                     val captureIndex = enclosingFun.captures.indexOfFirst { c -> c.id == e.id }
-                    frame.push("*", isRef)
+                    frame.push("*", type)
                     return listOf("cload $captureIndex //${e.id}")
                 }
             }
@@ -113,7 +112,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("dup")
         //get code address (replaces dup'd function with non-ref function address)
         ret.add("rload 0")
-        frame.push("*", false)
+        frame.push("*", Type.Op("Int"))
         //layout instruction
         ret.add("layout [${frame.getLayout().toString(", ")}]")
         //call (removes function address)
@@ -129,8 +128,8 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         }
         //load return value
         ret.add("load")
-        //push temp (return value)
-        frame.push("*", Type.simplify(e.t).isRefType())
+        //push return value
+        frame.push("*", Type.simplify(e.t))
         return ret
     }
 
@@ -216,6 +215,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
 
     override fun visit(e: Expr.Fun): List<String> {
         val ret = ArrayList<String>()
+        val type = Type.simplify(e.t)
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
         //set current layout
@@ -226,10 +226,10 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         val captureLayout = (1..e.captures.size).filter { i -> Type.simplify(e.captures[i - 1].t).isRefType() }
         //alloc function array
         ret.add("alloc [${captureLayout.map { ci -> ci.toString() }.toString(", ")}]")
-        frame.push("*", true)
+        frame.push("*", type)
         //duplicate function array
         ret.add("dup")
-        frame.push("*", true)
+        frame.push("*", type)
         //store function address in fun[0]
         ret.add("push $bodyLabel")
         ret.add("rstore 0")
@@ -237,7 +237,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         for (i in (0 until e.captures.size)) {
             //duplicate function array
             ret.add("dup")
-            frame.push("*", true)
+            frame.push("*", type)
             //compile capture reference
             ret.addAll(e.captures[i].accept(this))
             ret.add("rstore ${i + 1}")
@@ -256,6 +256,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
 
     override fun visit(e: Expr.CFun): List<String> {
         val ret = ArrayList<String>()
+        val type = Type.simplify(e.t)
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
         //set current layout
@@ -264,10 +265,10 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("push 1")
         //alloc function array
         ret.add("alloc []")
-        frame.push("*", true)
+        frame.push("*", type)
         //duplicate function array
         ret.add("dup")
-        frame.push("*", true)
+        frame.push("*", type)
         //store function address in fun[0]
         ret.add("push $bodyLabel")
         ret.add("rstore 0")
@@ -290,24 +291,19 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
     }
 
     override fun visit(e: Expr.Let): List<String> {
+        val valType = Type.simplify(e.value.t)
         //return var
         val ret = ArrayList<String>()
-        e.instances.forEachIndexed { index, instance ->
-            //TODO: this doesn't work because enclosingScope fields are not linked correctly
-            //TODO: have to create a completely new expr with correct instances
-            //get subs
-            val subs = Type.getSubstitutions(Type.simplify(e.value.t), instance)
-            //apply to value
-            val value = Expr.apply(subs, e.value)
-            //get local index (adjusted for instance #) in which to store this value
-            val localIndex = frame.push(e.id + "<$index>", value.t.isRefType())
-            //compile the value expr
-            ret.add("//$value")
-            ret.addAll(value.accept(this))
-            //store value in local
-            ret.add("lstore $localIndex //${e.id}<$index>")
-            frame.pop()
-        }
+        //add space for local
+        ret.add("push 0")
+        //get local index (adjusted for instance #) in which to store this value
+        val localIndex = frame.push(e.id, valType)
+        //compile the value expr
+        ret.add("//${e.value}: $valType")
+        ret.addAll(e.value.accept(this))
+        //store value in local
+        ret.add("lstore $localIndex //${e.id}: $valType")
+        frame.pop()
         //compile body if present
         ret.add("//${e.body}")
         ret.addAll(e.body.accept(this))
@@ -327,7 +323,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("$altLabel:")
         if (e.alt == null) {
             ret.add("push 0")
-            frame.push("*", false)
+            frame.push("*", Type.simplify(e.t))
         } else {
             ret.addAll(e.alt.accept(this))
         }
@@ -351,7 +347,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         frame.pop()
         //value of type Unit
         ret.add("push 0")
-        frame.push("*", false)
+        frame.push("*", Type.Op("Unit"))
         return ret
     }
 

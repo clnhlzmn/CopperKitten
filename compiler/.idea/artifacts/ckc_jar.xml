@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="ckc:jar">
+  <artifact type="jar" build-on-make="true" name="ckc:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/ckc_jar</output-path>
     <root id="archive" name="ckc.jar">
       <element id="module-output" name="ckc" />

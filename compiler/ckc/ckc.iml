@@ -10,8 +10,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
-    <content url="file://$MODULE_DIR$/build/generated-src/antlr/main" />
-    <content url="file://$MODULE_DIR$/build/generated-src/antlr/test" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
