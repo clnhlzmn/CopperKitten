@@ -1,6 +1,6 @@
-import ck.ast.ASTNode
-import ck.ast.ASTVisitor
-import ck.ast.BaseASTNode
+package ck.ast.node
+
+import ck.ast.visitors.ASTVisitor
 
 class CkFile(val defs: List<ASTNode>, val expr: Expr) : BaseASTNode() {
 

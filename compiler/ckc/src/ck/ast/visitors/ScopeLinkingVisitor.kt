@@ -1,5 +1,8 @@
-import ck.ast.ASTNode
-import ck.ast.BaseASTVisitor
+package ck.ast.visitors
+
+import ck.ast.node.CkFile
+import ck.ast.node.Expr
+import ck.ast.node.ASTNode
 
 //TODO: add enclosingLoop field to break expr and link it up here
 class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
@@ -62,7 +65,7 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
         e.value.accept(this)
     }
 
-    //Expr.Fun creates a new scope
+    //ck.ast.node.Expr.Fun creates a new scope
     override fun visit(e: Expr.Fun) {
         //first save current scope as enclosing scope for e
         e.enclosingScope = currentScope
@@ -78,7 +81,7 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
         //nothing
     }
 
-    //Expr.Let creates a new scope
+    //ck.ast.node.Expr.Let creates a new scope
     override fun visit(e: Expr.Let) {
         //first save current scope as enclosing scope for e
         e.enclosingScope = currentScope

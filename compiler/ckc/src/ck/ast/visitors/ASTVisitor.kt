@@ -1,7 +1,7 @@
-package ck.ast
+package ck.ast.visitors
 
-import CkFile
-import Expr
+import ck.ast.node.CkFile
+import ck.ast.node.Expr
 
 interface ASTVisitor<T> {
 

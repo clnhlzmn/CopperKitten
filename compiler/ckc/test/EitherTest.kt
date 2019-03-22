@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import util.either.Either
+import util.either.foldRightEither
 
 internal class EitherTest {
 

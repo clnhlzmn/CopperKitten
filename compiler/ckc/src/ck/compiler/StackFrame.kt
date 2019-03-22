@@ -1,3 +1,7 @@
+package ck.compiler
+
+import ck.ast.Type
+
 class StackFrame {
 
     private val locals = ArrayList<Pair<String, Type>>()

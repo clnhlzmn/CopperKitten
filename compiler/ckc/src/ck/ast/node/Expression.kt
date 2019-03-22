@@ -1,6 +1,8 @@
-import ck.ast.ASTNode
-import ck.ast.ASTVisitor
-import ck.ast.BaseASTNode
+package ck.ast.node
+
+import ck.ast.Type
+import ck.ast.visitors.ASTVisitor
+import util.extensions.toDelimitedString
 
 //Expressions
 
@@ -8,7 +10,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
     class Error(val what: String) : Expr(Type.Error(what)) {
         override fun toString(): String {
-            return "Error: $what"
+            return "util.extensions.Error: $what"
         }
 
         override fun equals(other: Any?): Boolean {
@@ -119,7 +121,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{$fn}(${args.toString(", ")})"
+            "{$fn}(${args.toDelimitedString(", ")})"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -277,8 +279,8 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             }
         }
 
-        //a list of Expr.Refs that are the variables that this Expr.Fun needs to capture
-        val captures = ArrayList<Expr.Ref>()
+        //a list of ck.ast.node.Expr.Refs that are the variables that this ck.ast.node.Expr.Fun needs to capture
+        val captures = ArrayList<Ref>()
 
         var enclosingScope: ASTNode? = null
 
@@ -286,7 +288,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             visitor.visit(this)
 
         override fun toString(): String =
-            "{(${params.toString(", ")}): $body}"
+            "{(${params.toDelimitedString(", ")}): $body}"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -471,7 +473,10 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                     Type.apply(subs, Type.simplify(e.t))
                 )
                 is Natural -> Natural(e.value)
-                is Ref -> Ref(e.id, Type.apply(subs, Type.simplify(e.t)))
+                is Ref -> Ref(
+                    e.id,
+                    Type.apply(subs, Type.simplify(e.t))
+                )
                 is Apply -> Apply(
                     apply(subs, e.fn),
                     e.args.map { a -> apply(subs, a) },
@@ -483,14 +488,25 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                 is Assign -> TODO()
                 is Fun ->
                     Fun(
-                        e.params.map { p -> Fun.Param(p.id, p.declType, Type.apply(subs, Type.simplify(p.t))) },
+                        e.params.map { p ->
+                            Fun.Param(
+                                p.id,
+                                p.declType,
+                                Type.apply(subs, Type.simplify(p.t))
+                            )
+                        },
                         e.declType,
                         apply(subs, e.body),
                         Type.apply(subs, Type.simplify(e.t))
                     )
                 is CFun -> e
                 is Let -> {
-                    Let(e.id, apply(subs, e.value), apply(subs, e.body), Type.apply(subs, Type.simplify(e.t)))
+                    Let(
+                        e.id,
+                        apply(subs, e.value),
+                        apply(subs, e.body),
+                        Type.apply(subs, Type.simplify(e.t))
+                    )
                 }
                 is If -> TODO()
                 is While -> TODO()
@@ -501,33 +517,61 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             return when (e) {
                 is Error -> e
                 Unit -> e
-                is Sequence -> Sequence(expand(e.first), expand(e.second), e.t)
+                is Sequence -> Sequence(
+                    expand(e.first),
+                    expand(e.second),
+                    e.t
+                )
                 is Natural -> e
                 is Ref -> e
-                is Apply -> Apply(expand(e.fn), e.args.map { a -> expand(a) }, e.t)
+                is Apply -> Apply(
+                    expand(e.fn),
+                    e.args.map { a -> expand(a) },
+                    e.t
+                )
                 is Unary -> TODO()
                 is Binary -> TODO()
                 is Cond -> TODO()
                 is Assign -> TODO()
-                is Fun -> Fun(e.params, e.declType, expand(e.body), e.t)
+                is Fun -> Fun(
+                    e.params,
+                    e.declType,
+                    expand(e.body),
+                    e.t
+                )
                 is CFun -> e
                 is Let -> {
                     val instance = e.instances.firstOrNull()
                     if (instance == null) {
-                        Let(e.id, expand(e.value), expand(e.body), e.t)
+                        Let(
+                            e.id,
+                            expand(e.value),
+                            expand(e.body),
+                            e.t
+                        )
                     } else {
                         //get subs (to create value with concrete type)
                         val subs = Type.getSubstitutions(Type.simplify(e.value.t), instance)
                         //apply to value (so value has concrete type)
-                        val value = Expr.apply(subs, e.value)
+                        val value = apply(subs, e.value)
                         if (e.instances.drop(1).count() == 0) {
-                            Let(e.id, expand(value), expand(e.body), e.t)
+                            Let(
+                                e.id,
+                                expand(value),
+                                expand(e.body),
+                                e.t
+                            )
                         } else {
                             //create body (a new let expr with instances - first)
                             val body = Let(e.id, e.value, e.body, e.t)
                             body.instances.addAll(e.instances.drop(1))
                             //return Let with expanded value and expanded body
-                            Let(e.id, expand(value), expand(body), e.t)
+                            Let(
+                                e.id,
+                                expand(value),
+                                expand(body),
+                                e.t
+                            )
                         }
                     }
                 }

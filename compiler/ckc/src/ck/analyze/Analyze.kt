@@ -1,4 +1,9 @@
-//adapted from "Basic Polymorphic Type Checking" by Luca Cardelli
+package ck.analyze
+
+import ck.ast.Type
+import ck.ast.node.Expr
+
+//adapted from "Basic Polymorphic ck.ast.Type Checking" by Luca Cardelli
 sealed class Analyze {
 
     data class Env(val id: String, val type: Type, val tail: Env?)
@@ -175,12 +180,18 @@ sealed class Analyze {
                 is Expr.Assign -> TODO()
                 is Expr.Fun -> {
                     //create new types for params
-//                    val paramTypes: List<Type> = e.params.map { Type.newVar() }
+//                    val paramTypes: List<ck.ast.Type> = e.params.map { ck.ast.Type.newVar() }
                     //params should already have new types here
                     val paramTypes: List<Type> = e.params.map { p -> p.t }
                     //extend env with mapping from param names to types
                     val bodyEnv: Env? =
-                        e.params.zip(paramTypes).foldRight(env) { pair, acc -> Env(pair.first.id, pair.second, acc) }
+                        e.params.zip(paramTypes).foldRight(env) { pair, acc ->
+                            Env(
+                                pair.first.id,
+                                pair.second,
+                                acc
+                            )
+                        }
                     //add param types to non generics
                     val bodyList: NonGenericTypes? =
                         paramTypes.foldRight(list) { type, acc -> NonGenericTypes(type, acc) }
@@ -196,7 +207,8 @@ sealed class Analyze {
                 }
                 is Expr.Let -> {
                     //extend body with binding, value is evaluated in current env
-                    val bodyEnv = Env(e.id, analyze(e.value, env, list), env)
+                    val bodyEnv =
+                        Env(e.id, analyze(e.value, env, list), env)
                     //then analyze body with new env
                     e.t = analyze(e.body, bodyEnv, list)
                     e.t

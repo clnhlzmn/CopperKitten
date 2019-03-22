@@ -1,7 +1,7 @@
 package ck.grammar.visitors
 
-import Expr
-import Type
+import ck.ast.node.Expr
+import ck.ast.Type
 import ckBaseVisitor
 import ckParser
 

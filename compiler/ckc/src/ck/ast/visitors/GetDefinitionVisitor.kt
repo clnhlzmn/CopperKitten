@@ -1,4 +1,7 @@
-import ck.ast.BaseASTVisitor
+package ck.ast.visitors
+
+import ck.ast.node.CkFile
+import ck.ast.node.Expr
 
 sealed class Definition(val local: Boolean) {
     class Let(val node: Expr.Let, local: Boolean) : Definition(local)
@@ -6,7 +9,7 @@ sealed class Definition(val local: Boolean) {
 }
 
 //a visitor used to traverse the ast using enclosing
-//scope to find the definition of a Expr.Ref
+//scope to find the definition of a ck.ast.node.Expr.Ref
 class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
 
     var isLocal = true
@@ -29,7 +32,7 @@ class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
         return null
     }
 
-    //first visit should be to a Expr.Ref where we immediately
+    //first visit should be to a ck.ast.node.Expr.Ref where we immediately
     //start visiting enclosing scopes
     override fun visit(e: Expr.Ref): Definition? {
         id = e.id
@@ -69,7 +72,7 @@ class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
     }
 
     override fun visit(e: Expr.Let): Definition? {
-        //check the id of Expr.Let
+        //check the id of ck.ast.node.Expr.Let
         if (e.id == id) {
             return Definition.Let(e, isLocal)
         }

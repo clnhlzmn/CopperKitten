@@ -1,4 +1,8 @@
-import ck.ast.BaseASTVisitor
+package ck.ast.visitors
+
+import ck.ast.node.CkFile
+import ck.ast.node.Expr
+import ck.ast.Type
 
 class ComputeInstancesVisitor : BaseASTVisitor<Unit>() {
 

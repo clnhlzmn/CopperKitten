@@ -1,3 +1,7 @@
+package ck.ast
+
+import util.extensions.toDelimitedString
+
 //Types
 
 sealed class Type {
@@ -21,7 +25,9 @@ sealed class Type {
             when {
                 t is Var && t.instance == null -> t
                 t is Var -> simplify(t.instance!!)
-                t is Op -> Op(t.operator, t.params.map { p -> simplify(p) })
+                t is Op -> Op(
+                    t.operator,
+                    t.params.map { p -> simplify(p) })
                 else -> t
             }
 
@@ -43,7 +49,9 @@ sealed class Type {
                     val found = subs.find { p -> p.first == t.id }
                     found?.second ?: t
                 }
-                is Op -> Op(t.operator, t.params.map { p -> apply(subs, p) })
+                is Op -> Op(
+                    t.operator,
+                    t.params.map { p -> apply(subs, p) })
                 else -> t
             }
 
@@ -59,7 +67,7 @@ sealed class Type {
             TODO("not implemented")
         }
 
-        override fun toString(): String = "Error: $what"
+        override fun toString(): String = "util.extensions.Error: $what"
 
     }
 
@@ -99,9 +107,9 @@ sealed class Type {
 
         override fun toString(): String =
             if (operator == "Fun")
-                "(${params.take(params.size - 1).toString(", ")}): ${params.last()}"
+                "(${params.take(params.size - 1).toDelimitedString(", ")}): ${params.last()}"
             else
-                "$operator ${params.toString(", ")}"
+                "$operator ${params.toDelimitedString(", ")}"
     }
 
 }

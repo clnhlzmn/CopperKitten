@@ -1,3 +1,5 @@
+package util.either
+
 sealed class Either<A, B> {
 
     abstract fun left(): A?

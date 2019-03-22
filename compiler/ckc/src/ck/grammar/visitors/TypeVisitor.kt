@@ -1,6 +1,6 @@
 package ck.grammar.visitors
 
-import Type
+import ck.ast.Type
 import ckBaseVisitor
 import ckParser
 

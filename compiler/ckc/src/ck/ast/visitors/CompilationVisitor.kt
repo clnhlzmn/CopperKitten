@@ -1,4 +1,10 @@
-import ck.ast.BaseASTVisitor
+package ck.ast.visitors
+
+import ck.ast.node.CkFile
+import ck.ast.node.Expr
+import ck.compiler.StackFrame
+import ck.ast.Type
+import util.extensions.toDelimitedString
 
 fun compileCkFile(ckFile: CkFile): List<String> {
     val program = ArrayList<String>()
@@ -37,7 +43,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
     //instruction like push, pop, dup, add, etc) we need
     //to adjust the corresponding frame element. similarly
     //when we emit an enter or leave instruction we need
-    //to create a new, or restore the last, StackFrame object
+    //to create a new, or restore the last, ck.compiler.StackFrame object
     val frame: StackFrame = StackFrame()
 
     companion object {
@@ -114,7 +120,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("rload 0")
         frame.push("*", Type.Op("Int"))
         //layout instruction
-        ret.add("layout [${frame.getLayout().toString(", ")}]")
+        ret.add("layout [${frame.getLayout().toDelimitedString(", ")}]")
         //call (removes function address)
         ret.add("call")
         frame.pop()
@@ -219,13 +225,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
         //set current layout
-        ret.add("layout [${frame.getLayout().map { i -> i.toString() }.toString(", ")}]")
+        ret.add("layout [${frame.getLayout().map { i -> i.toString() }.toDelimitedString(", ")}]")
         //push size of captures + 1 for function address
         ret.add("push ${e.captures.size + 1}")
         //capture layout is indices of captures where isRefType() is true + 1 because function address is first element
         val captureLayout = (1..e.captures.size).filter { i -> Type.simplify(e.captures[i - 1].t).isRefType() }
         //alloc function array
-        ret.add("alloc [${captureLayout.map { ci -> ci.toString() }.toString(", ")}]")
+        ret.add("alloc [${captureLayout.map { ci -> ci.toString() }.toDelimitedString(", ")}]")
         frame.push("*", type)
         //duplicate function array
         ret.add("dup")
@@ -260,7 +266,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
         //set current layout
-        ret.add("layout [${frame.getLayout().map { i -> i.toString() }.toString(", ")}]")
+        ret.add("layout [${frame.getLayout().map { i -> i.toString() }.toDelimitedString(", ")}]")
         //push size of 1 for function address
         ret.add("push 1")
         //alloc function array

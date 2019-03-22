@@ -1,7 +1,21 @@
+package ck
+
+import ck.grammar.DescriptiveErrorListener
+import ck.ast.Type
+import ck.analyze.Analyze
+import ck.ast.node.CkFile
+import ck.ast.node.Expr
+import ck.ast.visitors.ComputeCapturesVisitor
+import ck.ast.visitors.ComputeInstancesVisitor
+import ck.ast.visitors.ScopeLinkingVisitor
+import ck.ast.visitors.compileCkFile
 import ck.grammar.visitors.FileVisitor
+import ckLexer
+import ckParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.commons.cli.*
+import util.extensions.toDelimitedString
 import java.io.File
 
 class Cli(val args: Array<String>) {
@@ -43,7 +57,7 @@ class Cli(val args: Array<String>) {
                     val res: CkFile = context.accept(FileVisitor())
 
                     val exprType = Analyze.analyze(res.expr, null, null)
-//                    println(Analyze.prune(exprType))
+//                    println(ck.analyze.Analyze.prune(exprType))
 //                    println(res.expr)
                     res.expr.accept(ScopeLinkingVisitor())
                     res.expr.accept(ComputeInstancesVisitor())
@@ -65,10 +79,10 @@ class Cli(val args: Array<String>) {
                         //determine output location
                         if (outputFileName != null) {
                             File(outputFileName).printWriter().use { out ->
-                                out.print(code.toString("\n"))
+                                out.print(code.toDelimitedString("\n"))
                             }
                         } else {
-                            println(code.toString("\n"))
+                            println(code.toDelimitedString("\n"))
                         }
                     } else {
                         //print error
@@ -76,7 +90,7 @@ class Cli(val args: Array<String>) {
                     }
                 } else {
                     //parse error
-                    println(parseError.toString("\n"))
+                    println(parseError.toDelimitedString("\n"))
                 }
             }
 

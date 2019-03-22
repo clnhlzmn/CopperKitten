@@ -1,3 +1,6 @@
+import ck.analyze.Analyze
+import ck.ast.Type
+import ck.grammar.Parse
 import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
