@@ -1,3 +1,10 @@
+package ckBaseVisitors
+
+import Expr
+import Type
+import ckBaseVisitor
+import ckParser
+
 class ExprVisitor : ckBaseVisitor<Expr>() {
 
     override fun visitNaturalExpr(ctx: ckParser.NaturalExprContext?): Expr =
@@ -20,8 +27,8 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
         Expr.Apply(
             fn = ExprVisitor().visit(ctx!!.expr()),
             args =
-                if (ctx.args() != null) ArgsVisitor().visit(ctx.args())
-                else ArrayList(),
+            if (ctx.args() != null) ArgsVisitor().visit(ctx.args())
+            else ArrayList(),
             t = Type.newVar()
         )
 
@@ -135,11 +142,10 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
         )
 
     override fun visitFunExpr(ctx: ckParser.FunExprContext?): Expr {
-        val params =
-            if (ctx!!.params() != null) ParamsVisitor().visit(ctx.params())
-            else ArrayList()
         return Expr.Fun(
-            params = params,
+            params =
+                if (ctx!!.params() != null) ctx.params().accept(ckBaseVisitors.ParamsVisitor())
+                else ArrayList(),
             declType = if (ctx.type() == null) null else TypeVisitor().visit(ctx.type()),
             body = ExprVisitor().visit(ctx.expr()),
             t = Type.newVar()
@@ -158,8 +164,8 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             cond = ExprVisitor().visit(ctx!!.cond),
             csq = ExprVisitor().visit(ctx.csq),
             alt =
-                if (ctx.alt != null) ExprVisitor().visit(ctx.alt)
-                else null,
+            if (ctx.alt != null) ExprVisitor().visit(ctx.alt)
+            else null,
             t = Type.newVar()
         )
 
@@ -171,36 +177,10 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
 
 }
 
-class SequenceVisitor : ckBaseVisitor<Expr>() {
-    override fun visitSequence(ctx: ckParser.SequenceContext?): Expr {
-        val expr = ctx!!.expr()
-        return if (ctx.sequence() == null)
-            //if sequence is null then return expr
-            expr.accept(ExprVisitor())
-        else
-            when (expr) {
-                is ckParser.LetExprContext ->
-                    //if expr is let then make sequence it's body
-                    Expr.Let(
-                        id = expr.ID().text,
-                        value = ExprVisitor().visit(expr.value),
-                        body = SequenceVisitor().visit(ctx.sequence()),
-                        t = Type.newVar()
-                    )
-                else ->
-                    //otherwise it's a normal sequence
-                    Expr.Sequence(
-                        first = ExprVisitor().visit(ctx.expr()),
-                        second = SequenceVisitor().visit(ctx.sequence()),
-                        t = Type.newVar()
-                    )
-            }
-    }
-}
-
-class ArgsVisitor : ckBaseVisitor<List<Expr>>() {
-    override fun visitArgs(ctx: ckParser.ArgsContext?): List<Expr> =
-        ctx!!.expr().map { ectx -> ExprVisitor().visit(ectx) }
+//TODO: for some reason I can't put these classes in their own files...
+class ParamsVisitor : ckBaseVisitor<List<Expr.Fun.Param>>() {
+    override fun visitParams(ctx: ckParser.ParamsContext?): List<Expr.Fun.Param> =
+        ctx!!.param().map { p -> ckBaseVisitors.ParamVisitor().visit(p) }
 }
 
 class ParamVisitor : ckBaseVisitor<Expr.Fun.Param>() {
@@ -210,33 +190,5 @@ class ParamVisitor : ckBaseVisitor<Expr.Fun.Param>() {
             declType = if (ctx.type() == null) null else TypeVisitor().visit(ctx.type()),
             t = Type.newVar()
         )
-}
-
-class ParamsVisitor : ckBaseVisitor<List<Expr.Fun.Param>>() {
-    override fun visitParams(ctx: ckParser.ParamsContext?): List<Expr.Fun.Param> =
-        ctx!!.param().map { p -> ParamVisitor().visit(p) }
-}
-
-class TypeVisitor : ckBaseVisitor<Type>() {
-
-    override fun visitSimpleType(ctx: ckParser.SimpleTypeContext?): Type =
-        when (ctx!!.TYPEID().text) {
-            "Int" -> Type.Op("Int", emptyList())
-            "Unit" -> Type.Op("Unit", emptyList())
-            else -> Type.Error("unknown type ${ctx.TYPEID().text}") //SimpleType(ctx.TYPEID().text)
-        }
-
-    override fun visitFunType(ctx: ckParser.FunTypeContext?): Type =
-        Type.Op(
-            "Fun",
-            (if (ctx!!.types() != null) TypesVisitor().visit(ctx.types())
-            else emptyList())
-            + TypeVisitor().visit(ctx.type())
-        )
-}
-
-class TypesVisitor : ckBaseVisitor<List<Type>>() {
-    override fun visitTypes(ctx: ckParser.TypesContext?): List<Type> =
-        ctx!!.type().map { t -> TypeVisitor().visit(t) }
 }
 
