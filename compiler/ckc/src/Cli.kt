@@ -46,7 +46,7 @@ class Cli(val args: Array<String>) {
                     val exprType = Analyze.analyze(res.expr, null, null)
                     println(Analyze.prune(exprType))
                     println(res.expr)
-                    res.expr.accept(ScopeBuildingVisitor())
+                    res.expr.accept(ScopeLinkingVisitor())
 
                     res.expr.accept(ComputeInstancesVisitor())
 
@@ -54,20 +54,22 @@ class Cli(val args: Array<String>) {
 
                     val expanded = Expr.expand(res.expr)
 
+                    expanded.accept(ScopeLinkingVisitor())
+
 //                  check if error type
                     if (res.expr.t !is Type.Error) {
-                        //compute function captures
-                        res.expr.accept(ComputeCapturesVisitor())
-                        //compile file
-                        val code: List<String> = compileCkFile(res)
-                        //determine output location
-                        if (outputFileName != null) {
-                            File(outputFileName).printWriter().use { out ->
-                                out.print(code.toString("\n"))
-                            }
-                        } else {
-                            println(code.toString("\n"))
-                        }
+//                        //compute function captures
+//                        res.expr.accept(ComputeCapturesVisitor())
+//                        //compile file
+//                        val code: List<String> = compileCkFile(res)
+//                        //determine output location
+//                        if (outputFileName != null) {
+//                            File(outputFileName).printWriter().use { out ->
+//                                out.print(code.toString("\n"))
+//                            }
+//                        } else {
+//                            println(code.toString("\n"))
+//                        }
                     } else {
                         //print error
                         println(res.expr.t)
