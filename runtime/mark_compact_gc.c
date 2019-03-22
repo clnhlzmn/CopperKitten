@@ -48,6 +48,7 @@ static inline void mark_ref_cb(intptr_t **it, void *ctx) {
     assert(it);
     (void)ctx;
     intptr_t *ref = *it;
+    if (*it == NULL) { return; }
     struct gc_object *obj = get_gc_ptr(ref);
     if (obj->mark == 0) {
         /*printf("mark_ref_cb: obj = %p\r\n", obj);*/
@@ -61,6 +62,7 @@ static inline void mark_ref_cb(intptr_t **it, void *ctx) {
 static inline void update_ref_address_cb(intptr_t **it, void *ctx) {
     assert(it);
     (void)ctx;
+    if (*it == NULL) { return; }
     intptr_t **ref = it;
     struct gc_object *obj = get_gc_ptr(*ref);
     if (obj->forward) {

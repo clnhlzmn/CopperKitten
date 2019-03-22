@@ -146,6 +146,7 @@ static inline void forward_ref_cb(intptr_t **it, void *ctx) {
     assert(it);
     assert(ctx);
     /*printf("forward_ref_cb: self = %p, root = %p\r\n", data, it);*/
+    if (*it == NULL) { return; }
     *(intptr_t**)it 
         = get_user_ptr(
             gc_forward((struct gc*)ctx, get_gc_ptr(*(intptr_t**)it)));
