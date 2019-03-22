@@ -198,7 +198,12 @@ sealed class Analyze {
                     e.t
                 }
                 is Expr.If -> TODO()
-                is Expr.While -> TODO()
+                is Expr.While -> {
+                    val condType = analyze(e.cond, env, list)
+                    unifyType(condType, Type.Op("Int"))
+                    e.t = analyze(e.body, env, list)
+                    e.t
+                }
                 is Expr.Break -> TODO()
             }
 

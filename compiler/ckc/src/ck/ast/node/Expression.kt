@@ -3,6 +3,7 @@ package ck.ast.node
 import ck.ast.Type
 import ck.ast.visitors.ASTVisitor
 import util.extensions.toDelimitedString
+import kotlin.math.exp
 
 //Expressions
 
@@ -576,7 +577,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                     }
                 }
                 is If -> TODO()
-                is While -> TODO()
+                is While -> While(expand(e.cond), expand(e.body), e.t)
                 is Break -> TODO()
             }
         }
