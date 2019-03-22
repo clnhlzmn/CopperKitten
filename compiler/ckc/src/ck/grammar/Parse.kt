@@ -27,7 +27,7 @@ sealed class Parse {
             return ckParser
         }
 
-        fun expr(stream: CodePointCharStream): Either<Error, Expr> {
+        fun expr(stream: CharStream): Either<Error, Expr> {
             val parser = getParser(stream)
             return try {
                 val context = parser.expr()
@@ -37,7 +37,7 @@ sealed class Parse {
             }
         }
 
-        fun file(stream: CodePointCharStream): Either<Error, CkFile> {
+        fun file(stream: CharStream): Either<Error, CkFile> {
             val parser = getParser(stream)
             return try {
                 val context = parser.file()
