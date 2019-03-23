@@ -12,6 +12,14 @@ sealed class Either<A, B> {
     abstract fun <C> mapRight(f: (B) -> C): Either<A, C>
     abstract fun <C, D> map(l: (A) -> C, r: (B) -> D): Either<C, D>
 
+    infix fun <C> compose(rhs: Either<A, C>): Either<A, Pair<B, C>> {
+        return when {
+            isLeft() -> Either.left(left()!!)
+            rhs.isLeft() -> Either.left(rhs.left()!!)
+            else -> Either.right(Pair(right()!!, rhs.right()!!))
+        }
+    }
+
     data class Left<A, B>(val left: A) : Either<A, B>() {
         override fun left(): A? = left
         override fun right(): B? = null
