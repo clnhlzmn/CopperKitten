@@ -55,7 +55,8 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
     }
 
     override fun visit(e: Expr.Unit): List<String> {
-        frame.push("*", Type.Op("Unit"))
+        //NULL pointer
+        frame.push("*", true)
         return listOf("push 0")
     }
 
@@ -68,13 +69,22 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
     }
 
     override fun visit(e: Expr.Natural): List<String> {
-        frame.push("*", Type.Op("Int"))
-        return listOf("push ${e.value}")
+        val ret = ArrayList<String>()
+        //alloc storage for result value
+        ret.add("layout ${frame.getLayoutString()}")
+        ret.add("push 1")
+        ret.add("alloc []")
+        frame.push("*", true)
+        //[...|[]]
+        ret.add("push ${e.value}")
+        //[...|[]|value]
+        ret.add("rstore 0")
+        //[...|[value]]
+        return ret
     }
 
     override fun visit(e: Expr.Ref): List<String> {
         val def = e.accept(GetDefinitionVisitor())
-        val type = Type.simplify(e.t)
         when (def) {
             is Definition -> {
                 if (def.local) {
@@ -82,13 +92,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
                         is Definition.Param -> {
                             val enclosingFun = e.accept(GetEnclosingFunction())!!
                             val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
-                            frame.push("*", type)
+                            frame.push("*", true)
                             return listOf("aload $paramIndex //${e.id}")
                         }
                         is Definition.Let -> {
-                            val localIndex = frame.lookup(e.id, type)
+                            val localIndex = frame.lookup(e.id)
                             if (localIndex != null) {
-                                frame.push("*", type)
+                                frame.push("*", true)
                                 return listOf("lload $localIndex //${e.id}")
                             } else {
                                 TODO("error")
@@ -98,7 +108,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
                 } else {
                     val enclosingFun = e.accept(GetEnclosingFunction())!!
                     val captureIndex = enclosingFun.captures.indexOfFirst { c -> c.id == e.id }
-                    frame.push("*", type)
+                    frame.push("*", true)
                     return listOf("cload $captureIndex //${e.id}")
                 }
             }
@@ -118,9 +128,9 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("dup")
         //get code address (replaces dup'd function with non-ref function address)
         ret.add("rload 0")
-        frame.push("*", Type.Op("Int"))
+        frame.push("*", false)
         //layout instruction
-        ret.add("layout [${frame.getLayout().toDelimitedString(", ")}]")
+        ret.add("layout ${frame.getLayoutString()}")
         //call (removes function address)
         ret.add("call")
         frame.pop()
@@ -135,29 +145,59 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         //load return value
         ret.add("load")
         //push return value
-        frame.push("*", Type.simplify(e.t))
+        frame.push("*", true)
         return ret
     }
 
     override fun visit(e: Expr.Unary): List<String> {
         val ret = ArrayList<String>()
+
+        //alloc storage for result value
+        ret.add("layout ${frame.getLayoutString()}")
+        ret.add("push 1")
+        ret.add("alloc []")
+        frame.push("*", true)
+        //[...|[]]
+
         //evaluate operand
         ret.addAll(e.operand.accept(this))
+        ret.add("rload 0")
+        //[...|[]|operand]
+
         when (e.operator) {
             "-" -> ret.add("neg")
             "!" -> ret.add("not")
             "~" -> ret.add("bitnot")
             else -> TODO("not implemented")
         }
+        //[...|[]|op(operand)]
+
+        //store result
+        ret.add("rstore 0")
+        //[...|[op(operand)]]
+
         return ret
     }
 
     override fun visit(e: Expr.Binary): List<String> {
         val ret = ArrayList<String>()
+
+        //alloc storage for result value
+        ret.add("layout ${frame.getLayoutString()}")
+        ret.add("push 1")
+        ret.add("alloc []")
+        frame.push("*", true)
+        //[...|[]]
+
+        //do operation
         if (e.operator != "&&" && e.operator != "||") {
             ret.addAll(e.lhs.accept(this))
+            ret.add("rload 0")
             ret.addAll(e.rhs.accept(this))
+            ret.add("rload 0")
         }
+        //[...|[]|lhs|rhs]
+
         when (e.operator) {
             "*" -> ret.add("mul")
             "/" -> ret.add("div")
@@ -179,24 +219,34 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
             "&&" -> {
                 val endLabel = nextLabel()
                 ret.addAll(e.lhs.accept(this))
+                ret.add("rload 0")
                 ret.add("dup")
                 ret.add("jumpz $endLabel")
                 ret.add("pop")
                 ret.addAll(e.rhs.accept(this))
+                ret.add("rload 0")
                 ret.add("$endLabel:")
             }
             "||" -> {
                 val endLabel = nextLabel()
                 ret.addAll(e.lhs.accept(this))
+                ret.add("rload 0")
                 ret.add("dup")
                 ret.add("jumpnz $endLabel")
                 ret.add("pop")
                 ret.addAll(e.rhs.accept(this))
+                ret.add("rload 0")
                 ret.add("$endLabel:")
             }
             else -> TODO("not implemented")
         }
-        //all the above instructions (except && ||) remove a temp from the stack
+        //[...|[]|lhs op rhs]
+
+        //store result
+        ret.add("rstore 0")
+        //[...|[lhs op rhs]]
+
+        //remove one value from compile time stack
         frame.pop()
         return ret
     }
@@ -221,33 +271,24 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
 
     override fun visit(e: Expr.Fun): List<String> {
         val ret = ArrayList<String>()
-        val type = Type.simplify(e.t)
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
         //set current layout
-        ret.add("layout [${frame.getLayout().map { i -> i.toString() }.toDelimitedString(", ")}]")
+        ret.add("layout ${frame.getLayoutString()}")
         //push size of captures + 1 for function address
         ret.add("push ${e.captures.size + 1}")
         //capture layout is indices of captures where isRefType() is true + 1 because function address is first element
-        val captureLayout = (1..e.captures.size).filter { i -> Type.simplify(e.captures[i - 1].t).isRefType() }
+        val captureLayout = (1..e.captures.size).filter { true }.map { ci -> ci.toString() }.toDelimitedString(", ")
         //alloc function array
-        ret.add("alloc [${captureLayout.map { ci -> ci.toString() }.toDelimitedString(", ")}]")
-        frame.push("*", type)
-        //duplicate function array
-        ret.add("dup")
-        frame.push("*", type)
+        ret.add("alloc [$captureLayout]")
+        frame.push("*", true)
         //store function address in fun[0]
         ret.add("push $bodyLabel")
         ret.add("rstore 0")
-        frame.pop()
         for (i in (0 until e.captures.size)) {
-            //duplicate function array
-            ret.add("dup")
-            frame.push("*", type)
             //compile capture reference
             ret.addAll(e.captures[i].accept(this))
             ret.add("rstore ${i + 1}")
-            frame.pop()
         }
         //jump over the function body
         ret.add("jump $contLabel")
@@ -262,23 +303,18 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
 
     override fun visit(e: Expr.CFun): List<String> {
         val ret = ArrayList<String>()
-        val type = Type.simplify(e.t)
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
         //set current layout
-        ret.add("layout [${frame.getLayout().map { i -> i.toString() }.toDelimitedString(", ")}]")
+        ret.add("layout ${frame.getLayoutString()}")
         //push size of 1 for function address
         ret.add("push 1")
         //alloc function array
         ret.add("alloc []")
-        frame.push("*", type)
-        //duplicate function array
-        ret.add("dup")
-        frame.push("*", type)
+        frame.push("*", true)
         //store function address in fun[0]
         ret.add("push $bodyLabel")
         ret.add("rstore 0")
-        frame.pop()
         //jump over the function body
         ret.add("jump $contLabel")
         //here goes the body
@@ -303,7 +339,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         //add space for local
         ret.add("push 0")
         //get local index (adjusted for instance #) in which to store this value
-        val localIndex = frame.push(e.id, valType)
+        val localIndex = frame.push(e.id, true)
         //compile the value expr
         ret.add("//${e.value}: $valType")
         ret.addAll(e.value.accept(this))
@@ -323,13 +359,14 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         val altLabel = nextLabel()
         val endLabel = nextLabel()
         ret.addAll(e.cond.accept(this))
+        ret.add("rload 0")
         ret.add("jumpz $altLabel")
         ret.addAll(e.csq.accept(this))
         ret.add("jump $endLabel")
         ret.add("$altLabel:")
         if (e.alt == null) {
             ret.add("push 0")
-            frame.push("*", Type.simplify(e.t))
+            frame.push("*", true)
         } else {
             ret.addAll(e.alt.accept(this))
         }
@@ -349,11 +386,12 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         frame.pop()
         ret.add("$condLabel:")
         ret.addAll(e.cond.accept(this))
+        ret.add("rload 0")
         ret.add("jumpnz $beginLabel")
         frame.pop()
-        //value of type Unit
+        //value of type Unit (NULL pointer)
         ret.add("push 0")
-        frame.push("*", Type.Op("Unit"))
+        frame.push("*", true)
         return ret
     }
 

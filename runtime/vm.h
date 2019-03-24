@@ -148,6 +148,19 @@ static inline void vm_astore(struct vm *self, intptr_t index) {
     self->sp--;
 }
 
+static inline void vm_rload(struct vm *self, intptr_t index) {
+    //load a reference from the ref on tos
+    //[...|ref]->[...|ref[index]]
+    //sp[-1] = (sp[-1])[index]
+    self->sp[-1] = ((intptr_t*)self->sp[-1])[index];
+}
+
+static inline void vm_rstore(struct vm *self, intptr_t index) {
+    //[...|ref|value]->[...|ref]
+    ((intptr_t*)self->sp[-2])[index] = self->sp[-1];
+    self->sp -= 1;
+}
+
 static inline void vm_stack_layout_for_alloc(
     void (*cb)(intptr_t **it, void *ctx),
     void *cb_ctx,
@@ -162,6 +175,27 @@ static inline void vm_stack_layout_for_alloc(
             frame_layout(cb, cb_ctx, fp + 2);
         }
     }
+}
+
+//alloc a ref of the given size with the given layout and put it on top of the stack
+static inline void vm_alloc(struct vm *self, foreach_t layout) {
+    self->sp[-1] = (intptr_t)gc_alloc_with_layout(
+        self->gc,                               //gc inst
+        vm_stack_layout_for_alloc,              //stack layout
+        self,                                   //stack layout context
+        self->sp[-1],                           //alloc size
+        layout                                  //alloc layout
+    );
+}
+
+static inline void vm_push(struct vm *self, intptr_t value) {
+    self->sp[0] = value;
+    self->sp++;
+}
+
+static inline intptr_t vm_pop(struct vm *self) {
+    self->sp--;
+    return self->sp[0];
 }
 
 static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
@@ -285,8 +319,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp--;
             break;
         case PUSH: 
-            self->sp[0] = vm_get_word(self);
-            self->sp++;
+            vm_push(self, vm_get_word(self));
             break;
         case DUP:
             self->sp[0] = self->sp[-1];
@@ -326,13 +359,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->fp[1] = (intptr_t)self->functions[vm_get_word(self)];
             break;
         case ALLOC:
-            self->sp[-1] = (intptr_t)gc_alloc_with_layout(
-                self->gc,                               //gc inst
-                vm_stack_layout_for_alloc,              //stack layout
-                self,                                   //stack layout context
-                self->sp[-1],                           //alloc size
-                self->functions[vm_get_word(self)]      //alloc layout
-            );
+            vm_alloc(self, self->functions[vm_get_word(self)]);
             break;
         case LOAD:
             self->sp[0] = self->temp;
@@ -349,15 +376,10 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             vm_lstore(self, vm_get_word(self));
             break;
         case RLOAD:
-            //load a reference from the ref on tos
-            //[...|ref]->[...|ref[index]]
-            //sp[-1] = (sp[-1])[index]
-            self->sp[-1] = ((intptr_t*)self->sp[-1])[vm_get_word(self)];
+            vm_rload(self, vm_get_word(self));
             break;
         case RSTORE:
-            //[...|ref|value]->[...]
-            ((intptr_t*)self->sp[-2])[vm_get_word(self)] = self->sp[-1];
-            self->sp -= 2;
+            vm_rstore(self, vm_get_word(self));
             break;
         case ALOAD:
             vm_aload(self, vm_get_word(self));

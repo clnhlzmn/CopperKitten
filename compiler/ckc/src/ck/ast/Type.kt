@@ -6,7 +6,6 @@ import util.extensions.toDelimitedString
 
 sealed class Type {
 
-    abstract fun isRefType(): Boolean
     abstract fun isPolyType(): Boolean
 
     companion object {
@@ -67,10 +66,6 @@ sealed class Type {
             else
                 instance!!.isPolyType()
 
-        override fun isRefType(): Boolean {
-            TODO("not implemented")
-        }
-
         override fun toString(): String =
             if (instance != null) "$instance"
             else id
@@ -82,13 +77,6 @@ sealed class Type {
         constructor(operator: String) : this(operator, emptyList())
 
         override fun isPolyType(): Boolean = params.any { p -> p.isPolyType() }
-
-        override fun isRefType(): Boolean =
-            when (operator) {
-                "Int" -> false
-                "Unit" -> false
-                else -> true
-            }
 
         override fun toString(): String =
             if (operator == "Fun")

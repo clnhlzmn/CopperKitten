@@ -52,41 +52,20 @@ class Cli(val args: Array<String>) {
                         println("$err\n")
                     },
                     { file ->
-                        val exprType = Analyze.analyze(file.expr, null, null)
-//                    println(ck.analyze.Analyze.prune(exprType))
-//                    println(file.expr)
-                        file.expr.accept(ScopeLinkingVisitor())
-                        file.expr.accept(ComputeInstancesVisitor())
-
-//                    println(file.expr)
-
-                        var expanded = Expr.expand(file.expr)
-
-                        expanded.accept(ComputeInstancesVisitor())
-                        expanded = Expr.expand(expanded)
-
-                        val file = CkFile(file.defs, expanded)
-
+                        Analyze.analyze(file.expr, null, null)
                         file.accept(ScopeLinkingVisitor())
-
-//                  check if error type
-//                        if (file.expr.t !is Type.Error) {
-                            //compute function captures
-                            file.expr.accept(ComputeCapturesVisitor())
-                            //compile file
-                            val code: List<String> = compileCkFile(file)
-                            //determine output location
-                            if (outputFileName != null) {
-                                File(outputFileName).printWriter().use { out ->
-                                    out.print(code.toDelimitedString("\n"))
-                                }
-                            } else {
-                                println(code.toDelimitedString("\n"))
+                        //compute function captures
+                        file.expr.accept(ComputeCapturesVisitor())
+                        //compile file
+                        val code: List<String> = compileCkFile(file)
+                        //determine output location
+                        if (outputFileName != null) {
+                            File(outputFileName).printWriter().use { out ->
+                                out.print(code.toDelimitedString("\n"))
                             }
-//                        } else {
-//                            //print error
-//                            println(file.expr.t)
-//                        }
+                        } else {
+                            println(code.toDelimitedString("\n"))
+                        }
                     }
                 )
             }

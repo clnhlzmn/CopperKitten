@@ -4,7 +4,7 @@ CKC = java -jar ../../compiler/out/artifacts/ckc_jar/ckc.jar
 CKA = java -jar ../../compiler/out/artifacts/cka_jar/cka.jar
 
 #ck assembler options
-STACKSIZE = 100
+STACKSIZE = 1000
 HEAPSIZE = 1000
 WORDSIZE = 8
 GC = mark_compact
@@ -31,8 +31,8 @@ out:
 	mkdir out
 
 #use gcc to compile generated c code
-out/simple_io: out/simple_io.c simple_io_cfuns.c
-	gcc out/simple_io.c simple_io_cfuns.c ${GCIMPL} -o ${OUTDIR}/simple_io -I${RUNTIMEDIR} ${CFLAGS}
+out/simple_io: out/simple_io.c
+	gcc out/simple_io.c ${RUNTIMEDIR}/builtin_cfuns.c ${GCIMPL} -o ${OUTDIR}/simple_io -I${RUNTIMEDIR} ${CFLAGS}
 
 #use cka to generate c from simple_io.cka
 out/simple_io.c: out/simple_io.cka
