@@ -13,12 +13,12 @@ class ComputeInstancesVisitor : BaseASTVisitor<Unit>() {
             if (e is Expr.Ref) {
                 val def = e.accept(GetDefinitionVisitor())
                 if (def is Definition.Let) {
-                    if (!t.isPolyType()) {
+//                    if (!t.isPolyType()) {
                         //if t is not a polytype then add as instance
                         def.node.instances.add(t)
                         //recurse on def value
                         addInstance(def.node.value, t)
-                    }
+//                    }
                 }
             }
         }

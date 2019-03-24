@@ -60,7 +60,10 @@ class Cli(val args: Array<String>) {
 
 //                    println(file.expr)
 
-                        val expanded = Expr.expand(file.expr)
+                        var expanded = Expr.expand(file.expr)
+
+                        expanded.accept(ComputeInstancesVisitor())
+                        expanded = Expr.expand(expanded)
 
                         val file = CkFile(file.defs, expanded)
 
