@@ -15,7 +15,7 @@ sealed class Analyze {
     companion object {
 
         /**creates a new [Type.Var], TODO: how does this use [scan] and [env]*/
-        fun freshVar(type: Type, scan: CopyEnv?, env: Array<CopyEnv?>): Type {
+        private fun freshVar(type: Type, scan: CopyEnv?, env: Array<CopyEnv?>): Type {
             if (scan == null) {
                 /**if [scan] is empty then create a new var and extend original [env]*/
                 val newTypeVar = Type.newVar()
@@ -30,7 +30,7 @@ sealed class Analyze {
             }
         }
 
-        fun fresh(type: Type, list: NonGenericTypes?, env: Array<CopyEnv?>): Type {
+        private fun fresh(type: Type, list: NonGenericTypes?, env: Array<CopyEnv?>): Type {
             val pType = prune(type)
             return when (pType) {
                 is Type.Var ->
@@ -50,7 +50,7 @@ sealed class Analyze {
 
         /**Make a copy of [type]; the generic variables are copied,
          * while the non-generic variables are shared*/
-        fun freshType(type: Type, list: NonGenericTypes?): Type {
+        private fun freshType(type: Type, list: NonGenericTypes?): Type {
             val env: Array<CopyEnv?> = Array(1) { null }
             return fresh(type, list, env)
         }
@@ -58,7 +58,7 @@ sealed class Analyze {
         /**Search for an identifier in an environment and return a "fresh" copy of
         the associated [Type] (using [freshType]). The identifier must be
         bound in the environment*/
-        fun retrieve(id: String, env: Env?, list: NonGenericTypes?): Type {
+        private fun retrieve(id: String, env: Env?, list: NonGenericTypes?): Type {
             return if (env == null) {
                 /**[env] is empty: [id] is unbound*/
                 throw RuntimeException("unbound reference $id")
@@ -87,7 +87,7 @@ sealed class Analyze {
                 else -> t
             }
 
-        fun occursInType(tVar: Type, tExp: Type): Boolean {
+        private fun occursInType(tVar: Type, tExp: Type): Boolean {
             val ptExp = prune(tExp)
             return when (ptExp) {
                 is Type.Var -> ptExp == tVar
@@ -96,7 +96,7 @@ sealed class Analyze {
         }
 
         /**takes two types [t1] and [t2] and unifies them or throws an error*/
-        fun unifyType(t1: Type, t2: Type) {
+        private fun unifyType(t1: Type, t2: Type) {
             val pt1 = prune(t1)
             val pt2 = prune(t2)
             return when (pt1) {
@@ -123,7 +123,7 @@ sealed class Analyze {
         }
 
         /**Whether [type] is generic w.r.t. [list] of non-generic type variables*/
-        fun isGeneric(type: Type, list: NonGenericTypes?): Boolean =
+        private fun isGeneric(type: Type, list: NonGenericTypes?): Boolean =
             when {
                 list == null -> true
                 type == list.type -> false
@@ -176,11 +176,7 @@ sealed class Analyze {
                     //extend env with mapping from param names to types
                     val bodyEnv: Env? =
                         e.params.zip(paramTypes).foldRight(env) { pair, acc ->
-                            Env(
-                                pair.first.id,
-                                pair.second,
-                                acc
-                            )
+                            Env(pair.first.id, pair.second, acc)
                         }
                     //add param types to non generics
                     val bodyList: NonGenericTypes? =
@@ -192,7 +188,7 @@ sealed class Analyze {
                     e.t
                 }
                 is Expr.CFun -> {
-                    unifyType(e.sig, e.t)
+                    e.t = e.sig
                     e.t
                 }
                 is Expr.Let -> {
@@ -208,8 +204,7 @@ sealed class Analyze {
                     unifyType(condType, Type.Op("Int"))
                     val csqType = analyze(e.csq, env, list)
                     val altType = if (e.alt == null) Type.Op("Unit") else analyze(e.alt, env, list)
-                    unifyType(e.t, csqType)
-                    unifyType(e.t, altType)
+                    unifyType(csqType, csqType)
                     e.t = csqType
                     e.t
                 }
