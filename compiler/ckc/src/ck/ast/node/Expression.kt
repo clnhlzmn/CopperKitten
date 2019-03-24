@@ -493,6 +493,8 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                 is Break -> TODO()
             }
 
+        //TODO: need to combine this and ComputeInstancesVisitor so that
+        //TODO: expansion happens and then instances can be computed on the expansion
         fun expand(e: Expr): Expr {
             return when (e) {
                 is Error -> e
