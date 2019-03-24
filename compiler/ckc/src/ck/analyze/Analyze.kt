@@ -45,7 +45,6 @@ sealed class Analyze {
                         pType.params.map { p -> fresh(p, list, env) }
                     )
                 }
-                else -> pType
             }
         }
 
@@ -62,7 +61,7 @@ sealed class Analyze {
         fun retrieve(id: String, env: Env?, list: NonGenericTypes?): Type {
             return if (env == null) {
                 /**[env] is empty: [id] is unbound*/
-                Type.Error("unbound var $id")
+                throw RuntimeException("unbound reference $id")
             } else if (env.id == id) {
                 /**create a new [Type] that matches [env.type]
                  * vars are copied if they're generic and shared if not*/
@@ -93,7 +92,6 @@ sealed class Analyze {
             return when (ptExp) {
                 is Type.Var -> ptExp == tVar
                 is Type.Op -> ptExp.params.any { pt -> occursInType(tVar, pt) }
-                else -> false
             }
         }
 
@@ -120,10 +118,7 @@ sealed class Analyze {
                                     .forEach { pair -> unifyType(pair.first, pair.second) }
                             }
                         }
-                        else -> throw RuntimeException("type mismatch between $pt1 and $pt2")
                     }
-                else -> {
-                }
             }
         }
 
@@ -138,7 +133,6 @@ sealed class Analyze {
         /**returns the type of [e] in [env] given [list] of [NonGenericTypes]*/
         fun analyze(e: Expr, env: Env?, list: NonGenericTypes?): Type =
             when (e) {
-                is Expr.Error -> e.t
                 Expr.Unit -> e.t
                 is Expr.Natural -> e.t
                 is Expr.Sequence -> {
@@ -158,8 +152,20 @@ sealed class Analyze {
                     e.t = retType
                     e.t
                 }
-                is Expr.Unary -> TODO()
-                is Expr.Binary -> TODO()
+                is Expr.Unary -> {
+                    val operandType = analyze(e.operand, env, list)
+                    unifyType(operandType, Type.Op("Int"))
+                    e.t = Type.Op("Int")
+                    e.t
+                }
+                is Expr.Binary -> {
+                    val lhsType = analyze(e.lhs, env, list)
+                    val rhsType = analyze(e.rhs, env, list)
+                    unifyType(lhsType, Type.Op("Int"))
+                    unifyType(rhsType, Type.Op("Int"))
+                    e.t = Type.Op("Int")
+                    e.t
+                }
                 is Expr.Cond -> TODO()
                 is Expr.Assign -> TODO()
                 is Expr.Fun -> {
@@ -197,7 +203,16 @@ sealed class Analyze {
                     e.t = analyze(e.body, bodyEnv, list)
                     e.t
                 }
-                is Expr.If -> TODO()
+                is Expr.If -> {
+                    val condType = analyze(e.cond, env, list)
+                    unifyType(condType, Type.Op("Int"))
+                    val csqType = analyze(e.csq, env, list)
+                    val altType = if (e.alt == null) Type.Op("Unit") else analyze(e.alt, env, list)
+                    unifyType(e.t, csqType)
+                    unifyType(e.t, altType)
+                    e.t = csqType
+                    e.t
+                }
                 is Expr.While -> {
                     val condType = analyze(e.cond, env, list)
                     unifyType(condType, Type.Op("Int"))

@@ -52,22 +52,7 @@ sealed class Type {
                 is Op -> Op(
                     t.operator,
                     t.params.map { p -> apply(subs, p) })
-                else -> t
             }
-
-    }
-
-    data class Error(val what: String) : Type() {
-
-        override fun isPolyType(): Boolean {
-            TODO("not implemented")
-        }
-
-        override fun isRefType(): Boolean {
-            TODO("not implemented")
-        }
-
-        override fun toString(): String = "util.extensions.Error: $what"
 
     }
 

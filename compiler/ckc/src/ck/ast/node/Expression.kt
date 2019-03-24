@@ -9,27 +9,6 @@ import kotlin.math.exp
 
 sealed class Expr(var t: Type) : BaseASTNode() {
 
-    class Error(val what: String) : Expr(Type.Error(what)) {
-        override fun toString(): String {
-            return "util.extensions.Error: $what"
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as Error
-
-            if (what != other.what) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return what.hashCode()
-        }
-    }
-
     object Unit : Expr(Type.Op("Unit", emptyList())) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -530,8 +509,8 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                     e.args.map { a -> expand(a) },
                     e.t
                 )
-                is Unary -> TODO()
-                is Binary -> TODO()
+                is Unary -> Unary(e.operator, expand(e.operand), e.t)
+                is Binary -> Binary(expand(e.lhs), e.operator, expand(e.rhs), e.t)
                 is Cond -> TODO()
                 is Assign -> TODO()
                 is Fun -> Fun(
@@ -576,7 +555,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                         }
                     }
                 }
-                is If -> TODO()
+                is If -> If(expand(e.cond), expand(e.csq), if (e.alt == null) null else expand(e.alt), e.t)
                 is While -> While(expand(e.cond), expand(e.body), e.t)
                 is Break -> TODO()
             }

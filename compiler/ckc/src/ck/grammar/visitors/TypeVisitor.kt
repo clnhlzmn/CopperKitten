@@ -3,6 +3,7 @@ package ck.grammar.visitors
 import ck.ast.Type
 import ckBaseVisitor
 import ckParser
+import java.lang.RuntimeException
 
 class TypeVisitor : ckBaseVisitor<Type>() {
 
@@ -10,7 +11,7 @@ class TypeVisitor : ckBaseVisitor<Type>() {
         when (ctx!!.TYPEID().text) {
             "Int" -> Type.Op("Int", emptyList())
             "Unit" -> Type.Op("Unit", emptyList())
-            else -> Type.Error("unknown type ${ctx.TYPEID().text}") //SimpleType(ctx.TYPEID().text)
+            else -> throw RuntimeException("unknown type ${ctx.TYPEID().text}")
         }
 
     override fun visitFunType(ctx: ckParser.FunTypeContext?): Type =

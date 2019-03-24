@@ -67,7 +67,7 @@ class Cli(val args: Array<String>) {
                         file.accept(ScopeLinkingVisitor())
 
 //                  check if error type
-                        if (file.expr.t !is Type.Error) {
+//                        if (file.expr.t !is Type.Error) {
                             //compute function captures
                             file.expr.accept(ComputeCapturesVisitor())
                             //compile file
@@ -80,10 +80,10 @@ class Cli(val args: Array<String>) {
                             } else {
                                 println(code.toDelimitedString("\n"))
                             }
-                        } else {
-                            //print error
-                            println(file.expr.t)
-                        }
+//                        } else {
+//                            //print error
+//                            println(file.expr.t)
+//                        }
                     }
                 )
             }
