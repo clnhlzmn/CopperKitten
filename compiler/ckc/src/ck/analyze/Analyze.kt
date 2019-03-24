@@ -204,7 +204,7 @@ sealed class Analyze {
                     unifyType(condType, Type.Op("Int"))
                     val csqType = analyze(e.csq, env, list)
                     val altType = if (e.alt == null) Type.Op("Unit") else analyze(e.alt, env, list)
-                    unifyType(csqType, csqType)
+                    unifyType(csqType, altType)
                     e.t = csqType
                     e.t
                 }
