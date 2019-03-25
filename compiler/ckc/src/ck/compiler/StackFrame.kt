@@ -5,7 +5,7 @@ import util.extensions.toDelimitedString
 
 class StackFrame {
 
-    private val locals = ArrayList<Pair<String, Boolean>>()
+    val locals = ArrayList<Pair<String, Boolean>>()
 
     fun getLayout(): List<Int> {
         val ret = ArrayList<Int>()

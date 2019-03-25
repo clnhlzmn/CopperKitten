@@ -79,7 +79,7 @@ enum vm_op_code {
     LLOAD,      //[...]->[...|value], get the word at fp+index, index is the word following instruction
     LSTORE,     //[...value]->[...], set the word at fp+index to the given value
     RLOAD,      //[...|ref]->[...|value], get the word at ref+index
-    RSTORE,     //[...|ref|value]->[...], set the word at ref+index to the given value
+    RSTORE,     //[...|ref|value]->[...|ref], set the word at ref+index to the given value
     ALOAD,      //same as lload but for function arguments
     ASTORE,
     CLOAD,      //same as lload but for function captures
