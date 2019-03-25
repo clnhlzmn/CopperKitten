@@ -1,20 +1,11 @@
 package ck
 
-import ck.grammar.DescriptiveErrorListener
-import ck.ast.Type
 import ck.analyze.Analyze
-import ck.ast.node.CkFile
-import ck.ast.node.Expr
 import ck.ast.visitors.ComputeCapturesVisitor
-import ck.ast.visitors.ComputeInstancesVisitor
 import ck.ast.visitors.ScopeLinkingVisitor
 import ck.ast.visitors.compileCkFile
 import ck.grammar.Parse
-import ck.grammar.visitors.FileVisitor
-import ckLexer
-import ckParser
 import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.commons.cli.*
 import util.extensions.toDelimitedString
 import java.io.File
