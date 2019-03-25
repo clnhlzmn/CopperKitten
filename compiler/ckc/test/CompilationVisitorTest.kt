@@ -12,6 +12,7 @@ internal class CompilationVisitorTest {
         val expr = Parse.expr(CharStreams.fromString("42")).right()!!
         val res = expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
+        assertEquals(res, listOf("push 1", "layout []", "alloc []", "push 42", "rstore 0"))
     }
     @Test
     fun testBinExpr() {

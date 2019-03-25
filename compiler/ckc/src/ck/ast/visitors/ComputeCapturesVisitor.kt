@@ -1,10 +1,15 @@
 package ck.ast.visitors
 
+import ck.ast.node.CkFile
 import ck.ast.node.Expr
 
 class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
 
     var currentFun: Expr.Fun? = null
+
+    override fun visit(f: CkFile) {
+        f.expr.accept(this)
+    }
 
     override fun visit(e: Expr.Unit) {
         //nothing

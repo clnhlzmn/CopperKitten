@@ -1,9 +1,9 @@
 package ck
 
 import ck.analyze.Analyze
+import ck.ast.visitors.CompilationVisitor
 import ck.ast.visitors.ComputeCapturesVisitor
 import ck.ast.visitors.ScopeLinkingVisitor
-import ck.ast.visitors.compileCkFile
 import ck.grammar.Parse
 import org.antlr.v4.runtime.CharStreams
 import org.apache.commons.cli.*
@@ -43,12 +43,14 @@ class Cli(val args: Array<String>) {
                         println("$err\n")
                     },
                     { file ->
+                        //check types
                         Analyze.analyze(file.expr, null, null)
+                        //link scopes
                         file.accept(ScopeLinkingVisitor())
                         //compute function captures
-                        file.expr.accept(ComputeCapturesVisitor())
+                        file.accept(ComputeCapturesVisitor())
                         //compile file
-                        val code: List<String> = compileCkFile(file)
+                        val code: List<String> = file.accept(CompilationVisitor())
                         //determine output location
                         if (outputFileName != null) {
                             File(outputFileName).printWriter().use { out ->

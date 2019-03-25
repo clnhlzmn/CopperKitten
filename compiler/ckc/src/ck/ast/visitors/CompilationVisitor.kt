@@ -6,34 +6,6 @@ import ck.compiler.StackFrame
 import ck.ast.Type
 import util.extensions.toDelimitedString
 
-fun compileCkFile(ckFile: CkFile): List<String> {
-    val program = ArrayList<String>(compileTopLevelExpr(ckFile.expr))
-    program.add("halt")
-    return program
-}
-
-fun compileTopLevelExpr(expr: Expr): List<String> {
-    //empty program
-    val program = ArrayList<String>()
-    //enter frame
-    program.add("enter")
-    //compilation visitor
-    val compilationVisitor = CompilationVisitor()
-    //compile top level
-    program.addAll(expr.accept(compilationVisitor))
-    //save return value
-    program.add("store")
-    //leave top level frame
-    program.add("leave")
-    return program
-}
-
-fun compileFunctionBody(body: Expr): List<String> {
-    val ret = ArrayList(compileTopLevelExpr(body))
-    ret.add("return")
-    return ret
-}
-
 class CompilationVisitor : BaseASTVisitor<List<String>>() {
 
     //to keep track of locals and temps on the stack
@@ -50,6 +22,35 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         private fun nextLabel(): String {
             return "Label_${count++}"
         }
+
+        fun compileTopLevelExpr(expr: Expr): List<String> {
+            //empty program
+            val program = ArrayList<String>()
+            //enter frame
+            program.add("enter")
+            //compilation visitor
+            val compilationVisitor = CompilationVisitor()
+            //compile top level
+            program.addAll(expr.accept(compilationVisitor))
+            //save return value
+            program.add("store")
+            //leave top level frame
+            program.add("leave")
+            return program
+        }
+
+        fun compileFunctionBody(body: Expr): List<String> {
+            val ret = ArrayList(compileTopLevelExpr(body))
+            ret.add("return")
+            return ret
+        }
+
+    }
+
+    override fun visit(f: CkFile): List<String> {
+        val program = ArrayList(compileTopLevelExpr(f.expr))
+        program.add("halt")
+        return program
     }
 
     override fun visit(e: Expr.Unit): List<String> {
@@ -157,7 +158,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         //[...|argn-1|...|arg0]
 
         //remove args in the same way
-        e.args.forEach { _ ->
+        repeat(e.args.size) {
             ret.add("pop")
             frame.pop()
         }
@@ -376,8 +377,8 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("layout ${frame.getLayoutString()}")
 
         //alloc function array
-        //capture layout is indices of captures where isRefType() is true + 1 because function address is first element
-        val captureLayout = (1..e.captures.size).filter { true }.map { ci -> ci.toString() }.toDelimitedString(", ")
+        //capture layout is indices of captures + 1 because function address is first element
+        val captureLayout = (1..e.captures.size).map { ci -> ci.toString() }.toDelimitedString(", ")
         ret.add("alloc [$captureLayout]")
         frame.pop()
         frame.push("*", true)
@@ -388,9 +389,9 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("rstore 0")
         //[...|[addr|...]]
 
-        for (i in (0 until e.captures.size)) {
+        e.captures.forEachIndexed { i, c ->
             //compile capture reference
-            ret.addAll(e.captures[i].accept(this))
+            ret.addAll(c.accept(this))
             ret.add("rstore ${i + 1}")
             ////[...|[addr|capt0|...|capti]]
         }
