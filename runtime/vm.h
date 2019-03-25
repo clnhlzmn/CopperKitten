@@ -350,9 +350,13 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp++;
             break;
         case LEAVE:
-            self->sp--;
-            self->fp = (intptr_t*)self->sp[-1];
-            self->sp--;
+            //when leaving
+            //[...last frame...|last fp|layout fun ptr]
+            //                 ^                      ^
+            //                 |                      |
+            //                 fp                     sp
+            self->sp -= 2;
+            self->fp = (intptr_t*)self->sp[0];
             break;
         case LAYOUT:
             //set the first cell in the frame to the layout function found using the index in the word following ip
@@ -366,8 +370,8 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             self->sp++;
             break;
         case STORE:
-            self->temp = self->sp[-1];
             self->sp--;
+            self->temp = self->sp[0];
             break;
         case LLOAD:
             vm_lload(self, vm_get_word(self));

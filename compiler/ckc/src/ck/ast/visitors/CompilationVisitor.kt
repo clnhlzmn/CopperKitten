@@ -401,9 +401,10 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
 
         //code between bodyLabel and contLabel doesn't change stack here
         //here goes the body
-        ret.add("$bodyLabel:")
+        ret.add("$bodyLabel: //$e")
         //compile body (including 'enter', 'store' ret val, 'leave', and 'return')
         ret.addAll(compileFunctionBody(e.body))
+
         //continue program from above
         ret.add("$contLabel:")
 
