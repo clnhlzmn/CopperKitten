@@ -14,7 +14,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
     //to adjust the corresponding frame element. similarly
     //when we emit an enter or leave instruction we need
     //to create a new, or restore the last, ck.compiler.StackFrame object
-    val frame: StackFrame = StackFrame()
+    var frame: StackFrame = StackFrame()
 
     companion object {
         var count: Int = 0
@@ -28,14 +28,18 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         val ret = ArrayList<String>()
         //enter frame
         ret.add("enter")
-        //compilation visitor
-        val compilationVisitor = CompilationVisitor(debug)
+        //create a new compile time frame
+        val lastFrame = frame
+        frame = StackFrame()
         //compile top level
-        ret.addAll(expr.accept(compilationVisitor))
+        ret.addAll(expr.accept(this))
         //save return value
         ret.add("store")
+        frame.pop()
         //leave top level frame
         ret.add("leave")
+        //restore old frame
+        frame = lastFrame
         return ret
     }
 
@@ -87,7 +91,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         ret.add("layout ${frame.getLayoutString()}")
         ret.add("alloc []")
         frame.pop()
-        frame.push("<alloc []>", true)
+        frame.push("Int($e)", true)
         //[...|[]]
         ret.add("push ${e.value}")
         //[...|[]|value]
@@ -417,6 +421,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
             //compile capture reference
             ret.addAll(c.accept(this))
             ret.add("rstore ${i + 1}")
+            frame.pop()
             ////[...|[addr|capt0|...|capti]]
         }
 
@@ -460,16 +465,30 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 
         //jump over the function body
         ret.add("jump $contLabel")
+
         //here goes the body
         ret.add("$bodyLabel:")
-        //compile body (including 'enter', 'store' ret val, 'leave', and 'return')
+
+        //create new frame
         ret.add("enter")
+        val lastFrame = frame
+        frame = StackFrame()
+
+        //call native fun
         ret.add("ncall ${e.id}")
+        frame.push("<${e.id}()>", true)
+
         //store single return value from cfun
         ret.add("store")
+        frame.pop()
+
+        //leave frame
         ret.add("leave")
-        //put 'return' here
+        frame = lastFrame
+
+        //return
         ret.add("return")
+
         //continue program from above
         ret.add("$contLabel:")
         ret.add("debugpop")

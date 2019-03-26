@@ -14,9 +14,12 @@
             left(():60)
         else
             right(62);
-    
+
+    //somehow when compiling the following line the temporary <write> references get left on the compile time stack when compiling the literal functions
+    //this causes the offset of cons to be wrong which causes a segfault at runtime
     map(either, (f): write(f()), (i): write(i));
-    //write(map(either, (f): f(), (i): i));
+    //the following line is ok
+    write(map(either, (f): f(), (i): i));
     
     let cons = (a, b): (s): s(a, b);
     let fst = (p): p((a,b): a);
