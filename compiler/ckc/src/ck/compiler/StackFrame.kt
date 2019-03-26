@@ -1,6 +1,5 @@
 package ck.compiler
 
-import ck.ast.Type
 import util.extensions.toDelimitedString
 
 class StackFrame {

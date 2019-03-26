@@ -17,6 +17,7 @@ instruction
     | simpleInstruction             #simpleInst
     | literalIntMnemonic integer    #literalIntInst
     | literalLabelMnemonic LABEL    #literalLabelInst
+    | literalStringMnemonic STRING  #literalStringInst
     | 'layout' frameLayout          #layoutInst
     | 'alloc' allocLayout           #allocInst
     | 'ncall' ID                    #ncallInst
@@ -39,6 +40,10 @@ literalIntMnemonic
     | 'rstore'
     | 'cload'
     | 'cstore'
+    ;
+
+literalStringMnemonic
+    : 'debugpush'
     ;
 
 simpleInstruction
@@ -75,6 +80,7 @@ simpleInstruction
     | 'store'
     | 'rbarrier'
     | 'wbarrier'
+    | 'debugpop'
     ;
 
 frameLayout
@@ -94,6 +100,10 @@ NATURAL : ('0'..'9')+ ;
 
 ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 LABEL : ('A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
+
+STRING
+    : '"' ('\\' ('\\'|'\t'|'\r\n'|'\r'|'\n'|'"') | ~('\\'|'\t'|'\r'|'\n'|'"') )* '"'
+    ;
 
 //NL : '\n'|'\r\n' ;
 

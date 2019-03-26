@@ -1,5 +1,5 @@
 //LayoutFunction represents a generated function that the ck garbage collector
-//will use to find object references either in the runtime stack or in gc managed objects
+//will use to find object references util.either in the runtime stack or in gc managed objects
 //on the heap.
 //A layout function could be a custom layout where specific objects are marked as references
 //or it could be a ref array layout where all indices are refs and the number of such indices

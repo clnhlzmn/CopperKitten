@@ -50,6 +50,13 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLiteralLabelInst(ckaParser.LiteralLabelInstContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code literalStringInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteralStringInst(ckaParser.LiteralStringInstContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code layoutInst}
 	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
@@ -82,6 +89,12 @@ public interface ckaVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitLiteralIntMnemonic(ckaParser.LiteralIntMnemonicContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ckaParser#literalStringMnemonic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteralStringMnemonic(ckaParser.LiteralStringMnemonicContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ckaParser#simpleInstruction}.
 	 * @param ctx the parse tree

@@ -75,6 +75,18 @@ public interface ckaListener extends ParseTreeListener {
 	 */
 	void exitLiteralLabelInst(ckaParser.LiteralLabelInstContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code literalStringInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void enterLiteralStringInst(ckaParser.LiteralStringInstContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code literalStringInst}
+	 * labeled alternative in {@link ckaParser#instruction}.
+	 * @param ctx the parse tree
+	 */
+	void exitLiteralStringInst(ckaParser.LiteralStringInstContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code layoutInst}
 	 * labeled alternative in {@link ckaParser#instruction}.
 	 * @param ctx the parse tree
@@ -130,6 +142,16 @@ public interface ckaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLiteralIntMnemonic(ckaParser.LiteralIntMnemonicContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ckaParser#literalStringMnemonic}.
+	 * @param ctx the parse tree
+	 */
+	void enterLiteralStringMnemonic(ckaParser.LiteralStringMnemonicContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckaParser#literalStringMnemonic}.
+	 * @param ctx the parse tree
+	 */
+	void exitLiteralStringMnemonic(ckaParser.LiteralStringMnemonicContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ckaParser#simpleInstruction}.
 	 * @param ctx the parse tree

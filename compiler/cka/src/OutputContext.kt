@@ -8,11 +8,22 @@ class OutputContext(
     //where layout functions are stored
     private val functions = ArrayList<Function>()
 
+    private val strings = ArrayList<String>()
+
     fun addFunction(lf: Function): Long {
         val ret = functions.indexOf(lf)
         if (ret == -1) {
             functions.add(lf)
             return (functions.size - 1).toLong()
+        }
+        return ret.toLong()
+    }
+
+    fun addString(s: String): Long {
+        val ret = strings.indexOf(s)
+        if (ret == -1) {
+            strings.add(s)
+            return (strings.size - 1).toLong()
         }
         return ret.toLong()
     }
@@ -44,9 +55,14 @@ class OutputContext(
             program.map { op -> "\t$op,\n" }.fold("") { acc, s -> acc + s } +
             "};\n" +
             "\n" +
+            "const char *strings[] = {\n" +
+            strings.map { s -> "\t\"$s\",\n" }.fold("") { acc, s -> acc + s } +
+            "\tNULL,\n" +
+            "};\n" +
+            "\n" +
             "int main(void) {\n" +
             "\tgc_init(&gc_instance, gc_mem, MEM_SIZE);\n" +
-            "\tvm_init(&vm_instance, &gc_instance, stack_mem, functions);\n" +
+            "\tvm_init(&vm_instance, &gc_instance, stack_mem, functions, strings);\n" +
             "\tvm_execute(&vm_instance, program);\n" +
             "\treturn 0;\n" +
             "}"

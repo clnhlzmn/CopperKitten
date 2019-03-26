@@ -1,4 +1,4 @@
-package ck.grammar
+package util.antlr
 
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException

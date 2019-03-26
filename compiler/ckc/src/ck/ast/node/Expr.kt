@@ -3,7 +3,6 @@ package ck.ast.node
 import ck.ast.Type
 import ck.ast.visitors.ASTVisitor
 import util.extensions.toDelimitedString
-import kotlin.math.exp
 
 //Expressions
 

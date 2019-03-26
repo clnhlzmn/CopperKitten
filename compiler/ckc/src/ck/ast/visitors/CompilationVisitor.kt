@@ -3,10 +3,9 @@ package ck.ast.visitors
 import ck.ast.node.CkFile
 import ck.ast.node.Expr
 import ck.compiler.StackFrame
-import ck.ast.Type
 import util.extensions.toDelimitedString
 
-class CompilationVisitor : BaseASTVisitor<List<String>>() {
+class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<String>>() {
 
     //to keep track of locals and temps on the stack
     //(to be able to generate layout [] instructions)
@@ -25,18 +24,18 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
 
         fun compileTopLevelExpr(expr: Expr): List<String> {
             //empty program
-            val program = ArrayList<String>()
+            val ret = ArrayList<String>()
             //enter frame
-            program.add("enter")
+            ret.add("enter")
             //compilation visitor
             val compilationVisitor = CompilationVisitor()
             //compile top level
-            program.addAll(expr.accept(compilationVisitor))
+            ret.addAll(expr.accept(compilationVisitor))
             //save return value
-            program.add("store")
+            ret.add("store")
             //leave top level frame
-            program.add("leave")
-            return program
+            ret.add("leave")
+            return ret
         }
 
         fun compileFunctionBody(body: Expr): List<String> {
@@ -48,30 +47,41 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
     }
 
     override fun visit(f: CkFile): List<String> {
-        val program = ArrayList(compileTopLevelExpr(f.expr))
-        program.add("halt")
-        return program
+        val ret = ArrayList<String>()
+        ret.add("debugpush \"$f\"")
+        ret.addAll(compileTopLevelExpr(f.expr))
+        ret.add("debugpop")
+        ret.add("halt")
+        return ret
     }
 
     override fun visit(e: Expr.Unit): List<String> {
+        val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
         //NULL pointer
         frame.push("*", true)
-        return listOf("push 0")
+        ret.add("push 0")
+        ret.add("debugpop")
+        return ret
     }
 
     override fun visit(e: Expr.Sequence): List<String> {
-        val ret = ArrayList(e.first.accept(this))
+        val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
+        ret.addAll(e.first.accept(this))
         //[...|first]
         ret.add("pop")
         frame.pop()
         //[...]
         ret.addAll(e.second.accept(this))
         //[...|second]
+        ret.add("debugpop")
         return ret
     }
 
     override fun visit(e: Expr.Natural): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
         //alloc storage for result value
         ret.add("push 1")
         frame.push("*", false)
@@ -84,10 +94,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         //[...|[]|value]
         ret.add("rstore 0")
         //[...|[value]]
+        ret.add("debugpop")
         return ret
     }
 
     override fun visit(e: Expr.Ref): List<String> {
+        val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
         val def = e.accept(GetDefinitionVisitor())
         when (def) {
             is Definition -> {
@@ -97,13 +110,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
                             val enclosingFun = e.accept(GetEnclosingFunction())!!
                             val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
                             frame.push("*", true)
-                            return listOf("aload $paramIndex //${e.id}")
+                            ret.add("aload $paramIndex")
                         }
                         is Definition.Let -> {
                             val localIndex = frame.lookup(e.id)
                             if (localIndex != null) {
                                 frame.push("*", true)
-                                return listOf("lload $localIndex //${e.id}")
+                                ret.add("lload $localIndex")
                             } else {
                                 TODO("error")
                             }
@@ -113,15 +126,18 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
                     val enclosingFun = e.accept(GetEnclosingFunction())!!
                     val captureIndex = enclosingFun.captures.indexOfFirst { c -> c.id == e.id }
                     frame.push("*", true)
-                    return listOf("cload $captureIndex //${e.id}")
+                    ret.add("cload $captureIndex")
                 }
             }
             else -> TODO("error")
         }
+        ret.add("debugpop")
+        return ret
     }
 
     override fun visit(e: Expr.Apply): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
 
         //compile arguments in reverse order
         e.args.reversed().forEach { a ->
@@ -169,11 +185,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         frame.push("*", true)
         //[...|retVal]
 
+        ret.add("debugpop")
         return ret
     }
 
     override fun visit(e: Expr.Unary): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
 
         //alloc storage for result value
         ret.add("layout ${frame.getLayoutString()}")
@@ -202,11 +220,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         frame.pop()
         //[...|[op(operand)]]
 
+        ret.add("debugpop")
         return ret
     }
 
     override fun visit(e: Expr.Binary): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
 
         //alloc storage for result value
         ret.add("layout ${frame.getLayoutString()}")
@@ -317,11 +337,14 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("rstore 0")
         frame.pop()
         //[...|[lhs op rhs]]
+
+        ret.add("debugpop")
         return ret
     }
 
     override fun visit(e: Expr.Cond): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
         val altLabel = nextLabel()
         val endLabel = nextLabel()
 
@@ -356,6 +379,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("$endLabel:")
         //[...|cond?csq:alt]
 
+        ret.add("debugpop")
         return ret
     }
 
@@ -365,6 +389,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
 
     override fun visit(e: Expr.Fun): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
 
@@ -408,11 +433,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         //continue program from above
         ret.add("$contLabel:")
 
+        ret.add("debugpop")
         return ret
     }
 
     override fun visit(e: Expr.CFun): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
         val bodyLabel = nextLabel()
         val contLabel = nextLabel()
 
@@ -446,11 +473,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("return")
         //continue program from above
         ret.add("$contLabel:")
+        ret.add("debugpop")
         return ret
     }
 
     override fun visit(e: Expr.Let): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
         //[...]
 
         //add space for local
@@ -481,11 +510,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         frame.pop()
         //[...]
 
+        ret.add("debugpop")
         return ret
     }
 
     override fun visit(e: Expr.If): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
         val altLabel = nextLabel()
         val endLabel = nextLabel()
         //[...]
@@ -525,11 +556,13 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         ret.add("$endLabel:")
         //[...|if (cond) csq else alt]
 
+        ret.add("debugpop")
         return ret
     }
 
     override fun visit(e: Expr.While): List<String> {
         val ret = ArrayList<String>()
+        ret.add("debugpush \"$e\"")
         val beginLabel = nextLabel()
         val condLabel = nextLabel()
         ret.add("jump $condLabel")
@@ -548,6 +581,7 @@ class CompilationVisitor : BaseASTVisitor<List<String>>() {
         //value of type Unit (NULL pointer)
         ret.add("push 0")
         frame.push("*", true)
+        ret.add("debugpop")
         return ret
     }
 

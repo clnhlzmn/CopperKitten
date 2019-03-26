@@ -15,7 +15,7 @@
         else
             right(62);
     
-    //map(either, (f): write(f()), (i): write(i));
+    map(either, (f): write(f()), (i): write(i));
     write(map(either, (f): f(), (i): i));
     
     let cons = (a, b): (s): s(a, b);

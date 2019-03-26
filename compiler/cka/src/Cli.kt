@@ -1,7 +1,7 @@
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.apache.commons.cli.*;
-import org.antlr.v4.runtime.BailErrorStrategy
+import util.antlr.ThrowingErrorListener
 import java.io.File
 
 class Cli(val args: Array<String>) {
@@ -61,7 +61,8 @@ class Cli(val args: Array<String>) {
                 val lexer = ckaLexer(stream)
                 val tokens = CommonTokenStream(lexer)
                 val ckaParser = ckaParser(tokens)
-                ckaParser.errorHandler = BailErrorStrategy()
+                ckaParser.removeErrorListeners()
+                ckaParser.addErrorListener(ThrowingErrorListener())
                 val context = ckaParser.file()
                 val pc = FileVisitor().visit(context)
                 val oc = OutputContext(

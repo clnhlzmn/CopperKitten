@@ -87,6 +87,18 @@ public class ckaBaseListener implements ckaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterLiteralStringInst(ckaParser.LiteralStringInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLiteralStringInst(ckaParser.LiteralStringInstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterLayoutInst(ckaParser.LayoutInstContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -142,6 +154,18 @@ public class ckaBaseListener implements ckaListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLiteralIntMnemonic(ckaParser.LiteralIntMnemonicContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLiteralStringMnemonic(ckaParser.LiteralStringMnemonicContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLiteralStringMnemonic(ckaParser.LiteralStringMnemonicContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

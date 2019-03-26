@@ -1,4 +1,3 @@
-import ck.ast.Type.Companion.i
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import util.either.Either

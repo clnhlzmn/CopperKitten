@@ -3,6 +3,7 @@
 #ifndef VM_HPP
 #define VM_HPP
 
+#include <string.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -19,15 +20,24 @@ struct vm {
     uint8_t *ip;            //pointer to next instruction
     intptr_t *sp;           //pointer to one above tos
     intptr_t *fp;           //pointer to stack frame
-    void **functions;       //pointer to array of functions (some layout, some external)
     intptr_t temp;          //temporary register (not a root)
+    void **functions;       //pointer to array of functions (some layout, some external)
+    const char **strings;   //pointer to array of strings (for debugging)
+#ifndef NDEBUG
+#ifndef VM_DEBUG_STACK_SIZE
+#define VM_DEBUG_STACK_SIZE (100)
+#endif
+    intptr_t debug_sp;      //index to top of debug stack
+    const char *debug[VM_DEBUG_STACK_SIZE]; //stack for debugging
+#endif
 };
 
 static inline void vm_init(
     struct vm *self,
     struct gc *gc,
     intptr_t *stack,
-    void **functions)
+    void **functions,
+    const char **strings)
 {
     assert(self);
     assert(gc);
@@ -38,6 +48,11 @@ static inline void vm_init(
     self->gc = gc;
     self->fp = NULL;
     self->functions = functions;
+    self->strings = strings;
+#ifndef NDEBUG
+    self->debug_sp = 0;
+    memset(self->debug, 0, VM_DEBUG_STACK_SIZE * sizeof(intptr_t));
+#endif
 }
 
 enum vm_op_code {
@@ -89,6 +104,8 @@ enum vm_op_code {
     NCALL,      //[...|N]->[...], call the native function N i.e. (void(*)(void))*(sp-1)();
     NOP,        //
     HALT,       //halt execution
+    DEBUGPUSH,  //push debug info onto debug stack
+    DEBUGPOP    //pop debug info from debug stack
 };
 
 static inline void vm_dispatch(struct vm *self, uint8_t instruction);
@@ -422,6 +439,19 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case HALT:
             self->ip = NULL;
+            break;
+        case DEBUGPUSH:
+#ifndef NDEBUG
+            self->debug[self->debug_sp] = self->strings[vm_get_word(self)];
+            self->debug_sp++;
+#else
+            vm_get_word(self);
+#endif
+            break;
+        case DEBUGPOP:
+#ifndef NDEBUG
+            self->debug_sp--;
+#endif
             break;
     }
 }

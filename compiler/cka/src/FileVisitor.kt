@@ -30,6 +30,10 @@ class InstructionVisitor(val pc: ParseContext) : ckaBaseVisitor<Unit>() {
         pc.instructions.add(LiteralIntInstruction(ctx!!.literalIntMnemonic().text, ctx.integer().text.toLong()))
     }
 
+    override fun visitLiteralStringInst(ctx: ckaParser.LiteralStringInstContext?) {
+        pc.instructions.add(LiteralStringInstruction(ctx!!.literalStringMnemonic().text, ctx.STRING().text.trim{c -> c == '"'}))
+    }
+
     override fun visitLiteralLabelInst(ctx: ckaParser.LiteralLabelInstContext?) {
         pc.instructions.add(LiteralLabelInstruction(ctx!!.literalLabelMnemonic().text, ctx.LABEL().text))
     }

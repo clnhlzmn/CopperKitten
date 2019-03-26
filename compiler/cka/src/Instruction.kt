@@ -40,6 +40,26 @@ data class LiteralIntInstruction(val mnemonic: String, val data: Long) : Instruc
     }
 }
 
+data class LiteralStringInstruction(val mnemonic: String, val data: String) : Instruction {
+
+    override fun size(tc: TargetContext): Int {
+        return 1 + tc.wordSize
+    }
+
+    override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
+        val stringIndex = oc.addString(data)
+        if (!checkSize(stringIndex, tc)) {
+            //TODO handle this better
+            throw RuntimeException("literal too large")
+        }
+        oc.program.add(tc.convert(mnemonic))
+        oc.program.addAll(
+            (0 until tc.wordSize)
+                .map { i -> (stringIndex shr i * 8 and 0xFF).toString() }
+        )
+    }
+}
+
 //to be used for push Label and jumpxx Label
 data class LiteralLabelInstruction(val mnemonic: String, val label: String) : Instruction {
     override fun size(tc: TargetContext): Int {

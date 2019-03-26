@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/cka/cka.iml" filepath="$PROJECT_DIR$/cka/cka.iml" />
       <module fileurl="file://$PROJECT_DIR$/ckc/ckc.iml" filepath="$PROJECT_DIR$/ckc/ckc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/util/util.iml" filepath="$PROJECT_DIR$/util/util.iml" />
     </modules>
   </component>
 </project>
