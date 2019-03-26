@@ -7,7 +7,7 @@ CKA = java -jar ../../compiler/out/artifacts/cka_jar/cka.jar
 STACKSIZE = 1000
 HEAPSIZE = 1000
 WORDSIZE = 8
-GC = mark_compact
+GC = copying
 
 #cka options
 CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE} -g ${GC}
