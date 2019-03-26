@@ -146,6 +146,8 @@ static inline void vm_lload(struct vm *self, intptr_t index) {
 }
 
 static inline void vm_lstore(struct vm *self, intptr_t index) {
+    if (self->fp + 2 + index > self->sp)
+        assert(false);
     self->fp[2 + index] = self->sp[-1];
     self->sp--;
 }
@@ -451,6 +453,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
         case DEBUGPOP:
 #ifndef NDEBUG
             self->debug_sp--;
+            self->debug[self->debug_sp] = NULL;
 #endif
             break;
     }

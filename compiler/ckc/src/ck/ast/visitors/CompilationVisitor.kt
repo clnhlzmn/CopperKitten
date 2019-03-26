@@ -21,29 +21,28 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         private fun nextLabel(): String {
             return "Label_${count++}"
         }
+    }
 
-        fun compileTopLevelExpr(expr: Expr): List<String> {
-            //empty program
-            val ret = ArrayList<String>()
-            //enter frame
-            ret.add("enter")
-            //compilation visitor
-            val compilationVisitor = CompilationVisitor()
-            //compile top level
-            ret.addAll(expr.accept(compilationVisitor))
-            //save return value
-            ret.add("store")
-            //leave top level frame
-            ret.add("leave")
-            return ret
-        }
+    private fun compileTopLevelExpr(expr: Expr): List<String> {
+        //empty program
+        val ret = ArrayList<String>()
+        //enter frame
+        ret.add("enter")
+        //compilation visitor
+        val compilationVisitor = CompilationVisitor(debug)
+        //compile top level
+        ret.addAll(expr.accept(compilationVisitor))
+        //save return value
+        ret.add("store")
+        //leave top level frame
+        ret.add("leave")
+        return ret
+    }
 
-        fun compileFunctionBody(body: Expr): List<String> {
-            val ret = ArrayList(compileTopLevelExpr(body))
-            ret.add("return")
-            return ret
-        }
-
+    private fun compileFunctionBody(body: Expr): List<String> {
+        val ret = ArrayList(compileTopLevelExpr(body))
+        ret.add("return")
+        return ret
     }
 
     override fun visit(f: CkFile): List<String> {
@@ -59,7 +58,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         val ret = ArrayList<String>()
         ret.add("debugpush \"$e\"")
         //NULL pointer
-        frame.push("*", true)
+        frame.push("<()>", true)
         ret.add("push 0")
         ret.add("debugpop")
         return ret
@@ -84,11 +83,11 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         ret.add("debugpush \"$e\"")
         //alloc storage for result value
         ret.add("push 1")
-        frame.push("*", false)
+        frame.push("<1>", false)
         ret.add("layout ${frame.getLayoutString()}")
         ret.add("alloc []")
         frame.pop()
-        frame.push("*", true)
+        frame.push("<alloc []>", true)
         //[...|[]]
         ret.add("push ${e.value}")
         //[...|[]|value]
@@ -109,13 +108,13 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
                         is Definition.Param -> {
                             val enclosingFun = e.accept(GetEnclosingFunction())!!
                             val paramIndex = enclosingFun.params.indexOfFirst { p -> p.id == e.id }
-                            frame.push("*", true)
+                            frame.push("<$e>", true)
                             ret.add("aload $paramIndex")
                         }
                         is Definition.Let -> {
                             val localIndex = frame.lookup(e.id)
                             if (localIndex != null) {
-                                frame.push("*", true)
+                                frame.push("<$e>", true)
                                 ret.add("lload $localIndex")
                             } else {
                                 TODO("error")
@@ -125,7 +124,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
                 } else {
                     val enclosingFun = e.accept(GetEnclosingFunction())!!
                     val captureIndex = enclosingFun.captures.indexOfFirst { c -> c.id == e.id }
-                    frame.push("*", true)
+                    frame.push("<$e>", true)
                     ret.add("cload $captureIndex")
                 }
             }
@@ -151,13 +150,13 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 
         //duplicate function (puts another ref on stack)
         ret.add("dup")
-        frame.push("*", true)
+        frame.push("<${e.fn}>", true)
         //[...|argn-1|...|arg0|fun|fun]
 
         //get code address (replaces dup'd function with non-ref function address)
         ret.add("rload 0")
         frame.pop()
-        frame.push("*", false)
+        frame.push("&${e.fn}", false)
         //[...|argn-1|...|arg0|fun|addr]
 
         //layout instruction
@@ -182,7 +181,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 
         //load return value (function body uses store on ret val)
         ret.add("load")
-        frame.push("*", true)
+        frame.push("<$e>", true)
         //[...|retVal]
 
         ret.add("debugpop")
@@ -197,14 +196,14 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         ret.add("layout ${frame.getLayoutString()}")
         ret.add("push 1")
         ret.add("alloc []")
-        frame.push("*", true)
+        frame.push("<Int($e)>", true)
         //[...|[]]
 
         //compile operand
         ret.addAll(e.operand.accept(this))
         ret.add("rload 0")
         frame.pop()
-        frame.push("*", false)
+        frame.push("<${e.operand}>", false)
         //[...|[]|operand]
 
         when (e.operator) {
@@ -232,7 +231,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         ret.add("layout ${frame.getLayoutString()}")
         ret.add("push 1")
         ret.add("alloc []")
-        frame.push("*", true)
+        frame.push("<Int($e)>", true)
         //[...|[]]
 
         //do operation
@@ -241,14 +240,14 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
             ret.addAll(e.lhs.accept(this))
             ret.add("rload 0")
             frame.pop()
-            frame.push("*", false)
+            frame.push("<${e.lhs}>", false)
             //[...|[]|lhs]
 
             //compile rhs
             ret.addAll(e.rhs.accept(this))
             ret.add("rload 0")
             frame.pop()
-            frame.push("*", false)
+            frame.push("<${e.rhs}>", false)
             //[...|[]|lhs|rhs]
 
             //do op
@@ -282,7 +281,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
                     ret.addAll(e.lhs.accept(this))
                     ret.add("rload 0")
                     frame.pop()
-                    frame.push("*", false)
+                    frame.push("<${e.lhs}>", false)
                     //[...|[]|lhs]
 
                     ret.add("dup")
@@ -296,7 +295,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
                     ret.addAll(e.rhs.accept(this))
                     ret.add("rload 0")
                     frame.pop()
-                    frame.push("*", false)
+                    frame.push("<${e.rhs}>", false)
                     //[...|[]|rhs]
 
                     ret.add("$endLabel:")
@@ -308,7 +307,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
                     ret.addAll(e.lhs.accept(this))
                     ret.add("rload 0")
                     frame.pop()
-                    frame.push("*", false)
+                    frame.push("<${e.lhs}>", false)
                     //[...|[]|lhs]
 
                     ret.add("dup")
@@ -322,7 +321,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
                     ret.addAll(e.rhs.accept(this))
                     ret.add("rload 0")
                     frame.pop()
-                    frame.push("*", false)
+                    frame.push("<${e.rhs}>", false)
                     //[...|[]|rhs]
 
                     ret.add("$endLabel:")
@@ -352,7 +351,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         ret.addAll(e.cond.accept(this))
         ret.add("rload 0")
         frame.pop()
-        frame.push("*", false)
+        frame.push("<${e.cond}>", false)
         //[...|cond]
 
         //if cond is zero goto alt
@@ -395,7 +394,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 
         //push size of captures + 1 for function address
         ret.add("push ${e.captures.size + 1}")
-        frame.push("*", false)
+        frame.push("<${e.captures.size + 1}>", false)
         //[...|size]
 
         //set current layout
@@ -406,7 +405,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         val captureLayout = (1..e.captures.size).map { ci -> ci.toString() }.toDelimitedString(", ")
         ret.add("alloc [$captureLayout]")
         frame.pop()
-        frame.push("*", true)
+        frame.push("Fun($e)", true)
         //[...|fun]
 
         //store function address in fun[0]
@@ -445,13 +444,13 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 
         //push size of 1 for function address
         ret.add("push 1")
-        frame.push("*", false)
+        frame.push("<1>", false)
         //set current layout
         ret.add("layout ${frame.getLayoutString()}")
         //alloc function array
         ret.add("alloc []")
         frame.pop()
-        frame.push("*", true)
+        frame.push("<Fun($e)>", true)
         //[...|fun]
 
         //store function address in fun[0]
@@ -525,7 +524,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         ret.addAll(e.cond.accept(this))
         ret.add("rload 0")
         frame.pop()
-        frame.push("*", false)
+        frame.push("<${e.cond}>", false)
         //[...|cond]
 
         //if cond zero the goto alt
@@ -547,7 +546,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         frame.pop()
         if (e.alt == null) {
             ret.add("push 0")
-            frame.push("*", true)
+            frame.push("<()>", true)
         } else {
             ret.addAll(e.alt.accept(this))
         }
@@ -575,12 +574,12 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         ret.addAll(e.cond.accept(this))
         ret.add("rload 0")
         frame.pop()
-        frame.push("*", false)
+        frame.push("<${e.cond}>", false)
         ret.add("jumpnz $beginLabel")
         frame.pop()
         //value of type Unit (NULL pointer)
         ret.add("push 0")
-        frame.push("*", true)
+        frame.push("<()>", true)
         ret.add("debugpop")
         return ret
     }

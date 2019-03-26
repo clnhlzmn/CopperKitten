@@ -18,6 +18,7 @@ class Cli(val args: Array<String>) {
         options.addOption("h", "help", false, "show help")
         options.addRequiredOption("i", "input", true, "input file")
         options.addOption("o", "output", true, "output file")
+        options.addOption("d", "debug", false, "generate debug strings")
     }
 
     fun parse() {
@@ -34,6 +35,7 @@ class Cli(val args: Array<String>) {
 
                 val inputFileName = cmd.getOptionValue("i")!!
                 val outputFileName = cmd.getOptionValue("o")
+                val debug = cmd.hasOption("d")
 
                 val stream = CharStreams.fromFileName(inputFileName)
 
@@ -50,7 +52,7 @@ class Cli(val args: Array<String>) {
                         //compute function captures
                         file.accept(ComputeCapturesVisitor())
                         //compile file
-                        val code: List<String> = file.accept(CompilationVisitor())
+                        val code: List<String> = file.accept(CompilationVisitor(debug))
                         //determine output location
                         if (outputFileName != null) {
                             File(outputFileName).printWriter().use { out ->
