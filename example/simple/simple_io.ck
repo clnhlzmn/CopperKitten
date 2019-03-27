@@ -25,9 +25,5 @@
     let pair = cons((): 60, cons(62, ()));
     
     write(fst(pair)());
-    write(fst(snd(pair)));
-    
-    let rec fact = (n) n < 2 ? 1 : n * fact(n - 1);
-    
-    write(fact(3))
+    write(fst(snd(pair)))
 }
