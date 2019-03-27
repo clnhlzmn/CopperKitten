@@ -25,5 +25,9 @@
     let pair = cons((): 60, cons(62, ()));
     
     write(fst(pair)());
-    write(fst(snd(pair)))
+    write(fst(snd(pair)));
+    
+    let almostFact = (f): (n): if (n < 2) 1 else n * f(n - 1);
+    let fact = almostFact(almostFact);
+    write(fact(3))
 }
