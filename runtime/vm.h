@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 #include "gc_interface.h"
+#include "c_static_assert.h"
 
 #ifndef VM_DEREF_IP
 #define VM_DEREF_IP(ip) (*(ip))
@@ -56,6 +57,8 @@ static inline void vm_init(
 }
 
 enum vm_op_code {
+    
+    //arithmetic
     ADD,        //[...|lhs|rhs]->[...|lhs+rhs]
     SUB,        //[...|lhs|rhs]->[...|lhs-rhs]
     MUL,        //[...|lhs|rhs]->[...|lhs*rhs]
@@ -69,6 +72,8 @@ enum vm_op_code {
     BITAND,     //[...|lhs|rhs]->[...|lhs&rhs]
     BITXOR,     //[...|lhs|rhs]->[...|lhs^rhs]
     BITOR,      //[...|lhs|rhs]->[...|lhs|rhs]
+    
+    //comparison
     LT,         //[...|lhs|rhs]->[...|lhs<rhs]
     LTE,        //[...|lhs|rhs]->[...|lhs<=rhs]
     GT,         //[...|lhs|rhs]->[...|lhs>rhs]
@@ -76,37 +81,70 @@ enum vm_op_code {
     EQ,         //[...|lhs|rhs]->[...|lhs==rhs]
     NEQ,        //[...|lhs|rhs]->[...|lhs!=rhs]
     CMP,        //[...|lhs|rhs]->[...|lhs<rhs?-1:lhs>rhs?1:0]
-    CALL,       //jump to the address on the stack and push current address
-    RETURN,        //pop address from the stack and jump to it
-    JUMP,       //jump to the address following JMP
-    JUMPZ,      //same as JMP if tos is zero
-    JUMPNZ,     //same as JMP if toz is not zero
+    
+    //control flow
+    CALL,       //jump to the address (offset into program) on the stack and push current address (actual native address)
+    RETURN,     //pop address (actual) from the stack and jump to it
+    JUMP,       //jump to the address (offset) following JUMP instruction
+    JUMPZ,      //same as JUMP if tos is zero
+    JUMPNZ,     //same as JUMP if toz is not zero
+    
+    //stack
     PUSH,       //push the next word in the instruction stream
+    PUSHB,      //push the next byte in the instruction stream
     DUP,        //duplicate the top value
     POP,        //pop the top value from the stack
     SWAP,       //swap the top two items on the stack
+    
+    //frame
     ENTER,      //enter a stack frame
     LEAVE,      //leave a stack frame
-    LAYOUT,     //[...]->[...], set the frame layout from the next word in the program
+    LAYOUT,     //[...]->[...], set the frame layout from the next word (offset into functions array) in the program
+    
+    //allocation
     ALLOC,      //[...|size]->[...|ref], allocate n cells with the given layout. size is on stack, layout is in instruction stream
-    LOAD,       //[...]->[...|value], load value from temp register
-    STORE,      //[...|value]->[...], store value in temp register
-    LLOAD,      //[...]->[...|value], get the word at fp+index, index is the word following instruction
-    LSTORE,     //[...value]->[...], set the word at fp+index to the given value
-    RLOAD,      //[...|ref]->[...|value], get the word at ref+index
-    RSTORE,     //[...|ref|value]->[...|ref], set the word at ref+index to the given value
-    ALOAD,      //same as lload but for function arguments
-    ASTORE,
-    CLOAD,      //same as lload but for function captures
-    CSTORE,
     RBARRIER,   //gc read barrier on ref on tos
     WBARRIER,   //gc write barrier on ref on tos
+    
+    //temporaries
+    LOAD,       //[...]->[...|value], load value from temp register
+    STORE,      //[...|value]->[...], store value in temp register
+    
+    //locals
+    LLOAD,      //[...]->[...|value], get the word at fp+index, index is the word following instruction
+    LLOADB,
+    LSTORE,     //[...value]->[...], set the word at fp+index to the given value
+    LSTOREB,
+    
+    //reference
+    RLOAD,      //[...|ref]->[...|value], get the word at ref+index
+    RLOADB,
+    RSTORE,     //[...|ref|value]->[...|ref], set the word at ref+index to the given value
+    RSTOREB,
+    
+    //arguments
+    ALOAD,      //same as lload but for function arguments
+    ALOADB,
+    ASTORE,
+    ASTOREB,
+    
+    //function captures
+    CLOAD,      //same as lload but for function captures
+    CLOADB,
+    CSTORE,
+    CSTOREB,
+    
+    //misc
     NCALL,      //[...|N]->[...], call the native function N i.e. (void(*)(void))*(sp-1)();
     NOP,        //
     HALT,       //halt execution
     DEBUGPUSH,  //push debug info onto debug stack
-    DEBUGPOP    //pop debug info from debug stack
+    DEBUGPOP,   //pop debug info from debug stack
+    
+    MAX_OPCODE
 };
+
+C_STATIC_ASSERT(MAX_OPCODE <= 256, vm_h);
 
 static inline void vm_dispatch(struct vm *self, uint8_t instruction);
 
@@ -134,6 +172,14 @@ static inline intptr_t vm_get_word(struct vm *self) {
     return word;
 }
 
+//gets a byte from the current instruction pointer
+//increments ip
+//probably ub too, but not on 2s complement machs
+static inline intptr_t vm_get_byte(struct vm *self) {
+    int8_t byte = VM_DEREF_IP(self->ip++);
+    return (intptr_t)byte;
+}
+
 static inline void vm_lload(struct vm *self, intptr_t index) {
     //when loading a local the stack looks like
     //[...last frame...|last fp|layout fun ptr|...locals...|...temps...]
@@ -146,8 +192,6 @@ static inline void vm_lload(struct vm *self, intptr_t index) {
 }
 
 static inline void vm_lstore(struct vm *self, intptr_t index) {
-    if (self->fp + 2 + index > self->sp)
-        assert(false);
     self->fp[2 + index] = self->sp[-1];
     self->sp--;
 }
@@ -340,6 +384,9 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
         case PUSH: 
             vm_push(self, vm_get_word(self));
             break;
+        case PUSHB: 
+            vm_push(self, vm_get_byte(self));
+            break;
         case DUP:
             self->sp[0] = self->sp[-1];
             self->sp++;
@@ -398,17 +445,35 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
         case LSTORE:
             vm_lstore(self, vm_get_word(self));
             break;
+        case LLOADB:
+            vm_lload(self, vm_get_byte(self));
+            break;
+        case LSTOREB:
+            vm_lstore(self, vm_get_byte(self));
+            break;
         case RLOAD:
             vm_rload(self, vm_get_word(self));
             break;
         case RSTORE:
             vm_rstore(self, vm_get_word(self));
             break;
+        case RLOADB:
+            vm_rload(self, vm_get_byte(self));
+            break;
+        case RSTOREB:
+            vm_rstore(self, vm_get_byte(self));
+            break;
         case ALOAD:
             vm_aload(self, vm_get_word(self));
             break;
         case ASTORE:
             vm_astore(self, vm_get_word(self));
+            break;
+        case ALOADB:
+            vm_aload(self, vm_get_byte(self));
+            break;
+        case ASTOREB:
+            vm_astore(self, vm_get_byte(self));
             break;
         case CLOAD:
             //when loading a capture the stack should look like
@@ -421,6 +486,14 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case CSTORE:
             ((intptr_t*)self->fp[-2])[1 + vm_get_word(self)] = self->sp[-1];
+            self->sp--;
+            break;
+        case CLOADB:
+            self->sp[0] = ((intptr_t*)self->fp[-2])[1 + vm_get_byte(self)];
+            self->sp++;
+            break;
+        case CSTOREB:
+            ((intptr_t*)self->fp[-2])[1 + vm_get_byte(self)] = self->sp[-1];
             self->sp--;
             break;
         case RBARRIER: {
@@ -439,6 +512,7 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
         }
         case NOP:
             break;
+        case MAX_OPCODE:
         case HALT:
             self->ip = NULL;
             break;

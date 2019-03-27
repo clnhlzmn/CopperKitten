@@ -6,6 +6,12 @@ fun checkSize(i: Long, tc: TargetContext): Boolean {
     return i >= min && i <= max
 }
 
+fun checkSizeByte(i: Long): Boolean {
+    val max = pow(2.0, 7.0) - 1
+    val min = -pow(2.0, 7.0)
+    return i >= min && i <= max
+}
+
 interface Instruction {
     fun size(tc: TargetContext): Int
     fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext)
@@ -24,7 +30,11 @@ data class SimpleInstruction(val mnemonic: String) : Instruction {
 data class LiteralIntInstruction(val mnemonic: String, val data: Long) : Instruction {
 
     override fun size(tc: TargetContext): Int {
-        return 1 + tc.wordSize
+        if (checkSizeByte(data)) {
+            return 2
+        } else {
+            return 1 + tc.wordSize
+        }
     }
 
     override fun emit(pc: ParseContext, tc: TargetContext, oc: OutputContext) {
@@ -32,11 +42,17 @@ data class LiteralIntInstruction(val mnemonic: String, val data: Long) : Instruc
             //TODO handle this better
             throw RuntimeException("literal too large")
         }
-        oc.program.add(tc.convert(mnemonic))
-        oc.program.addAll(
-            (0 until tc.wordSize)
-                .map { i -> (data shr i * 8 and 0xFF).toString() }
-        )
+        if (checkSizeByte(data)) {
+            oc.program.add(tc.convert("${mnemonic}b"))
+            //I think the following works
+            oc.program.add(data.toString())
+        } else {
+            oc.program.add(tc.convert(mnemonic))
+            oc.program.addAll(
+                (0 until tc.wordSize)
+                    .map { i -> (data shr i * 8 and 0xFF).toString() }
+            )
+        }
     }
 }
 
