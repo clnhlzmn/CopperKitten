@@ -199,6 +199,23 @@ sealed class Analyze {
                     e.t = analyze(e.body, bodyEnv, list)
                     e.t
                 }
+                is Expr.LetRec -> {
+                    var newEnv = env
+                    var newList = list
+                    e.bindings.forEach { binding ->
+                        val newType = Type.newVar()
+                        newEnv = Env(binding.first, newType, newEnv)
+                        newList = NonGenericTypes(newType, newList)
+                    }
+                    e.bindings.forEach { binding ->
+                        unifyType(
+                            retrieve(binding.first, newEnv, newList),
+                            analyze(binding.second, newEnv, newList)
+                        )
+                    }
+                    e.t = analyze(e.body, newEnv, newList)
+                    e.t
+                }
                 is Expr.If -> {
                     val condType = analyze(e.cond, env, list)
                     unifyType(condType, Type.Op("Int"))

@@ -13,6 +13,13 @@ class SequenceVisitor : ckBaseVisitor<Expr>() {
             expr.accept(ExprVisitor())
         else
             when (expr) {
+                is ckParser.LetRecExprContext ->
+                    Expr.LetRec(
+                        expr.ID().zip(expr.expr()).map { p ->
+                            Pair(p.first.text, p.second.accept(ExprVisitor())) },
+                        ctx.sequence().accept(SequenceVisitor()),
+                        Type.newVar()
+                    )
                 is ckParser.LetExprContext ->
                     //if expr is let then make sequence it's body
                     Expr.Let(

@@ -27,7 +27,7 @@
     write(fst(pair)());
     write(fst(snd(pair)));
     
-    let almostFact = (f): (n): if (n < 2) 1 else n * f(n - 1);
-    let fact = almostFact(almostFact);
+    let rec fact = (n) n < 2 ? 1 : n * fact(n - 1);
+    
     write(fact(3))
 }

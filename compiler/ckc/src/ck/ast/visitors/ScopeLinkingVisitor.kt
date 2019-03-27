@@ -87,8 +87,22 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
         e.enclosingScope = currentScope
         //then set the current scope to e
         currentScope = e
+        //TODO: I think visiting value should be before we change currentScope
         //then visit value of let operand
         e.value.accept(this)
+        //then visit the body of e with the new current scope set
+        e.body.accept(this)
+        //then reset enclosing scope
+        currentScope = e.enclosingScope
+    }
+
+    override fun visit(e: Expr.LetRec) {
+        //first save current scope as enclosing scope for e
+        e.enclosingScope = currentScope
+        //then set the current scope to e
+        currentScope = e
+        //then visit values of let operand
+        e.bindings.forEach { b -> b.second.accept(this) }
         //then visit the body of e with the new current scope set
         e.body.accept(this)
         //then reset enclosing scope

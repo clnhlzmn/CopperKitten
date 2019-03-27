@@ -1,4 +1,4 @@
-// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from /Users/colinholzman/Documents/CopperKitten/compiler/ckc/grammar/ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -43,13 +43,6 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCondExpr(ckParser.CondExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code orExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOrExpr(ckParser.OrExprContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code sequenceExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -63,13 +56,6 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBreakExpr(ckParser.BreakExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code multExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMultExpr(ckParser.MultExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code letExpr}
 	 * labeled alternative in {@link ckParser#expr}.
@@ -85,54 +71,12 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBitXorExpr(ckParser.BitXorExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code cFunExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCFunExpr(ckParser.CFunExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code shiftExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitShiftExpr(ckParser.ShiftExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code bitOrExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBitOrExpr(ckParser.BitOrExprContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code unaryExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitUnaryExpr(ckParser.UnaryExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code whileExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitWhileExpr(ckParser.WhileExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code addExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAddExpr(ckParser.AddExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code refExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRefExpr(ckParser.RefExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ifExpr}
 	 * labeled alternative in {@link ckParser#expr}.
@@ -175,6 +119,69 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitUnitExpr(ckParser.UnitExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code orExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOrExpr(ckParser.OrExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code multExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMultExpr(ckParser.MultExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code cFunExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCFunExpr(ckParser.CFunExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code shiftExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitShiftExpr(ckParser.ShiftExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code bitOrExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBitOrExpr(ckParser.BitOrExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code whileExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWhileExpr(ckParser.WhileExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code addExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAddExpr(ckParser.AddExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code refExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRefExpr(ckParser.RefExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code letRecExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLetRecExpr(ckParser.LetRecExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code equalityExpr}
 	 * labeled alternative in {@link ckParser#expr}.

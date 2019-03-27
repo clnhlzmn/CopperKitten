@@ -4,6 +4,7 @@ import ck.ast.node.Expr
 import ck.ast.Type
 import ckBaseVisitor
 import ckParser
+import java.lang.RuntimeException
 
 class ExprVisitor : ckBaseVisitor<Expr>() {
 
@@ -16,6 +17,10 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     //if visiting a let expr by itself then it has no "body" just return value
     override fun visitLetExpr(ctx: ckParser.LetExprContext?): Expr =
         ctx!!.value.accept(ExprVisitor())
+
+    override fun visitLetRecExpr(ctx: ckParser.LetRecExprContext?): Expr {
+        throw RuntimeException("let rec without body")
+    }
 
     override fun visitUnitExpr(ctx: ckParser.UnitExprContext?): Expr =
         Expr.Unit

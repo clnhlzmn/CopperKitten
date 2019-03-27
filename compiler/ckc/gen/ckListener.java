@@ -1,4 +1,4 @@
-// Generated from C:/code/ck/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
+// Generated from /Users/colinholzman/Documents/CopperKitten/compiler/ckc/grammar/ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -63,18 +63,6 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitCondExpr(ckParser.CondExprContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code orExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterOrExpr(ckParser.OrExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code orExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitOrExpr(ckParser.OrExprContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code sequenceExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -98,18 +86,6 @@ public interface ckListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBreakExpr(ckParser.BreakExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code multExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterMultExpr(ckParser.MultExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code multExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitMultExpr(ckParser.MultExprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code letExpr}
 	 * labeled alternative in {@link ckParser#expr}.
@@ -135,42 +111,6 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitBitXorExpr(ckParser.BitXorExprContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code cFunExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterCFunExpr(ckParser.CFunExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code cFunExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitCFunExpr(ckParser.CFunExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code shiftExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterShiftExpr(ckParser.ShiftExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code shiftExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitShiftExpr(ckParser.ShiftExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code bitOrExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterBitOrExpr(ckParser.BitOrExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code bitOrExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitBitOrExpr(ckParser.BitOrExprContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code unaryExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -182,42 +122,6 @@ public interface ckListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitUnaryExpr(ckParser.UnaryExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code whileExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterWhileExpr(ckParser.WhileExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code whileExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitWhileExpr(ckParser.WhileExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code addExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterAddExpr(ckParser.AddExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code addExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitAddExpr(ckParser.AddExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code refExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterRefExpr(ckParser.RefExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code refExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitRefExpr(ckParser.RefExprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code ifExpr}
 	 * labeled alternative in {@link ckParser#expr}.
@@ -290,6 +194,114 @@ public interface ckListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitUnitExpr(ckParser.UnitExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code orExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterOrExpr(ckParser.OrExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code orExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitOrExpr(ckParser.OrExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code multExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterMultExpr(ckParser.MultExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code multExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitMultExpr(ckParser.MultExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code cFunExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterCFunExpr(ckParser.CFunExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code cFunExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitCFunExpr(ckParser.CFunExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code shiftExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterShiftExpr(ckParser.ShiftExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code shiftExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitShiftExpr(ckParser.ShiftExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code bitOrExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterBitOrExpr(ckParser.BitOrExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code bitOrExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitBitOrExpr(ckParser.BitOrExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code whileExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterWhileExpr(ckParser.WhileExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code whileExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitWhileExpr(ckParser.WhileExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code addExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterAddExpr(ckParser.AddExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code addExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitAddExpr(ckParser.AddExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code refExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterRefExpr(ckParser.RefExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code refExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitRefExpr(ckParser.RefExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code letRecExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterLetRecExpr(ckParser.LetRecExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code letRecExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitLetRecExpr(ckParser.LetRecExprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code equalityExpr}
 	 * labeled alternative in {@link ckParser#expr}.

@@ -5,6 +5,7 @@ import ck.ast.node.Expr
 
 sealed class Definition(val local: Boolean) {
     class Let(val node: Expr.Let, local: Boolean) : Definition(local)
+    class LetRec(val node: Expr.LetRec, local: Boolean): Definition(local)
     class Param(val node: Expr.Fun.Param, local: Boolean) : Definition(local)
 }
 
@@ -78,6 +79,19 @@ class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
         }
         //otherwise look in enclosing scope
         return e.enclosingScope?.accept(this)
+    }
+
+    override fun visit(e: Expr.LetRec): Definition? {
+        for (binding in e.bindings) {
+            if (binding.first == id) {
+                return Definition.LetRec(e, isLocal)
+            }
+        }
+        return e.enclosingScope?.accept(this)
+    }
+
+    override fun visit(e: Expr.CFun): Definition? {
+        return null
     }
 
     override fun visit(e: Expr.If): Definition? {

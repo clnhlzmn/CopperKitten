@@ -86,6 +86,11 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
         e.body.accept(this)
     }
 
+    override fun visit(e: Expr.LetRec) {
+        e.bindings.forEach { b -> b.second.accept(this) }
+        e.body.accept(this)
+    }
+
     override fun visit(e: Expr.If) {
         e.cond.accept(this)
         e.csq.accept(this)

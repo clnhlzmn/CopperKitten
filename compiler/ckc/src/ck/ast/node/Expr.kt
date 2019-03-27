@@ -349,6 +349,38 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
     }
 
+    class LetRec(val bindings: List<Pair<String, Expr>>, val body: Expr, t: Type) : Expr(t) {
+
+        var enclosingScope: ASTNode? = null
+
+        override fun <T> accept(visitor: ASTVisitor<T>): T =
+            visitor.visit(this)
+
+        override fun toString(): String {
+            val bindingsString = bindings.map { p -> "${p.first} = ${p.second}" }.toDelimitedString(" and ")
+            return "{let rec $bindingsString; $body}"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as LetRec
+
+            if (bindings != other.bindings) return false
+            if (body != other.body) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = bindings.hashCode()
+            result = 31 * result + body.hashCode()
+            return result
+        }
+
+    }
+
     class If(val cond: Expr, val csq: Expr, val alt: Expr?, t: Type) : Expr(t) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)

@@ -19,12 +19,16 @@ interface ASTVisitor<T> {
     fun visit(e: Expr.Fun): T
     fun visit(e: Expr.CFun): T
     fun visit(e: Expr.Let): T
+    fun visit(e: Expr.LetRec): T
     fun visit(e: Expr.If): T
     fun visit(e: Expr.While): T
     fun visit(e: Expr.Break): T
 }
 
 open class BaseASTVisitor<T> : ASTVisitor<T> {
+    override fun visit(e: Expr.LetRec): T {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     override fun visit(f: CkFile): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
