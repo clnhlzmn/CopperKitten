@@ -23,7 +23,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         }
     }
 
-    private fun compileTopLevelExpr(expr: Expr): List<String> {
+    private fun compileExprInNewFrame(expr: Expr): List<String> {
         //empty program
         val ret = ArrayList<String>()
         //enter frame
@@ -44,7 +44,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
     }
 
     private fun compileFunctionBody(body: Expr): List<String> {
-        val ret = ArrayList(compileTopLevelExpr(body))
+        val ret = ArrayList(compileExprInNewFrame(body))
         ret.add("return")
         return ret
     }
@@ -52,7 +52,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
     override fun visit(f: CkFile): List<String> {
         val ret = ArrayList<String>()
         if (debug) ret.add("debugpush \"$f\"")
-        ret.addAll(compileTopLevelExpr(f.expr))
+        ret.addAll(compileExprInNewFrame(f.expr))
         if (debug) ret.add("debugpop")
         ret.add("halt")
         return ret
@@ -399,21 +399,8 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: Expr.Fun): List<String> {
-        //TODO: find a way to allow recursive functions to refer to themselves before they're defined
-        //TODO: as in let rec foo = (): foo()
-        //TODO: when we compile foo we will attempt to compile it's captures which will be a lload
-        //TODO: but at that point the actual function value hasn't been stored in the local, so the load
-        //TODO: will be null, ...
-        //TODO: sln1: use 'self' keyword to refer to current function and load from known place on stack (doesn't help with mutual recursion)
-        //TODO: sln2: fix the captures after let rec compilation in the case that value is a fun
-        //TODO: sln3: when compiling let rec if value is Fun then do alloc and lstore first, then compile captures and body
+    private fun compileFunctionAllocation(e: Expr.Fun): List<String> {
         val ret = ArrayList<String>()
-        if (debug) ret.add("debugpush \"$e\"")
-        val bodyLabel = nextLabel()
-        val contLabel = nextLabel()
-
-        //push size of captures + 1 for function address
         ret.add("push ${e.captures.size + 1}")
         frame.push("<${e.captures.size + 1}>", false)
         //[...|size]
@@ -428,6 +415,13 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         frame.pop()
         frame.push("Fun($e)", true)
         //[...|fun]
+        return ret
+    }
+
+    private fun compileFunctionWithoutAlloc(e: Expr.Fun): List<String> {
+        val ret = ArrayList<String>()
+        val bodyLabel = nextLabel()
+        val contLabel = nextLabel()
 
         //store function address in fun[0]
         ret.add("push $bodyLabel")
@@ -453,6 +447,16 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 
         //continue program from above
         ret.add("$contLabel:")
+        return ret
+    }
+
+    override fun visit(e: Expr.Fun): List<String> {
+        val ret = ArrayList<String>()
+        if (debug) ret.add("debugpush \"$e\"")
+
+        ret.addAll(compileFunctionAllocation(e))
+
+        ret.addAll(compileFunctionWithoutAlloc(e))
 
         if (debug) ret.add("debugpop")
         return ret
@@ -567,15 +571,34 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 
         //compile the values
         e.bindings.forEachIndexed { index, binding ->
-            ret.addAll(binding.second.accept(this))
-            //[...|0|...|0|val]
-
+            if (binding.second is Expr.Fun) {
+                //compile the function alloc
+                ret.addAll(compileFunctionAllocation(binding.second as Expr.Fun))
+            } else {
+                ret.addAll(binding.second.accept(this))
+                //[...|0|...|0|val]
+            }
             //store value in local
             ret.add("lstore ${localIndices[index]} //${binding.first}")
             frame.pop()
             //[...|val0|...|0]
         }
         //[...|val0|...|valn]
+        
+        e.bindings.forEachIndexed { index, binding ->
+            if (binding.second is Expr.Fun) {
+                //load fun alloc from local
+                ret.add("lload ${localIndices[index]} //${binding.first}")
+                frame.push("<${binding.second}>", true)
+                //[...|fun]
+                //compile rest of fun
+                ret.addAll(compileFunctionWithoutAlloc(binding.second as Expr.Fun))
+                //[...|fun]
+                //fun alloc is already stored in local so can just remove here
+                ret.add("pop")
+                frame.pop()
+            }
+        }
 
         //compile body
         ret.addAll(e.body.accept(this))
