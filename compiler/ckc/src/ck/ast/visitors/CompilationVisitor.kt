@@ -124,6 +124,15 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
                                 TODO("error")
                             }
                         }
+                        is Definition.LetRec -> {
+                            val localIndex = frame.lookup(e.id)
+                            if (localIndex != null) {
+                                frame.push("<$e>", true)
+                                ret.add("lload $localIndex")
+                            } else {
+                                TODO("error")
+                            }
+                        }
                     }
                 } else {
                     val enclosingFun = e.accept(GetEnclosingFunction())!!
@@ -391,6 +400,14 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
     }
 
     override fun visit(e: Expr.Fun): List<String> {
+        //TODO: find a way to allow recursive functions to refer to themselves before they're defined
+        //TODO: as in let rec foo = (): foo()
+        //TODO: when we compile foo we will attempt to compile it's captures which will be a lload
+        //TODO: but at that point the actual function value hasn't been stored in the local, so the load
+        //TODO: will be null, ...
+        //TODO: sln1: use 'self' keyword to refer to current function and load from known place on stack (doesn't help with mutual recursion)
+        //TODO: sln2: fix the captures after let rec compilation in the case that value is a fun
+        //TODO: sln3: when compiling let rec if value is Fun then do alloc and lstore first, then compile captures and body
         val ret = ArrayList<String>()
         if (debug) ret.add("debugpush \"$e\"")
         val bodyLabel = nextLabel()
@@ -526,7 +543,61 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         //remove local now we're done with it
         ret.add("pop")
         frame.pop()
+        //[...|bodyVal]
+
+        if (debug) ret.add("debugpop")
+        return ret
+    }
+
+    override fun visit(e: Expr.LetRec): List<String> {
+        val ret = ArrayList<String>()
+        if (debug) ret.add("debugpush \"$e\"")
         //[...]
+
+        val localIndices = ArrayList<Int>()
+
+        //add space for locals
+        e.bindings.forEach { binding ->
+            ret.add("push 0")
+            //get local index (adjusted for instance #) in which to store this value
+            localIndices.add(frame.push(binding.first, true))
+            //[...|0]
+        }
+        //[...|0|...|0]
+
+        //compile the values
+        e.bindings.forEachIndexed { index, binding ->
+            ret.addAll(binding.second.accept(this))
+            //[...|0|...|0|val]
+
+            //store value in local
+            ret.add("lstore ${localIndices[index]} //${binding.first}")
+            frame.pop()
+            //[...|val0|...|0]
+        }
+        //[...|val0|...|valn]
+
+        //compile body
+        ret.addAll(e.body.accept(this))
+        //[...|val0|...|valn|bodyVal]
+
+        //store body value
+        ret.add("store")
+        frame.pop()
+        //[...|val0|...|valn]
+
+        //remove locals now we're done with it
+        e.bindings.forEach {
+            ret.add("pop")
+            frame.pop()
+            //[...|val0|...|valn-1]
+        }
+        //[...]
+
+        //load body value
+        ret.add("load")
+        frame.push("<${e.body}>", true)
+        //[...|bodyVal]
 
         if (debug) ret.add("debugpop")
         return ret
