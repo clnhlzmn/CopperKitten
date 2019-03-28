@@ -28,5 +28,10 @@
     write(fst(snd(pair)));
     
     let rec fact = (n): if (n < 2) 1 else n * fact(n - 1);
-    write(fact(4) + 97)
+    write(fact(4) + 97);
+    
+    let rec even = (n): if (n == 0) 1 else odd(n - 1)
+    and odd = (n): !even(n);
+    
+    if (even(read())) write(97+4) else write(97+14)
 }
