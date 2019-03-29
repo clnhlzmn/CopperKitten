@@ -5,8 +5,7 @@ import ck.ast.node.Expr
 
 class FindTailCalls: BaseASTVisitor<Unit>() {
 
-    //defaults to true, set to false when is not true
-    var tailPosition = true
+    var tailPosition = false
 
     override fun visit(e: Expr.LetRec) {
         val tp = tailPosition
@@ -17,7 +16,7 @@ class FindTailCalls: BaseASTVisitor<Unit>() {
     }
 
     override fun visit(f: CkFile) {
-        tailPosition = true
+        tailPosition = false
         f.expr.accept(this)
     }
 
