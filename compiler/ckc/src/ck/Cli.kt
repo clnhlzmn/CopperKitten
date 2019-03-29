@@ -3,6 +3,7 @@ package ck
 import ck.analyze.Analyze
 import ck.ast.visitors.CompilationVisitor
 import ck.ast.visitors.ComputeCapturesVisitor
+import ck.ast.visitors.FindTailCalls
 import ck.ast.visitors.ScopeLinkingVisitor
 import ck.grammar.Parse
 import org.antlr.v4.runtime.CharStreams
@@ -47,6 +48,8 @@ class Cli(val args: Array<String>) {
                     { file ->
                         //check types
                         Analyze.analyze(file.expr, null, null)
+                        //find tail calls
+                        file.accept(FindTailCalls())
                         //link scopes
                         file.accept(ScopeLinkingVisitor())
                         //compute function captures

@@ -49,11 +49,11 @@
     let isNil = fst;
     let cons = (h, t): pair(false, pair(h, t));
     let head = (l): fst(snd(l));
-    let tail = (l): snd(snd(l));
-    let rec len = (l): if (isNil(l)(1, 0)) 0 else len(tail(l));
-    
-    
-    let myLen = len(nil)
+    let tail = (l): snd(snd(l))
+    //let rec len = (l): if (isNil(l)(1, 0)) 0 else len(tail(l));
+    //
+    //
+    //let myLen = len(nil)
     
     //let myList = cons(42, nil)
 }

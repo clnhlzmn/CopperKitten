@@ -96,6 +96,8 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
     class Apply(val fn: Expr, val args: List<Expr>, t: Type) : Expr(t) {
 
+        var isTailCall = false
+
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
