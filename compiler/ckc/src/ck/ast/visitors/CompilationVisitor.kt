@@ -569,7 +569,9 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         }
         //[...|0|...|0]
 
-        //compile the values
+        //compile the values (only function alloc if value is function)
+        //this creates an array of appropriate size to hold the function
+        //address+captures and stores it in its spot on the stack
         e.bindings.forEachIndexed { index, binding ->
             if (binding.second is Expr.Fun) {
                 //compile the function alloc
@@ -584,7 +586,14 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
             //[...|val0|...|0]
         }
         //[...|val0|...|valn]
-        
+
+        //compile function bodies if value is function
+        //this loads the uninitialized function from the stack
+        //and compiles the rest of it (code address, captures)
+        //and stores those things in the function object
+        //the value on the stack is a pointer to the same object
+        //that is pointed to by the local at localIndices[i] so it too
+        //is updated with code address and captures
         e.bindings.forEachIndexed { index, binding ->
             if (binding.second is Expr.Fun) {
                 //load fun alloc from local
