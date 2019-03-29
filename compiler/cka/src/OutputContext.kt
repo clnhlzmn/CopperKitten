@@ -1,15 +1,26 @@
-//represents areas of output c file in which to
-//define various parts of the compiled program
-class OutputContext(
+//represents information about the target code to be generated
+data class OutputContext(
+    //to convert mnemonics from cka grammar to opcodes to store in bytecode array
+    val convert: (String) -> String,
+    //sizeof(intptr_t) on target
+    val wordSize: Int,
+    //size of heap in units of intptr_t
     private val memSize: Int,
+    //size of stack in units of intptr_t
     private val stackSize: Int,
-    private val gcImpl: String) {
+    //name of gc impl
+    private val gcImpl: String,
+    //array of instructions
+    val program:ArrayList<String>
+) {
 
     //where layout functions are stored
     private val functions = ArrayList<Function>()
 
     private val strings = ArrayList<String>()
 
+    //adds a function if it is not already present
+    //returns index of function in function array
     fun addFunction(lf: Function): Long {
         val ret = functions.indexOf(lf)
         if (ret == -1) {
@@ -29,7 +40,6 @@ class OutputContext(
     }
 
     //where the program array goes
-    val program = ArrayList<String>()
 
     fun emit(): String {
         return "#include \"vm.h\"\n" +

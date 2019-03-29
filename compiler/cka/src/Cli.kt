@@ -52,9 +52,13 @@ class Cli(val args: Array<String>) {
                 val gcImpls = gcOpts.map { o -> Pair(o, "${o}_gc.h") }.toMap()
                 val gcImpl = gcImpls.getValue(gcOpt.toLowerCase())
 
-                val tc = TargetContext(
+                val oc = OutputContext(
                     { mnemonic -> mnemonic.toUpperCase() },
-                    wordSize?.toInt() ?: 4
+                    wordSize?.toInt() ?: 4,
+                    heapSize?.toInt() ?: 1000,
+                    stackSize?.toInt() ?: 100,
+                    gcImpl,
+                    ArrayList()
                 )
 
                 val stream = CharStreams.fromFileName(inputFileName)
@@ -65,13 +69,8 @@ class Cli(val args: Array<String>) {
                 ckaParser.addErrorListener(ThrowingErrorListener())
                 val context = ckaParser.file()
                 val pc = FileVisitor().visit(context)
-                val oc = OutputContext(
-                    heapSize?.toInt() ?: 1000,
-                    stackSize?.toInt() ?: 100,
-                    gcImpl
-                )
                 for (inst in pc.instructions) {
-                    inst.emit(pc, tc, oc)
+                    inst.emit(pc, oc)
                 }
                 if (outputFileName != null) {
                     File(outputFileName).printWriter().use { out ->

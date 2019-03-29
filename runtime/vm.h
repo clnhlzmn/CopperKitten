@@ -100,9 +100,11 @@ enum vm_op_code {
     ENTER,      //enter a stack frame
     LEAVE,      //leave a stack frame
     LAYOUT,     //[...]->[...], set the frame layout from the next word (offset into functions array) in the program
+    LAYOUTB,    //same as layout but index is byte from program stream
     
     //allocation
     ALLOC,      //[...|size]->[...|ref], allocate n cells with the given layout. size is on stack, layout is in instruction stream
+    ALLOCB,     //same as alloc but index to layout fun is byte not word
     RBARRIER,   //gc read barrier on ref on tos
     WBARRIER,   //gc write barrier on ref on tos
     
@@ -428,8 +430,14 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             //set the first cell in the frame to the layout function found using the index in the word following ip
             self->fp[1] = (intptr_t)self->functions[vm_get_word(self)];
             break;
+        case LAYOUTB:
+            self->fp[1] = (intptr_t)self->functions[vm_get_byte(self)];
+            break;
         case ALLOC:
             vm_alloc(self, self->functions[vm_get_word(self)]);
+            break;
+        case ALLOCB:
+            vm_alloc(self, self->functions[vm_get_byte(self)]);
             break;
         case LOAD:
             self->sp[0] = self->temp;
