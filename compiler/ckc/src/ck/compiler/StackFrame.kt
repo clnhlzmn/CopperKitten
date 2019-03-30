@@ -21,6 +21,10 @@ class StackFrame {
         return locals.size - 1
     }
 
+    fun dup() {
+        locals.add(locals[locals.size - 1])
+    }
+
     fun lookup(id: String): Int? {
         val i = locals.indexOfLast { l -> l.first == id  }
         return if (i == -1) null else i

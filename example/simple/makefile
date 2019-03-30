@@ -8,6 +8,10 @@ STACKSIZE = 1000
 HEAPSIZE = 1000
 WORDSIZE = 8
 GC = copying
+#DEBUG = -d
+DEBUG = 
+
+CKFLAGS = ${DEBUG}
 
 #cka options
 CKAFLAGS = -s ${STACKSIZE} -m ${HEAPSIZE} -w ${WORDSIZE} -g ${GC}
@@ -40,7 +44,7 @@ out/simple_io.c: out/simple_io.cka
 
 #use ckc to generate cka from simple_io.ck
 out/simple_io.cka: simple_io.ck
-	${CKC} -i simple_io.ck -o ${OUTDIR}/simple_io.cka
+	${CKC} -i simple_io.ck -o ${OUTDIR}/simple_io.cka ${CKFLAGS}
 
 #remove outdir
 clean:

@@ -186,10 +186,10 @@ static inline intptr_t vm_get_byte(struct vm *self) {
 
 static inline void vm_lload(struct vm *self, intptr_t index) {
     //when loading a local the stack looks like
-    //[...last frame...|last fp|layout fun ptr|...locals...|...temps...]
-    //                 ^                                               ^
-    //                 |                                               |
-    //                 fp                                              sp
+    //[...last frame...|last fp|layout fun ptr|...locals...]
+    //                 ^                                   ^
+    //                 |                                   |
+    //                 fp                                  sp
     //to load a local we execute sp[0] = fp[2 + index] then increment sp
     self->sp[0] = self->fp[2 + index];
     self->sp++;
@@ -202,9 +202,9 @@ static inline void vm_lstore(struct vm *self, intptr_t index) {
 
 static inline void vm_aload(struct vm *self, intptr_t index) {
     //when loading an argument the stack should look like
-    //[...|argn-1|...|arg0|fun|ret addr|last fp|layout fun ptr|...locals...|...temps...]
-    //                                 ^                                               ^
-    //                                 fp                                              sp
+    //[...|argn-1|...|arg0|fun|ret addr|last fp|layout fun ptr|...locals...]
+    //                                 ^                                   ^
+    //                                 fp                                  sp
     //to load an arg we execute sp[0] = fp[-3 - argindex] then increment sp
     self->sp[0] = self->fp[-3 - index];
     self->sp++;

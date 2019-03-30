@@ -32,7 +32,6 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         val lastFrame = frame
         frame = StackFrame()
         //compile top level
-        //TODO: to make TCO work will require cooperation from here
         ret.addAll(expr.accept(this))
         //save return value
         ret.add("store")
@@ -152,7 +151,6 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         val ret = ArrayList<String>()
         if (debug) ret.add("debugpush \"$e\"")
 
-        //TODO: TCO requires cooperation from compileExprInNewFrame
 //        //tail call optimization if number of args of caller and callee are equal
 //        if (e.isTailCall && e.accept(GetEnclosingFunction())!!.params.size == e.args.size) {
 //
@@ -185,6 +183,16 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 //            //then load fun
 //            ret.add("load")
 //            frame.push("<${e.fn}>", true)
+//
+//            //make a copy
+//            ret.add("dup")
+//            frame.dup()
+//
+//            //store copy in fun location on stack
+//            //[...|argn-1|...|arg0|fun|retAddr|lastFp|layout|...locals...]
+//            //                    ^here
+//            ret.add("astore -1")
+//            frame.pop()
 //
 //            //get addr
 //            ret.add("rload 0")
