@@ -30,5 +30,9 @@ class StackFrame {
         locals.removeAt(locals.size - 1)
     }
 
+    fun clear() {
+        locals.removeAll(locals)
+    }
+
 }
 

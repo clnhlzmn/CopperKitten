@@ -32,6 +32,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         val lastFrame = frame
         frame = StackFrame()
         //compile top level
+        //TODO: to make TCO work will require cooperation from here
         ret.addAll(expr.accept(this))
         //save return value
         ret.add("store")
@@ -151,51 +152,101 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         val ret = ArrayList<String>()
         if (debug) ret.add("debugpush \"$e\"")
 
-        //compile arguments in reverse order
-        e.args.reversed().forEach { a ->
-            ret.addAll(a.accept(this))
-        }
-        //[...|argn-1|...|arg0]
+        //TODO: TCO requires cooperation from compileExprInNewFrame
+//        //tail call optimization if number of args of caller and callee are equal
+//        if (e.isTailCall && e.accept(GetEnclosingFunction())!!.params.size == e.args.size) {
+//
+//            //compile arguments in reverse order
+//            e.args.reversed().forEach { a ->
+//                ret.addAll(a.accept(this))
+//            }
+//            //[...|argn-1|...|arg0]
+//
+//            //then compile function
+//            ret.addAll(e.fn.accept(this))
+//            //[...|argn-1|...|arg0|fun]
+//
+//            //then store fun
+//            ret.add("store")
+//            frame.pop()
+//            //[...|argn-1|...|arg0]
+//
+//            //then store args
+//            e.args.forEachIndexed { index, _ ->
+//                ret.add("astore $index")
+//                frame.pop()
+//                //[...|argn-1|...]
+//            }
+//
+//            //then clear frame
+//            ret.add("clear")
+//            frame.clear()
+//
+//            //then load fun
+//            ret.add("load")
+//            frame.push("<${e.fn}>", true)
+//
+//            //get addr
+//            ret.add("rload 0")
+//            frame.pop()
+//            frame.push("<&${e.fn}>", false)
+//
+//            //then jump
+//            ret.add("goto")
+//            frame.pop()
+//
+//            //then push "fake" return value?
+//            frame.push("<$e>", true)
+//
+//        } else {
 
-        //then compile function
-        ret.addAll(e.fn.accept(this))
-        //[...|argn-1|...|arg0|fun]
+            //compile arguments in reverse order
+            e.args.reversed().forEach { a ->
+                ret.addAll(a.accept(this))
+            }
+            //[...|argn-1|...|arg0]
 
-        //duplicate function (puts another ref on stack)
-        ret.add("dup")
-        frame.push("<${e.fn}>", true)
-        //[...|argn-1|...|arg0|fun|fun]
+            //then compile function
+            ret.addAll(e.fn.accept(this))
+            //[...|argn-1|...|arg0|fun]
 
-        //get code address (replaces dup'd function with non-ref function address)
-        ret.add("rload 0")
-        frame.pop()
-        frame.push("&${e.fn}", false)
-        //[...|argn-1|...|arg0|fun|addr]
+            //duplicate function (puts another ref on stack)
+            ret.add("dup")
+            frame.push("<${e.fn}>", true)
+            //[...|argn-1|...|arg0|fun|fun]
 
-        //layout instruction
-        ret.add("layout ${frame.getLayoutString()}")
+            //get code address (replaces dup'd function with non-ref function address)
+            ret.add("rload 0")
+            frame.pop()
+            frame.push("&${e.fn}", false)
+            //[...|argn-1|...|arg0|fun|addr]
 
-        //call (return removes function address)
-        ret.add("call")
-        frame.pop()
-        //[...|argn-1|...|arg0|fun]
+            //layout instruction
+            ret.add("layout ${frame.getLayoutString()}")
 
-        //remove original function
-        ret.add("pop")
-        frame.pop()
-        //[...|argn-1|...|arg0]
+            //call (return removes function address)
+            ret.add("call")
+            frame.pop()
+            //[...|argn-1|...|arg0|fun]
 
-        //remove args in the same way
-        repeat(e.args.size) {
+            //remove original function
             ret.add("pop")
             frame.pop()
-        }
-        //[...]
+            //[...|argn-1|...|arg0]
 
-        //load return value (function body uses store on ret val)
-        ret.add("load")
-        frame.push("<$e>", true)
-        //[...|retVal]
+            //remove args in the same way
+            repeat(e.args.size) {
+                ret.add("pop")
+                frame.pop()
+            }
+            //[...]
+
+            //load return value (function body uses store on ret val)
+            ret.add("load")
+            frame.push("<$e>", true)
+            //[...|retVal]
+
+//        }
 
         if (debug) ret.add("debugpop")
         return ret

@@ -84,6 +84,7 @@ enum vm_op_code {
     
     //control flow
     CALL,       //jump to the address (offset into program) on the stack and push current address (actual native address)
+    GOTO,       //jump to the address (offset into program) on the stack
     RETURN,     //pop address (actual) from the stack and jump to it
     JUMP,       //jump to the address (offset) following JUMP instruction
     JUMPZ,      //same as JUMP if tos is zero
@@ -101,6 +102,7 @@ enum vm_op_code {
     LEAVE,      //leave a stack frame
     LAYOUT,     //[...]->[...], set the frame layout from the next word (offset into functions array) in the program
     LAYOUTB,    //same as layout but index is byte from program stream
+    CLEAR,      //set sp to &fp[2]
     
     //allocation
     ALLOC,      //[...|size]->[...|ref], allocate n cells with the given layout. size is on stack, layout is in instruction stream
@@ -360,6 +362,10 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             //[...|argn-1|...|arg0|fun|ret address]
             break;
         }
+        case GOTO:
+            self->ip = self->program + self->sp[-1];
+            self->sp--;
+            break;
         case RETURN:
             self->ip = (uint8_t*)self->sp[-1];
             self->sp--;
@@ -432,6 +438,9 @@ static inline void vm_dispatch(struct vm *self, uint8_t instruction) {
             break;
         case LAYOUTB:
             self->fp[1] = (intptr_t)self->functions[vm_get_byte(self)];
+            break;
+        case CLEAR:
+            self->sp = &self->fp[2];
             break;
         case ALLOC:
             vm_alloc(self, self->functions[vm_get_word(self)]);

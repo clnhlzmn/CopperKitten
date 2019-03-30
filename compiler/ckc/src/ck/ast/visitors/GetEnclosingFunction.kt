@@ -6,15 +6,15 @@ import java.security.spec.ECField
 class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
 
     override fun visit(e: Expr.Unit): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.Sequence): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.Natural): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.Ref): Expr.Fun? {
@@ -22,23 +22,23 @@ class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
     }
 
     override fun visit(e: Expr.Apply): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.Unary): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.Binary): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.Cond): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.Assign): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.Fun): Expr.Fun? {
@@ -54,15 +54,15 @@ class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
     }
 
     override fun visit(e: Expr.If): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.While): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
     override fun visit(e: Expr.Break): Expr.Fun? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return e.enclosingScope?.accept(this)
     }
 
 }

@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/compiler/cka/grammar\cka.g4 by ANTLR 4.7.2
+// Generated from /Users/colinholzman/Documents/CopperKitten/compiler/cka/grammar/cka.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -23,8 +23,8 @@ public class ckaParser extends Parser {
 		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
 		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45, 
 		T__45=46, T__46=47, T__47=48, T__48=49, T__49=50, T__50=51, T__51=52, 
-		T__52=53, T__53=54, T__54=55, T__55=56, NATURAL=57, ID=58, LABEL=59, STRING=60, 
-		WHITESPACE=61, COMMENT=62;
+		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, NATURAL=59, 
+		ID=60, LABEL=61, STRING=62, WHITESPACE=63, COMMENT=64;
 	public static final int
 		RULE_file = 0, RULE_instructions = 1, RULE_instruction = 2, RULE_literalLabelMnemonic = 3, 
 		RULE_literalIntMnemonic = 4, RULE_literalStringMnemonic = 5, RULE_simpleInstruction = 6, 
@@ -47,7 +47,7 @@ public class ckaParser extends Parser {
 			"'bitxor'", "'bitor'", "'lt'", "'lte'", "'gt'", "'gte'", "'eq'", "'neq'", 
 			"'cmp'", "'call'", "'return'", "'dup'", "'pop'", "'swap'", "'enter'", 
 			"'leave'", "'nop'", "'halt'", "'load'", "'store'", "'rbarrier'", "'wbarrier'", 
-			"'debugpop'", "'['", "']'", "','", "'*'", "'-'"
+			"'debugpop'", "'clear'", "'goto'", "'['", "']'", "','", "'*'", "'-'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -57,8 +57,8 @@ public class ckaParser extends Parser {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, "NATURAL", "ID", 
-			"LABEL", "STRING", "WHITESPACE", "COMMENT"
+			null, null, null, null, null, null, null, null, null, null, null, "NATURAL", 
+			"ID", "LABEL", "STRING", "WHITESPACE", "COMMENT"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -146,7 +146,7 @@ public class ckaParser extends Parser {
 			setState(21);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << T__30) | (1L << T__31) | (1L << T__32) | (1L << T__33) | (1L << T__34) | (1L << T__35) | (1L << T__36) | (1L << T__37) | (1L << T__38) | (1L << T__39) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << LABEL))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << T__30) | (1L << T__31) | (1L << T__32) | (1L << T__33) | (1L << T__34) | (1L << T__35) | (1L << T__36) | (1L << T__37) | (1L << T__38) | (1L << T__39) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << LABEL))) != 0)) {
 				{
 				setState(20);
 				instructions();
@@ -206,7 +206,7 @@ public class ckaParser extends Parser {
 			setState(29);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << T__30) | (1L << T__31) | (1L << T__32) | (1L << T__33) | (1L << T__34) | (1L << T__35) | (1L << T__36) | (1L << T__37) | (1L << T__38) | (1L << T__39) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << LABEL))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << T__30) | (1L << T__31) | (1L << T__32) | (1L << T__33) | (1L << T__34) | (1L << T__35) | (1L << T__36) | (1L << T__37) | (1L << T__38) | (1L << T__39) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << LABEL))) != 0)) {
 				{
 				{
 				setState(26);
@@ -663,7 +663,7 @@ public class ckaParser extends Parser {
 			{
 			setState(58);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << T__30) | (1L << T__31) | (1L << T__32) | (1L << T__33) | (1L << T__34) | (1L << T__35) | (1L << T__36) | (1L << T__37) | (1L << T__38) | (1L << T__39) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << T__30) | (1L << T__31) | (1L << T__32) | (1L << T__33) | (1L << T__34) | (1L << T__35) | (1L << T__36) | (1L << T__37) | (1L << T__38) | (1L << T__39) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -745,9 +745,9 @@ public class ckaParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(60);
-				match(T__51);
+				match(T__53);
 				setState(61);
-				match(T__52);
+				match(T__54);
 				}
 				break;
 			case 2:
@@ -755,17 +755,17 @@ public class ckaParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(62);
-				match(T__51);
+				match(T__53);
 				setState(63);
 				match(NATURAL);
 				setState(68);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==T__53) {
+				while (_la==T__55) {
 					{
 					{
 					setState(64);
-					match(T__53);
+					match(T__55);
 					setState(65);
 					match(NATURAL);
 					}
@@ -775,7 +775,7 @@ public class ckaParser extends Parser {
 					_la = _input.LA(1);
 				}
 				setState(71);
-				match(T__52);
+				match(T__54);
 				}
 				break;
 			}
@@ -868,11 +868,11 @@ public class ckaParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(74);
-				match(T__51);
+				match(T__53);
 				setState(75);
-				match(T__54);
+				match(T__56);
 				setState(76);
-				match(T__52);
+				match(T__54);
 				}
 				break;
 			case 2:
@@ -880,9 +880,9 @@ public class ckaParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(77);
-				match(T__51);
+				match(T__53);
 				setState(78);
-				match(T__52);
+				match(T__54);
 				}
 				break;
 			case 3:
@@ -890,17 +890,17 @@ public class ckaParser extends Parser {
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(79);
-				match(T__51);
+				match(T__53);
 				setState(80);
 				match(NATURAL);
 				setState(85);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==T__53) {
+				while (_la==T__55) {
 					{
 					{
 					setState(81);
-					match(T__53);
+					match(T__55);
 					setState(82);
 					match(NATURAL);
 					}
@@ -910,7 +910,7 @@ public class ckaParser extends Parser {
 					_la = _input.LA(1);
 				}
 				setState(88);
-				match(T__52);
+				match(T__54);
 				}
 				break;
 			}
@@ -957,10 +957,10 @@ public class ckaParser extends Parser {
 			setState(92);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__55) {
+			if (_la==T__57) {
 				{
 				setState(91);
-				match(T__55);
+				match(T__57);
 				}
 			}
 
@@ -980,31 +980,31 @@ public class ckaParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3@c\4\2\t\2\4\3\t\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3Bc\4\2\t\2\4\3\t\3"+
 		"\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\3\2"+
 		"\5\2\30\n\2\3\2\3\2\3\3\3\3\7\3\36\n\3\f\3\16\3!\13\3\3\4\3\4\3\4\3\4"+
 		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4\65\n\4\3"+
 		"\5\3\5\3\6\3\6\3\7\3\7\3\b\3\b\3\t\3\t\3\t\3\t\3\t\3\t\7\tE\n\t\f\t\16"+
 		"\tH\13\t\3\t\5\tK\n\t\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\7\nV\n\n\f\n"+
 		"\16\nY\13\n\3\n\5\n\\\n\n\3\13\5\13_\n\13\3\13\3\13\3\13\2\2\f\2\4\6\b"+
-		"\n\f\16\20\22\24\2\5\3\2\7\n\4\2\7\7\13\22\3\2\24\65\2g\2\27\3\2\2\2\4"+
+		"\n\f\16\20\22\24\2\5\3\2\7\n\4\2\7\7\13\22\3\2\24\67\2g\2\27\3\2\2\2\4"+
 		"\33\3\2\2\2\6\64\3\2\2\2\b\66\3\2\2\2\n8\3\2\2\2\f:\3\2\2\2\16<\3\2\2"+
 		"\2\20J\3\2\2\2\22[\3\2\2\2\24^\3\2\2\2\26\30\5\4\3\2\27\26\3\2\2\2\27"+
 		"\30\3\2\2\2\30\31\3\2\2\2\31\32\7\2\2\3\32\3\3\2\2\2\33\37\5\6\4\2\34"+
 		"\36\5\6\4\2\35\34\3\2\2\2\36!\3\2\2\2\37\35\3\2\2\2\37 \3\2\2\2 \5\3\2"+
-		"\2\2!\37\3\2\2\2\"#\7=\2\2#\65\7\3\2\2$\65\5\16\b\2%&\5\n\6\2&\'\5\24"+
-		"\13\2\'\65\3\2\2\2()\5\b\5\2)*\7=\2\2*\65\3\2\2\2+,\5\f\7\2,-\7>\2\2-"+
+		"\2\2!\37\3\2\2\2\"#\7?\2\2#\65\7\3\2\2$\65\5\16\b\2%&\5\n\6\2&\'\5\24"+
+		"\13\2\'\65\3\2\2\2()\5\b\5\2)*\7?\2\2*\65\3\2\2\2+,\5\f\7\2,-\7@\2\2-"+
 		"\65\3\2\2\2./\7\4\2\2/\65\5\20\t\2\60\61\7\5\2\2\61\65\5\22\n\2\62\63"+
-		"\7\6\2\2\63\65\7<\2\2\64\"\3\2\2\2\64$\3\2\2\2\64%\3\2\2\2\64(\3\2\2\2"+
+		"\7\6\2\2\63\65\7>\2\2\64\"\3\2\2\2\64$\3\2\2\2\64%\3\2\2\2\64(\3\2\2\2"+
 		"\64+\3\2\2\2\64.\3\2\2\2\64\60\3\2\2\2\64\62\3\2\2\2\65\7\3\2\2\2\66\67"+
 		"\t\2\2\2\67\t\3\2\2\289\t\3\2\29\13\3\2\2\2:;\7\23\2\2;\r\3\2\2\2<=\t"+
-		"\4\2\2=\17\3\2\2\2>?\7\66\2\2?K\7\67\2\2@A\7\66\2\2AF\7;\2\2BC\78\2\2"+
-		"CE\7;\2\2DB\3\2\2\2EH\3\2\2\2FD\3\2\2\2FG\3\2\2\2GI\3\2\2\2HF\3\2\2\2"+
-		"IK\7\67\2\2J>\3\2\2\2J@\3\2\2\2K\21\3\2\2\2LM\7\66\2\2MN\79\2\2N\\\7\67"+
-		"\2\2OP\7\66\2\2P\\\7\67\2\2QR\7\66\2\2RW\7;\2\2ST\78\2\2TV\7;\2\2US\3"+
-		"\2\2\2VY\3\2\2\2WU\3\2\2\2WX\3\2\2\2XZ\3\2\2\2YW\3\2\2\2Z\\\7\67\2\2["+
-		"L\3\2\2\2[O\3\2\2\2[Q\3\2\2\2\\\23\3\2\2\2]_\7:\2\2^]\3\2\2\2^_\3\2\2"+
-		"\2_`\3\2\2\2`a\7;\2\2a\25\3\2\2\2\n\27\37\64FJW[^";
+		"\4\2\2=\17\3\2\2\2>?\78\2\2?K\79\2\2@A\78\2\2AF\7=\2\2BC\7:\2\2CE\7=\2"+
+		"\2DB\3\2\2\2EH\3\2\2\2FD\3\2\2\2FG\3\2\2\2GI\3\2\2\2HF\3\2\2\2IK\79\2"+
+		"\2J>\3\2\2\2J@\3\2\2\2K\21\3\2\2\2LM\78\2\2MN\7;\2\2N\\\79\2\2OP\78\2"+
+		"\2P\\\79\2\2QR\78\2\2RW\7=\2\2ST\7:\2\2TV\7=\2\2US\3\2\2\2VY\3\2\2\2W"+
+		"U\3\2\2\2WX\3\2\2\2XZ\3\2\2\2YW\3\2\2\2Z\\\79\2\2[L\3\2\2\2[O\3\2\2\2"+
+		"[Q\3\2\2\2\\\23\3\2\2\2]_\7<\2\2^]\3\2\2\2^_\3\2\2\2_`\3\2\2\2`a\7=\2"+
+		"\2a\25\3\2\2\2\n\27\37\64FJW[^";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

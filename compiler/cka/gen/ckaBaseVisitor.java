@@ -1,4 +1,4 @@
-// Generated from C:/code/CopperKitten/compiler/cka/grammar\cka.g4 by ANTLR 4.7.2
+// Generated from /Users/colinholzman/Documents/CopperKitten/compiler/cka/grammar/cka.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**

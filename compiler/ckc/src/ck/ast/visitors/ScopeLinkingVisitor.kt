@@ -17,50 +17,50 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
 
     //leaf node, do nothing
     override fun visit(e: Expr.Unit) {
-        //nothing
+        e.enclosingScope = currentScope
     }
 
     //not a ref or an enclosing scope, just have to visit children
     override fun visit(e: Expr.Sequence) {
+        e.enclosingScope = currentScope
         e.first.accept(this)
         e.second.accept(this)
     }
 
     override fun visit(e: Expr.Natural) {
-        //nothing
-    }
-
-    override fun visit(e: Expr.Ref) {
-        //ref first needs to have scope set
         e.enclosingScope = currentScope
     }
 
-    //visit children
+    override fun visit(e: Expr.Ref) {
+        e.enclosingScope = currentScope
+    }
+
     override fun visit(e: Expr.Apply) {
+        e.enclosingScope = currentScope
         e.fn.accept(this)
         e.args.forEach { a -> a.accept(this) }
     }
 
-    //visit children
     override fun visit(e: Expr.Unary) {
+        e.enclosingScope = currentScope
         e.operand.accept(this)
     }
 
-    //visit children
     override fun visit(e: Expr.Binary) {
+        e.enclosingScope = currentScope
         e.lhs.accept(this)
         e.rhs.accept(this)
     }
 
-    //visit children
     override fun visit(e: Expr.Cond) {
+        e.enclosingScope = currentScope
         e.cond.accept(this)
         e.csq.accept(this)
         e.alt.accept(this)
     }
 
-    //visit children
     override fun visit(e: Expr.Assign) {
+        e.enclosingScope = currentScope
         e.target.accept(this)
         e.value.accept(this)
     }
@@ -78,7 +78,7 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
     }
 
     override fun visit(e: Expr.CFun) {
-        //nothing
+        e.enclosingScope = currentScope
     }
 
     //ck.ast.node.Expr.Let creates a new scope
@@ -108,21 +108,21 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
         currentScope = e.enclosingScope
     }
 
-    //visit children
     override fun visit(e: Expr.If) {
+        e.enclosingScope = currentScope
         e.cond.accept(this)
         e.csq.accept(this)
         e.alt?.accept(this)
     }
 
-    //visit children
     override fun visit(e: Expr.While) {
+        e.enclosingScope = currentScope
         e.cond.accept(this)
         e.body.accept(this)
     }
 
-    //visit children
     override fun visit(e: Expr.Break) {
+        e.enclosingScope = currentScope
         e.value?.accept(this)
     }
 

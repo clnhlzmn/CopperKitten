@@ -8,6 +8,8 @@ import util.extensions.toDelimitedString
 
 sealed class Expr(var t: Type) : BaseASTNode() {
 
+    var enclosingScope: ASTNode? = null
+
     object Unit : Expr(Type.Op("Unit", emptyList())) {
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -69,8 +71,6 @@ sealed class Expr(var t: Type) : BaseASTNode() {
     }
 
     class Ref(var id: String, t: Type) : Expr(t) {
-
-        var enclosingScope: ASTNode? = null
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -263,8 +263,6 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         //a list of ck.ast.node.Expr.Refs that are the variables that this ck.ast.node.Expr.Fun needs to capture
         val captures = ArrayList<Ref>()
 
-        var enclosingScope: ASTNode? = null
-
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
@@ -321,8 +319,6 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
     class Let(val id: String, val value: Expr, val body: Expr, t: Type) : Expr(t) {
 
-        var enclosingScope: ASTNode? = null
-
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
@@ -352,8 +348,6 @@ sealed class Expr(var t: Type) : BaseASTNode() {
     }
 
     class LetRec(val bindings: List<Pair<String, Expr>>, val body: Expr, t: Type) : Expr(t) {
-
-        var enclosingScope: ASTNode? = null
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)

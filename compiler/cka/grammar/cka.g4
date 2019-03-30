@@ -81,6 +81,8 @@ simpleInstruction
     | 'rbarrier'
     | 'wbarrier'
     | 'debugpop'
+    | 'clear'
+    | 'goto'
     ;
 
 frameLayout
