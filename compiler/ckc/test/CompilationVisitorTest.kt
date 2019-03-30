@@ -11,32 +11,31 @@ internal class CompilationVisitorTest {
     fun testNaturalExpr() {
         val visitor = CompilationVisitor()
         val expr = Parse.expr(CharStreams.fromString("42")).right()!!
-        val res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
-        assertEquals(res, listOf("push 1", "layout []", "alloc []", "push 42", "rstore 0"))
     }
     @Test
     fun testBinExpr() {
         var visitor = CompilationVisitor()
         var expr = Parse.expr(CharStreams.fromString("43 < 42")).right()!!
-        var res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
 
         visitor = CompilationVisitor()
         expr = Parse.expr(CharStreams.fromString("43 && 42")).right()!!
-        res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
 
         visitor = CompilationVisitor()
         expr = Parse.expr(CharStreams.fromString("43 || 42")).right()!!
-        res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
     }
     @Test
     fun testSequenceExpr() {
         val visitor = CompilationVisitor()
         val expr = Parse.expr(CharStreams.fromString("{42; 43}")).right()!!
-        val res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
     }
     @Test
@@ -44,7 +43,7 @@ internal class CompilationVisitorTest {
         var visitor = CompilationVisitor()
         var expr = Parse.expr(CharStreams.fromString("{let a = 42; a}")).right()!!
         expr.accept(ScopeLinkingVisitor())
-        var res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
         expr = Parse.expr(CharStreams.fromString("{\n" +
             "    let read = cfun native_read ():Int;\n" +
@@ -84,7 +83,7 @@ internal class CompilationVisitorTest {
         val visitor = CompilationVisitor()
         val expr = Parse.expr(CharStreams.fromString("if (1) 42 else 43")).right()!!
         expr.accept(ScopeLinkingVisitor())
-        val res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
     }
     @Test
@@ -92,7 +91,7 @@ internal class CompilationVisitorTest {
         val visitor = CompilationVisitor()
         val expr = Parse.expr(CharStreams.fromString("(a): a")).right()!!
         expr.accept(ScopeLinkingVisitor())
-        val res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
     }
     @Test
@@ -100,13 +99,13 @@ internal class CompilationVisitorTest {
         var visitor = CompilationVisitor()
         var expr = Parse.expr(CharStreams.fromString("{(a): a}(42)")).right()!!
         expr.accept(ScopeLinkingVisitor())
-        var res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
 
         visitor = CompilationVisitor()
         expr = Parse.expr(CharStreams.fromString("let id = (a): a; id(42)")).right()!!
         expr.accept(ScopeLinkingVisitor())
-        res = expr.accept(visitor)
+        expr.accept(visitor)
         assert(visitor.frame.locals.size == 1)
     }
 }
