@@ -182,27 +182,22 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
             //[...]
 
             //don't have to keep exact compile time stack info here
-            //just remove args and fun above and add "fake" ret value at enc
+            //just add "fake" ret value at enc
 
             //then clear frame
             ret.add("clear")
-//            frame.clear()
 
             //then leave frame
             ret.add("leave")
 
             //then load fun
             ret.add("load")
-//            frame.push("<${e.fn}>", true)
 
             //get addr
             ret.add("rload 0")
-//            frame.pop()
-//            frame.push("<&${e.fn}>", false)
 
             //then jump
             ret.add("goto")
-//            frame.pop()
 
             //then push "fake" return value?
             frame.push("<$e>", true)
