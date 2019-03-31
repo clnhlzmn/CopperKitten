@@ -57,12 +57,4 @@ class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
         return e.enclosingScope?.accept(this)
     }
 
-    override fun visit(e: Expr.While): Expr.Fun? {
-        return e.enclosingScope?.accept(this)
-    }
-
-    override fun visit(e: Expr.Break): Expr.Fun? {
-        return e.enclosingScope?.accept(this)
-    }
-
 }

@@ -115,15 +115,4 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
         e.alt?.accept(this)
     }
 
-    override fun visit(e: Expr.While) {
-        e.enclosingScope = currentScope
-        e.cond.accept(this)
-        e.body.accept(this)
-    }
-
-    override fun visit(e: Expr.Break) {
-        e.enclosingScope = currentScope
-        e.value?.accept(this)
-    }
-
 }

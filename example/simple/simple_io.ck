@@ -48,11 +48,27 @@
     let isNil = fst;
     let cons = (h, t): pair(false, pair(h, t));
     let head = (l): fst(snd(l));
-    let tail = (l): snd(snd(l))
+    let tail = (l): snd(snd(l));
     //let rec len = (l): if (isNil(l)(1, 0)) 0 else len(tail(l));
     //
     //
     //let myLen = len(nil)
     
     //let myList = cons(42, nil)
+    
+    let rec readIntImpl = (acc): {
+        let char = read();
+        if (char == 10 || char == 13) 
+            acc
+        else if (char >= 48 && char <= 57)
+            readIntImpl(acc * 10 + char - 48)
+        else
+            -1
+    };
+    
+    let readInt = (): {
+        readIntImpl(0)
+    };
+    
+    write(readInt())
 }

@@ -97,14 +97,5 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
         e.alt?.accept(this)
     }
 
-    override fun visit(e: Expr.While) {
-        e.cond.accept(this)
-        e.body.accept(this)
-    }
-
-    override fun visit(e: Expr.Break) {
-        e.value?.accept(this)
-    }
-
 }
 

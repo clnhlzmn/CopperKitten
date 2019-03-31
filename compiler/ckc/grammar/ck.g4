@@ -36,8 +36,6 @@ expr
     | 'let' ID '=' value=expr                                           #letExpr
     | 'let' 'rec' ID '=' expr ('and' ID '=' expr)*                      #letRecExpr
     | 'if' '(' cond=expr ')' csq=expr ( 'else' alt=expr )?              #ifExpr
-    | 'while' '(' cond=expr ')' body=expr                               #whileExpr
-    | 'break' expr?                                                     #breakExpr
     ;
 
 args

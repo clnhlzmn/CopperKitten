@@ -98,12 +98,4 @@ class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
         return null
     }
 
-    override fun visit(e: Expr.While): Definition? {
-        return null
-    }
-
-    override fun visit(e: Expr.Break): Definition? {
-        return null
-    }
-
 }

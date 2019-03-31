@@ -21,8 +21,6 @@ interface ASTVisitor<T> {
     fun visit(e: Expr.Let): T
     fun visit(e: Expr.LetRec): T
     fun visit(e: Expr.If): T
-    fun visit(e: Expr.While): T
-    fun visit(e: Expr.Break): T
 }
 
 open class BaseASTVisitor<T> : ASTVisitor<T> {
@@ -83,14 +81,6 @@ open class BaseASTVisitor<T> : ASTVisitor<T> {
     }
 
     override fun visit(e: Expr.If): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun visit(e: Expr.While): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun visit(e: Expr.Break): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

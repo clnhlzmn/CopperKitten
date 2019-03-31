@@ -157,13 +157,6 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
         )
     }
 
-    override fun visitWhileExpr(ctx: ckParser.WhileExprContext?): Expr =
-        Expr.While(
-            cond = ExprVisitor().visit(ctx!!.cond),
-            body = ExprVisitor().visit(ctx.body),
-            t = Type.newVar()
-        )
-
     override fun visitIfExpr(ctx: ckParser.IfExprContext?): Expr =
         Expr.If(
             cond = ExprVisitor().visit(ctx!!.cond),
@@ -173,12 +166,6 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             else null,
             t = Type.newVar()
         )
-
-    override fun visitBreakExpr(ctx: ckParser.BreakExprContext?): Expr =
-        if (ctx!!.expr() != null)
-            Expr.Break(ExprVisitor().visit(ctx.expr()), t = Type.newVar())
-        else
-            Expr.Break(null, t = Type.newVar())
 
 }
 

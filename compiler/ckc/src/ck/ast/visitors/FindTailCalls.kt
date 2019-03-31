@@ -104,12 +104,4 @@ class FindTailCalls: BaseASTVisitor<Unit>() {
         e.alt?.accept(this)
     }
 
-    override fun visit(e: Expr.While) {
-        TODO("not implemented")
-    }
-
-    override fun visit(e: Expr.Break) {
-        TODO("not implemented")
-    }
-
 }

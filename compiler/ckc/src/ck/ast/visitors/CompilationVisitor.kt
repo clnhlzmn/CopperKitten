@@ -166,9 +166,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 
             //save a copy of fun for later
             ret.add("dup")
-            frame.dup()
             ret.add("store")
-            frame.pop()
 
             //then store fun in fun location on stack
             ret.add("astore -1")
@@ -183,25 +181,28 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
             }
             //[...]
 
+            //don't have to keep exact compile time stack info here
+            //just remove args and fun above and add "fake" ret value at enc
+
             //then clear frame
             ret.add("clear")
-            frame.clear()
+//            frame.clear()
 
             //then leave frame
             ret.add("leave")
 
             //then load fun
             ret.add("load")
-            frame.push("<${e.fn}>", true)
+//            frame.push("<${e.fn}>", true)
 
             //get addr
             ret.add("rload 0")
-            frame.pop()
-            frame.push("<&${e.fn}>", false)
+//            frame.pop()
+//            frame.push("<&${e.fn}>", false)
 
             //then jump
             ret.add("goto")
-            frame.pop()
+//            frame.pop()
 
             //then push "fake" return value?
             frame.push("<$e>", true)
@@ -742,35 +743,6 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
 
         if (debug) ret.add("debugpop")
         return ret
-    }
-
-    override fun visit(e: Expr.While): List<String> {
-        val ret = ArrayList<String>()
-        if (debug) ret.add("debugpush \"$e\"")
-        val beginLabel = nextLabel()
-        val condLabel = nextLabel()
-        ret.add("jump $condLabel")
-        ret.add("$beginLabel:")
-        ret.addAll(e.body.accept(this))
-        //discard result
-        ret.add("pop")
-        frame.pop()
-        ret.add("$condLabel:")
-        ret.addAll(e.cond.accept(this))
-        ret.add("rload 0")
-        frame.pop()
-        frame.push("<${e.cond}>", false)
-        ret.add("jumpnz $beginLabel")
-        frame.pop()
-        //value of type Unit (NULL pointer)
-        ret.add("push 0")
-        frame.push("<()>", true)
-        if (debug) ret.add("debugpop")
-        return ret
-    }
-
-    override fun visit(e: Expr.Break): List<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }
