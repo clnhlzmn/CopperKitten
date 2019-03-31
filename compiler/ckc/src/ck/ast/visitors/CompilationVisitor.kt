@@ -151,62 +151,62 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         val ret = ArrayList<String>()
         if (debug) ret.add("debugpush \"$e\"")
 
-//        //tail call optimization if number of args of caller and callee are equal
-//        if (e.isTailCall && e.accept(GetEnclosingFunction())!!.params.size == e.args.size) {
-//
-//            //compile arguments in reverse order
-//            e.args.reversed().forEach { a ->
-//                ret.addAll(a.accept(this))
-//            }
-//            //[...|argn-1|...|arg0]
-//
-//            //then compile function
-//            ret.addAll(e.fn.accept(this))
-//            //[...|argn-1|...|arg0|fun]
-//
-//            //then store fun
-//            ret.add("store")
-//            frame.pop()
-//            //[...|argn-1|...|arg0]
-//
-//            //then store args
-//            e.args.forEachIndexed { index, _ ->
-//                ret.add("astore $index")
-//                frame.pop()
-//                //[...|argn-1|...]
-//            }
-//
-//            //then clear frame
-//            ret.add("clear")
-//            frame.clear()
-//
-//            //then load fun
-//            ret.add("load")
-//            frame.push("<${e.fn}>", true)
-//
-//            //make a copy
-//            ret.add("dup")
-//            frame.dup()
-//
-//            //store copy in fun location on stack
-//            //[...|argn-1|...|arg0|fun|retAddr|lastFp|layout|...locals...]
-//            //                    ^here
-//            ret.add("astore -1")
-//            frame.pop()
-//
-//            //get addr
-//            ret.add("rload 0")
-//            frame.pop()
-//            frame.push("<&${e.fn}>", false)
-//
-//            //then jump
-//            ret.add("goto")
-//            frame.pop()
-//
-//            //then push "fake" return value?
-//            frame.push("<$e>", true)
-//
-//        } else {
+        //tail call optimization if number of args of caller and callee are equal
+        if (e.isTailCall && e.accept(GetEnclosingFunction())!!.params.size == e.args.size) {
+
+            //compile arguments in reverse order
+            e.args.reversed().forEach { a ->
+                ret.addAll(a.accept(this))
+            }
+            //[...|argn-1|...|arg0]
+
+            //then compile function
+            ret.addAll(e.fn.accept(this))
+            //[...|argn-1|...|arg0|fun]
+
+            //save a copy of fun for later
+            ret.add("dup")
+            frame.dup()
+            ret.add("store")
+            frame.pop()
+
+            //then store fun in fun location on stack
+            ret.add("astore -1")
+            frame.pop()
+            //[...|argn-1|...|arg0]
+
+            //then store args
+            e.args.forEachIndexed { index, _ ->
+                ret.add("astore $index")
+                frame.pop()
+                //[...|argn-1|...]
+            }
+            //[...]
+
+            //then clear frame
+            ret.add("clear")
+            frame.clear()
+
+            //then leave frame
+            ret.add("leave")
+
+            //then load fun
+            ret.add("load")
+            frame.push("<${e.fn}>", true)
+
+            //get addr
+            ret.add("rload 0")
+            frame.pop()
+            frame.push("<&${e.fn}>", false)
+
+            //then jump
+            ret.add("goto")
+            frame.pop()
+
+            //then push "fake" return value?
+            frame.push("<$e>", true)
+
+        } else {
 
             //compile arguments in reverse order
             e.args.reversed().forEach { a ->
@@ -254,7 +254,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
             frame.push("<$e>", true)
             //[...|retVal]
 
-//        }
+        }
 
         if (debug) ret.add("debugpop")
         return ret
@@ -495,6 +495,8 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
             ////[...|[addr|capt0|...|capti]]
         }
 
+        //leave function object on stack here
+
         //jump over the function body
         ret.add("jump $contLabel")
 
@@ -542,6 +544,8 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         ret.add("push $bodyLabel")
         ret.add("rstore 0")
         //[...|[addr]]
+
+        //leave function object on stack here
 
         //jump over the function body
         ret.add("jump $contLabel")

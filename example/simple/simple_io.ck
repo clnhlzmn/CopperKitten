@@ -1,4 +1,3 @@
-
 {
     //native read and write funs for chars
     let read = cfun native_read ():Int;
