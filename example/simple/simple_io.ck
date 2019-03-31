@@ -66,9 +66,16 @@
             -1
     };
     
+    let rec writeInt = (i): {
+        if (i != 0) {
+            write(i % 10 + 48);
+            writeInt(i / 10)
+        }
+    };
+    
     let readInt = (): {
         readIntImpl(0)
     };
     
-    write(readInt())
+    writeInt(readInt())
 }
