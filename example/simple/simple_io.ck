@@ -77,5 +77,13 @@
         readIntImpl(0)
     };
     
-    map(readInt(), (l): write(97+4), (r): writeInt(r))
+    map(readInt(), (l): write(97+4), (r): writeInt(r));
+    
+    let rec forever = (f): {
+        f();
+        forever(f)
+    };
+    
+    forever((): write(97 + 5))
+    
 }
