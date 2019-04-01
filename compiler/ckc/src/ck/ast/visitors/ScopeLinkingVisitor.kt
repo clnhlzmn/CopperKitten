@@ -84,7 +84,7 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
     //ck.ast.node.Expr.Let creates a new scope
     override fun visit(e: Expr.Let) {
         //visit value of let in currentScope
-        e.value.accept(this)
+        e.binding.value.accept(this)
         //save current scope as enclosing scope for e
         e.enclosingScope = currentScope
         //then set the current scope to e
@@ -101,7 +101,7 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
         //then set the current scope to e
         currentScope = e
         //then visit values of let operand
-        e.bindings.forEach { b -> b.second.accept(this) }
+        e.bindings.forEach { b -> b.value.accept(this) }
         //then visit the body of e with the new current scope set
         e.body.accept(this)
         //then reset enclosing scope

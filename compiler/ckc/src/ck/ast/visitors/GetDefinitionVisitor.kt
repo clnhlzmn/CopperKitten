@@ -74,7 +74,7 @@ class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
 
     override fun visit(e: Expr.Let): Definition? {
         //check the id of ck.ast.node.Expr.Let
-        if (e.id == id) {
+        if (e.binding.id == id) {
             return Definition.Let(e, isLocal)
         }
         //otherwise look in enclosing scope
@@ -83,7 +83,7 @@ class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
 
     override fun visit(e: Expr.LetRec): Definition? {
         for (binding in e.bindings) {
-            if (binding.first == id) {
+            if (binding.id == id) {
                 return Definition.LetRec(e, isLocal)
             }
         }

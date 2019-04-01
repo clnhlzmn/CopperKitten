@@ -10,7 +10,7 @@ class FindTailCalls: BaseASTVisitor<Unit>() {
     override fun visit(e: Expr.LetRec) {
         val tp = tailPosition
         tailPosition = false
-        e.bindings.forEach { b -> b.second.accept(this) }
+        e.bindings.forEach { b -> b.value.accept(this) }
         tailPosition = tp
         e.body.accept(this)
     }
@@ -90,7 +90,7 @@ class FindTailCalls: BaseASTVisitor<Unit>() {
     override fun visit(e: Expr.Let) {
         val tp = tailPosition
         tailPosition = false
-        e.value.accept(this)
+        e.binding.value.accept(this)
         tailPosition = tp
         e.body.accept(this)
     }

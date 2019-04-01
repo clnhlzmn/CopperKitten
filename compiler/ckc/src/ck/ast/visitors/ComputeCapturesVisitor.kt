@@ -82,12 +82,12 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
     }
 
     override fun visit(e: Expr.Let) {
-        e.value.accept(this)
+        e.binding.value.accept(this)
         e.body.accept(this)
     }
 
     override fun visit(e: Expr.LetRec) {
-        e.bindings.forEach { b -> b.second.accept(this) }
+        e.bindings.forEach { b -> b.value.accept(this) }
         e.body.accept(this)
     }
 

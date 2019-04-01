@@ -583,15 +583,15 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         //add space for local
         ret.add("push 0")
         //get local index (adjusted for instance #) in which to store this value
-        val localIndex = frame.push(e.id, true)
+        val localIndex = frame.push(e.binding.id, true)
         //[...|0]
 
         //compile the value expr
-        ret.addAll(e.value.accept(this))
+        ret.addAll(e.binding.value.accept(this))
         //[...|0|val]
 
         //store value in local
-        ret.add("lstore $localIndex //${e.id}")
+        ret.add("lstore $localIndex //${e.binding.id}")
         frame.pop()
         //[...|val]
 
@@ -623,7 +623,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         e.bindings.forEach { binding ->
             ret.add("push 0")
             //get local index (adjusted for instance #) in which to store this value
-            localIndices.add(frame.push(binding.first, true))
+            localIndices.add(frame.push(binding.id, true))
             //[...|0]
         }
         //[...|0|...|0]
@@ -632,15 +632,15 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         //this creates an array of appropriate size to hold the function
         //address+captures and stores it in its spot on the stack
         e.bindings.forEachIndexed { index, binding ->
-            if (binding.second is Expr.Fun) {
+            if (binding.value is Expr.Fun) {
                 //compile the function alloc
-                ret.addAll(compileFunctionAllocation(binding.second as Expr.Fun))
+                ret.addAll(compileFunctionAllocation(binding.value))
             } else {
-                ret.addAll(binding.second.accept(this))
+                ret.addAll(binding.value.accept(this))
                 //[...|0|...|0|val]
             }
             //store value in local
-            ret.add("lstore ${localIndices[index]} //${binding.first}")
+            ret.add("lstore ${localIndices[index]} //${binding.id}")
             frame.pop()
             //[...|val0|...|0]
         }
@@ -654,13 +654,13 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         //that is pointed to by the local at localIndices[i] so it too
         //is updated with code address and captures
         e.bindings.forEachIndexed { index, binding ->
-            if (binding.second is Expr.Fun) {
+            if (binding.value is Expr.Fun) {
                 //load fun alloc from local
-                ret.add("lload ${localIndices[index]} //${binding.first}")
-                frame.push("<${binding.second}>", true)
+                ret.add("lload ${localIndices[index]} //${binding.id}")
+                frame.push("<${binding.value}>", true)
                 //[...|fun]
                 //compile rest of fun
-                ret.addAll(compileFunctionWithoutAlloc(binding.second as Expr.Fun))
+                ret.addAll(compileFunctionWithoutAlloc(binding.value))
                 //[...|fun]
                 //fun alloc is already stored in local so can just remove here
                 ret.add("pop")

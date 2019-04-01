@@ -194,7 +194,7 @@ sealed class Analyze {
                 is Expr.Let -> {
                     //extend body with binding, value is evaluated in current env
                     val bodyEnv =
-                        Env(e.id, analyze(e.value, env, list), env)
+                        Env(e.binding.id, analyze(e.binding.value, env, list), env)
                     //then analyze body with new env
                     e.t = analyze(e.body, bodyEnv, list)
                     e.t
@@ -204,13 +204,13 @@ sealed class Analyze {
                     var newList = list
                     e.bindings.forEach { binding ->
                         val newType = Type.newVar()
-                        newEnv = Env(binding.first, newType, newEnv)
+                        newEnv = Env(binding.id, newType, newEnv)
                         newList = NonGenericTypes(newType, newList)
                     }
                     e.bindings.forEach { binding ->
                         unifyType(
-                            retrieve(binding.first, newEnv, newList),
-                            analyze(binding.second, newEnv, newList)
+                            retrieve(binding.id, newEnv, newList),
+                            analyze(binding.value, newEnv, newList)
                         )
                     }
                     e.t = analyze(e.body, newEnv, newList)

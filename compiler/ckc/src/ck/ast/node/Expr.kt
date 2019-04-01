@@ -317,13 +317,18 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         }
     }
 
-    class Let(val id: String, val value: Expr, val body: Expr, t: Type) : Expr(t) {
+    data class Binding(val id: String, val type: Type?, val value: Expr) {
+        override fun toString(): String =
+            "$id${if (type != null) ": $type" else ""} = $value"
+    }
+
+    class Let(val binding: Binding, val body: Expr, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String =
-            "{let $id = $value; $body}"
+            "{let $binding; $body}"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -331,29 +336,27 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
             other as Let
 
-            if (id != other.id) return false
-            if (value != other.value) return false
+            if (binding != other.binding) return false
             if (body != other.body) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            var result = id.hashCode()
-            result = 31 * result + value.hashCode()
+            var result = binding.hashCode()
             result = 31 * result + body.hashCode()
             return result
         }
 
     }
 
-    class LetRec(val bindings: List<Pair<String, Expr>>, val body: Expr, t: Type) : Expr(t) {
+    class LetRec(val bindings: List<Binding>, val body: Expr, t: Type) : Expr(t) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
         override fun toString(): String {
-            val bindingsString = bindings.map { p -> "${p.first} = ${p.second}" }.toDelimitedString(" and ")
+            val bindingsString = bindings.map { p -> "$p" }.toDelimitedString(" and ")
             return "{let rec $bindingsString; $body}"
         }
 

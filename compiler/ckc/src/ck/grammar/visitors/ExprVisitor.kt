@@ -16,7 +16,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
 
     //if visiting a let expr by itself then it has no "body" just return value
     override fun visitLetExpr(ctx: ckParser.LetExprContext?): Expr =
-        ctx!!.value.accept(ExprVisitor())
+        ctx!!.binding().expr().accept(ExprVisitor())
 
     override fun visitLetRecExpr(ctx: ckParser.LetRecExprContext?): Expr {
         throw RuntimeException("let rec without body")

@@ -33,9 +33,13 @@ expr
     | <assoc=right> target=expr '=' value=expr                          #assignExpr
     | '(' params? ')' ':' type? expr                                    #funExpr
     | 'cfun' ID funType                                                 #cFunExpr
-    | 'let' ID '=' value=expr                                           #letExpr
-    | 'let' 'rec' ID '=' expr ('and' ID '=' expr)*                      #letRecExpr
+    | 'let' binding                                                     #letExpr
+    | 'let' 'rec' binding ('and' binding)*                              #letRecExpr
     | 'if' '(' cond=expr ')' csq=expr ( 'else' alt=expr )?              #ifExpr
+    ;
+
+binding
+    : ID (':' type)? '=' expr
     ;
 
 args

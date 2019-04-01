@@ -1,4 +1,4 @@
-// Generated from /Users/colinholzman/Documents/CopperKitten/compiler/ckc/grammar/ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -182,6 +182,12 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitAndExpr(ckParser.AndExprContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ckParser#binding}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBinding(ckParser.BindingContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ckParser#args}.
 	 * @param ctx the parse tree
