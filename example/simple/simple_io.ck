@@ -59,11 +59,11 @@
     let rec readIntImpl = (acc): {
         let char = read();
         if (char == 10 || char == 13) 
-            acc
+            right(acc)
         else if (char >= 48 && char <= 57)
             readIntImpl(acc * 10 + char - 48)
         else
-            -1
+            left(-1)
     };
     
     let rec writeInt = (i): {
@@ -77,5 +77,5 @@
         readIntImpl(0)
     };
     
-    writeInt(readInt())
+    map(readInt(), (l): write(97+4), (r): writeInt(r))
 }
