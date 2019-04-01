@@ -235,9 +235,9 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         }
     }
 
-    class Fun(val params: List<Param>, val declType: Type?, val body: Expr, t: Type) : Expr(t) {
+    class Fun(val params: List<Param>, val body: Expr, t: Type) : Expr(t) {
 
-        class Param(val id: String, val declType: Type?, val t: Type) {
+        class Param(val id: String, val t: Type) {
             override fun toString(): String =
                 id
 
@@ -248,15 +248,12 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                 other as Param
 
                 if (id != other.id) return false
-                if (declType != other.declType) return false
 
                 return true
             }
 
             override fun hashCode(): Int {
-                var result = id.hashCode()
-                result = 31 * result + (declType?.hashCode() ?: 0)
-                return result
+                return id.hashCode()
             }
         }
 
@@ -276,7 +273,6 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             other as Fun
 
             if (params != other.params) return false
-            if (declType != other.declType) return false
             if (body != other.body) return false
 
             return true
@@ -284,7 +280,6 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         override fun hashCode(): Int {
             var result = params.hashCode()
-            result = 31 * result + (declType?.hashCode() ?: 0)
             result = 31 * result + body.hashCode()
             return result
         }

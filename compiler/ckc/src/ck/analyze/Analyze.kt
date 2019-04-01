@@ -204,7 +204,7 @@ sealed class Analyze {
                     var newEnv = env
                     var newList = list
                     e.bindings.forEach { binding ->
-                        val newType = Type.newVar()
+                        val newType = binding.type ?: Type.newVar()
                         newEnv = Env(binding.id, newType, newEnv)
                         newList = NonGenericTypes(newType, newList)
                     }

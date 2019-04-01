@@ -213,19 +213,15 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitParams(ckParser.ParamsContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ckParser#type}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitType(ckParser.TypeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ckParser#simpleType}.
+	 * Visit a parse tree produced by the {@code simpleType}
+	 * labeled alternative in {@link ckParser#type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSimpleType(ckParser.SimpleTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ckParser#funType}.
+	 * Visit a parse tree produced by the {@code funType}
+	 * labeled alternative in {@link ckParser#type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */

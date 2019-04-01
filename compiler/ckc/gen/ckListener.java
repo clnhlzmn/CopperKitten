@@ -353,32 +353,26 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitParams(ckParser.ParamsContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ckParser#type}.
-	 * @param ctx the parse tree
-	 */
-	void enterType(ckParser.TypeContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ckParser#type}.
-	 * @param ctx the parse tree
-	 */
-	void exitType(ckParser.TypeContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link ckParser#simpleType}.
+	 * Enter a parse tree produced by the {@code simpleType}
+	 * labeled alternative in {@link ckParser#type}.
 	 * @param ctx the parse tree
 	 */
 	void enterSimpleType(ckParser.SimpleTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ckParser#simpleType}.
+	 * Exit a parse tree produced by the {@code simpleType}
+	 * labeled alternative in {@link ckParser#type}.
 	 * @param ctx the parse tree
 	 */
 	void exitSimpleType(ckParser.SimpleTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ckParser#funType}.
+	 * Enter a parse tree produced by the {@code funType}
+	 * labeled alternative in {@link ckParser#type}.
 	 * @param ctx the parse tree
 	 */
 	void enterFunType(ckParser.FunTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ckParser#funType}.
+	 * Exit a parse tree produced by the {@code funType}
+	 * labeled alternative in {@link ckParser#type}.
 	 * @param ctx the parse tree
 	 */
 	void exitFunType(ckParser.FunTypeContext ctx);

@@ -24,8 +24,7 @@ internal class ParseTest {
         assertEquals(
             expr.right()!!,
             Expr.Fun(
-                listOf(Expr.Fun.Param("a", null, Type.newVar())),
-                null,
+                listOf(Expr.Fun.Param("a", Type.newVar())),
                 Expr.Ref("a", Type.newVar()),
                 Type.newVar()
             )

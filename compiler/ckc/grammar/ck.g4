@@ -32,7 +32,7 @@ expr
     | <assoc=right> cond=expr '?' con=expr ':' alt=expr                 #condExpr
     | <assoc=right> target=expr '=' value=expr                          #assignExpr
     | '(' params? ')' ':' type? expr                                    #funExpr
-    | 'cfun' ID funType                                                 #cFunExpr
+    | 'cfun' ID type                                                    #cFunExpr
     | 'let' binding                                                     #letExpr
     | 'let' 'rec' binding ('and' binding)*                              #letRecExpr
     | 'if' '(' cond=expr ')' csq=expr ( 'else' alt=expr )?              #ifExpr
@@ -60,16 +60,8 @@ params
     ;
 
 type
-    : simpleType
-    | funType
-    ;
-
-simpleType
-    : TYPEID
-    ;
-
-funType
-    : '(' types? ')' ':' type
+    : TYPEID                    #simpleType
+    | '(' types? ')' ':' type   #funType
     ;
 
 types

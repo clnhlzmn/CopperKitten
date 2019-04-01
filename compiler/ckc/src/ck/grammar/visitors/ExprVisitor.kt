@@ -142,7 +142,7 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
     override fun visitCFunExpr(ctx: ckParser.CFunExprContext?): Expr =
         Expr.CFun(
             ctx!!.ID().text,
-            ctx.funType().accept(TypeVisitor()),
+            ctx.type().accept(TypeVisitor()),
             t = Type.newVar()
         )
 
@@ -151,7 +151,6 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
             params =
             if (ctx!!.params() != null) ctx.params().accept(ParamsVisitor())
             else ArrayList(),
-            declType = if (ctx.type() == null) null else TypeVisitor().visit(ctx.type()),
             body = ExprVisitor().visit(ctx.expr()),
             t = Type.newVar()
         )
@@ -179,7 +178,6 @@ class ParamVisitor : ckBaseVisitor<Expr.Fun.Param>() {
     override fun visitParam(ctx: ckParser.ParamContext?): Expr.Fun.Param =
         Expr.Fun.Param(
             id = ctx!!.ID().text,
-            declType = if (ctx.type() == null) null else TypeVisitor().visit(ctx.type()),
             t = Type.newVar()
         )
 }
