@@ -99,13 +99,14 @@ sealed class Analyze {
         private fun unifyType(t1: Type, t2: Type) {
             val pt1 = prune(t1)
             val pt2 = prune(t2)
-            return when (pt1) {
+            when (pt1) {
                 is Type.Var ->
-                    if (occursInType(pt1, pt2) && pt1 != pt2)
-                    //un-unifiable circularity
-                        throw RuntimeException("un-unifiable circularity between $pt1 and $pt2")
-                    else
-                    //pt1 is var and does not occur in pt2, extend env with pt1.id = pt2
+                    if (occursInType(pt1, pt2)) {
+                        if (pt1 != pt2)
+                            //un-unifiable circularity
+                            throw RuntimeException("un-unifiable circularity between $pt1 and $pt2")
+                    } else
+                        //pt1 is var and does not occur in pt2, extend env with pt1.id = pt2
                         pt1.instance = pt2
                 is Type.Op ->
                     when (pt2) {
