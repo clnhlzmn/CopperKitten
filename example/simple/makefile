@@ -8,8 +8,8 @@ STACKSIZE = 1000
 HEAPSIZE = 1000
 WORDSIZE = 8
 GC = copying
-DEBUG = -d
-#DEBUG = 
+#DEBUG = -d
+DEBUG = 
 
 CKFLAGS = ${DEBUG}
 
