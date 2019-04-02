@@ -7,7 +7,8 @@ interface ASTVisitor<T> {
 
     fun visit(f: CkFile): T
 
-    fun visit(e: Expr.Unit): T
+//    fun visit(e: Expr.Unit): T
+    fun visit(e: Expr.Tuple): T
     fun visit(e: Expr.Sequence): T
     fun visit(e: Expr.Natural): T
     fun visit(e: Expr.Ref): T
@@ -32,7 +33,11 @@ open class BaseASTVisitor<T> : ASTVisitor<T> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(e: Expr.Unit): T {
+//    override fun visit(e: Expr.Unit): T {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
+
+    override fun visit(e: Expr.Tuple): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

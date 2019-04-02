@@ -10,13 +10,38 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
     var enclosingScope: ASTNode? = null
 
-    object Unit : Expr(Type.Op("Unit", emptyList())) {
+//    object Unit : Expr(Type.Op("Unit", emptyList())) {
+//        override fun <T> accept(visitor: ASTVisitor<T>): T =
+//            visitor.visit(this)
+//
+//        override fun toString(): String {
+//            return "()"
+//        }
+//    }
+
+    class Tuple(val exprs: List<Expr> = ArrayList()): Expr(Type.Op("Tuple", exprs.map { e -> e.t })) {
+
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
 
-        override fun toString(): String {
-            return "()"
+        override fun toString(): String =
+            "(${exprs.toDelimitedString(", ")})"
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Tuple
+
+            if (exprs != other.exprs) return false
+
+            return true
         }
+
+        override fun hashCode(): Int {
+            return exprs.hashCode()
+        }
+
     }
 
     class Sequence(val first: Expr, val second: Expr, t: Type) : Expr(t) {

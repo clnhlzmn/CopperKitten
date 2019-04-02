@@ -14,10 +14,10 @@ decl
 
 expr
     : '{' sequence '}'                                                  #sequenceExpr
-    | '(' ')'                                                           #unitExpr
+    | '(' exprs? ')'                                                    #tupleExpr
     | NATURAL                                                           #naturalExpr
     | ID                                                                #refExpr
-    | expr '(' args? ')'                                                #applyExpr
+    | expr '(' exprs? ')'                                                #applyExpr
     | <assoc=right> op=( '-' | '!' | '~' ) expr                         #unaryExpr
     | lhs=expr op=( '*' | '/' | '%' ) rhs=expr                          #multExpr
     | lhs=expr op=( '+' | '-' ) rhs=expr                                #addExpr
@@ -42,7 +42,7 @@ binding
     : ID (':' type)? '=' expr
     ;
 
-args
+exprs
     : expr (',' expr)*
     ;
 

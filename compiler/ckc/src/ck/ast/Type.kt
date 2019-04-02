@@ -79,10 +79,11 @@ sealed class Type {
         override fun isPolyType(): Boolean = params.any { p -> p.isPolyType() }
 
         override fun toString(): String =
-            if (operator == "Fun")
-                "(${params.take(params.size - 1).toDelimitedString(", ")}): ${params.last()}"
-            else
-                "$operator ${params.toDelimitedString(", ")}"
+            when {
+                operator == "Fun" -> "(${params.take(params.size - 1).toDelimitedString(", ")}): ${params.last()}"
+                operator == "Tuple" && params.isEmpty() -> "()"
+                else -> "$operator(${params.toDelimitedString(", ")})"
+            }
     }
 
 }
