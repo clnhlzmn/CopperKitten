@@ -17,7 +17,7 @@ expr
     | '(' exprs? ')'                                                    #tupleExpr
     | NATURAL                                                           #naturalExpr
     | ID                                                                #refExpr
-    | expr '(' exprs? ')'                                                #applyExpr
+    | expr '(' exprs? ')'                                               #applyExpr
     | <assoc=right> op=( '-' | '!' | '~' ) expr                         #unaryExpr
     | lhs=expr op=( '*' | '/' | '%' ) rhs=expr                          #multExpr
     | lhs=expr op=( '+' | '-' ) rhs=expr                                #addExpr

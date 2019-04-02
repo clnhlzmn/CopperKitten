@@ -5,7 +5,7 @@ import java.security.spec.ECField
 
 class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
 
-    override fun visit(e: Expr.Unit): Expr.Fun? {
+    override fun visit(e: Expr.Tuple): Expr.Fun? {
         return e.enclosingScope?.accept(this)
     }
 

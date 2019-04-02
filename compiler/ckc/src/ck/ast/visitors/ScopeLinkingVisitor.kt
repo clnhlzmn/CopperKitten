@@ -16,7 +16,7 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
     }
 
     //leaf node, do nothing
-    override fun visit(e: Expr.Unit) {
+    override fun visit(e: Expr.Tuple) {
         e.enclosingScope = currentScope
     }
 

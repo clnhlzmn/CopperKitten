@@ -20,8 +20,11 @@ class FindTailCalls: BaseASTVisitor<Unit>() {
         f.expr.accept(this)
     }
 
-    override fun visit(e: Expr.Unit) {
-        //nothing
+    override fun visit(e: Expr.Tuple) {
+        val tp = tailPosition
+        tailPosition = false
+        e.exprs.forEach { expr -> expr.accept(this) }
+        tailPosition = tp
     }
 
     override fun visit(e: Expr.Sequence) {

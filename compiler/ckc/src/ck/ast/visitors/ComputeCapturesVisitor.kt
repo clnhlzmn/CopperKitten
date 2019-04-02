@@ -11,8 +11,8 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
         f.expr.accept(this)
     }
 
-    override fun visit(e: Expr.Unit) {
-        //nothing
+    override fun visit(e: Expr.Tuple) {
+        e.exprs.forEach { expr -> expr.accept(this) }
     }
 
     override fun visit(e: Expr.Sequence) {

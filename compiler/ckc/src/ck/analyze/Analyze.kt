@@ -134,7 +134,6 @@ sealed class Analyze {
         /**returns the type of [e] in [env] given [list] of [NonGenericTypes]*/
         fun analyze(e: Expr, env: Env?, list: NonGenericTypes?): Type =
             when (e) {
-//                Expr.Unit -> e.t
                 is Expr.Tuple -> {
                     e.t = Type.Op("Tuple", e.exprs.map { p -> analyze(p, env, list) })
                     e.t

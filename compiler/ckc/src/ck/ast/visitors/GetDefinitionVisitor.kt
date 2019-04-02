@@ -21,7 +21,7 @@ class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
         return null
     }
 
-    override fun visit(e: Expr.Unit): Definition? {
+    override fun visit(e: Expr.Tuple): Definition? {
         return null
     }
 

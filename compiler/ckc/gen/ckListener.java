@@ -1,4 +1,4 @@
-// Generated from /Users/colinholzman/Documents/CopperKitten/compiler/ckc/grammar/ck.g4 by ANTLR 4.7.2
+// Generated from C:/code/CopperKitten/compiler/ckc/grammar\ck.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

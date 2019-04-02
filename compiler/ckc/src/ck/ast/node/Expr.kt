@@ -10,15 +10,6 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
     var enclosingScope: ASTNode? = null
 
-//    object Unit : Expr(Type.Op("Unit", emptyList())) {
-//        override fun <T> accept(visitor: ASTVisitor<T>): T =
-//            visitor.visit(this)
-//
-//        override fun toString(): String {
-//            return "()"
-//        }
-//    }
-
     class Tuple(val exprs: List<Expr> = ArrayList()): Expr(Type.Op("Tuple", exprs.map { e -> e.t })) {
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =

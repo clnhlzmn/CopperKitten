@@ -14,6 +14,6 @@ class FileVisitor : ckBaseVisitor<CkFile>() {
             if (ctx!!.expr() != null)
                 ExprVisitor().visit(ctx.expr())
             else
-                Expr.Unit
+                Expr.Tuple()
         )
 }

@@ -4,6 +4,7 @@ import ck.ast.node.CkFile
 import ck.ast.node.Expr
 import ck.compiler.StackFrame
 import util.extensions.toDelimitedString
+import kotlin.math.exp
 
 class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<String>>() {
 
@@ -58,12 +59,29 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         return ret
     }
 
-    override fun visit(e: Expr.Unit): List<String> {
+    override fun visit(e: Expr.Tuple): List<String> {
         val ret = ArrayList<String>()
         if (debug) ret.add("debugpush \"$e\"")
-        //NULL pointer
-        frame.push("<()>", true)
-        ret.add("push 0")
+        if (e.exprs.isEmpty()) {
+            //NULL pointer
+            frame.push("<()>", true)
+            ret.add("push 0")
+        } else {
+            ret.add("push ${e.exprs.size}")
+            frame.push("${e.exprs.size}", false)
+
+            ret.add("layout ${frame.getLayoutString()}")
+
+            ret.add("alloc [${e.exprs.mapIndexed { index, _ ->  index.toString() }.toDelimitedString(", ")}]")
+            frame.pop()
+            frame.push("[${e.exprs.size}]", true)
+
+            e.exprs.forEachIndexed { index, expr ->
+                ret.addAll(expr.accept(this))
+                ret.add("rstore $index")
+                frame.pop()
+            }
+        }
         if (debug) ret.add("debugpop")
         return ret
     }
