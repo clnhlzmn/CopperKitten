@@ -55,6 +55,11 @@ sealed class Type {
 
     }
 
+//    data class Rec(val param: String, val body: Type): Type() {
+//        override fun isPolyType(): Boolean = true
+//
+//    }
+
     data class Var(val id: String) : Type() {
         //TODO: eliminate instance and store type var assignments in env
 

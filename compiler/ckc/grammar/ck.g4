@@ -9,7 +9,15 @@ file
     ;
 
 decl
-    : 'decl'
+    : 'type' 'rec'? TYPEID '=' '(' typeParams? ')' ':' sum
+    ;
+
+sum
+    : product ( '|' product )*
+    ;
+
+product
+    : ID '(' types? ')'
     ;
 
 expr
@@ -62,6 +70,12 @@ params
 type
     : TYPEID                    #simpleType
     | '(' types? ')' ':' type   #funType
+    | '(' types? ')'            #tupleType
+    | TYPEID '(' types ')' #ctorType
+    ;
+
+typeParams
+    : TYPEID ( ',' TYPEID )*
     ;
 
 types
