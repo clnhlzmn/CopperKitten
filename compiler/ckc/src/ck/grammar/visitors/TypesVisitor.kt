@@ -4,7 +4,7 @@ import ck.ast.Type
 import ckBaseVisitor
 import ckParser
 
-class TypesVisitor : ckBaseVisitor<List<Type>>() {
+class TypesVisitor(val env: List<Pair<String, Type>> = emptyList()) : ckBaseVisitor<List<Type>>() {
     override fun visitTypes(ctx: ckParser.TypesContext?): List<Type> =
-        ctx!!.type().map { t -> TypeVisitor().visit(t) }
+        ctx!!.type().map { t -> TypeVisitor(env).visit(t) }
 }

@@ -27,6 +27,26 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitDecl(ckParser.DeclContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ckParser#sum}.
+	 * @param ctx the parse tree
+	 */
+	void enterSum(ckParser.SumContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckParser#sum}.
+	 * @param ctx the parse tree
+	 */
+	void exitSum(ckParser.SumContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ckParser#product}.
+	 * @param ctx the parse tree
+	 */
+	void enterProduct(ckParser.ProductContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckParser#product}.
+	 * @param ctx the parse tree
+	 */
+	void exitProduct(ckParser.ProductContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code applyExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -376,6 +396,40 @@ public interface ckListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunType(ckParser.FunTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code tupleType}
+	 * labeled alternative in {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void enterTupleType(ckParser.TupleTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code tupleType}
+	 * labeled alternative in {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void exitTupleType(ckParser.TupleTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ctorType}
+	 * labeled alternative in {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void enterCtorType(ckParser.CtorTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ctorType}
+	 * labeled alternative in {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void exitCtorType(ckParser.CtorTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ckParser#typeParams}.
+	 * @param ctx the parse tree
+	 */
+	void enterTypeParams(ckParser.TypeParamsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ckParser#typeParams}.
+	 * @param ctx the parse tree
+	 */
+	void exitTypeParams(ckParser.TypeParamsContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ckParser#types}.
 	 * @param ctx the parse tree

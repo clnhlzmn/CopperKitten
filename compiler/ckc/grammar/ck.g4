@@ -9,7 +9,7 @@ file
     ;
 
 decl
-    : 'type' 'rec'? TYPEID '=' '(' typeParams? ')' ':' sum
+    : 'type' (rec='rec')? TYPEID '=' '(' typeParams? ')' ':' sum
     ;
 
 sum
