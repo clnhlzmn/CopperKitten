@@ -1,8 +1,8 @@
 package ck.ast.visitors
 
-import ck.ast.node.CkFile
 import ck.ast.node.Expr
 import ck.ast.node.ASTNode
+import ck.ast.node.CkFile
 
 //TODO: add enclosingLoop field to break expr and link it up here
 class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {

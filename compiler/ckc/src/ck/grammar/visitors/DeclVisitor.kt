@@ -32,16 +32,23 @@ class DeclVisitor(val rest: Expr): ckBaseVisitor<Expr>() {
         val productCtx = ctx.sum().product()[0]
 
         //create product data ctor
-        val productCtorArgTypes = if (productCtx.types() == null) ArrayList() else productCtx.types().accept(TypesVisitor(env))
-        val productCtorType = Type.Op("Fun", productCtorArgTypes + type)
+        val ctorArgTypes = if (productCtx.types() == null) ArrayList() else productCtx.types().accept(TypesVisitor(env))
+        val ctorType = Type.Op("Fun", ctorArgTypes + type)
 
+        //TODO: create product field accessor functions
+        val accessors = ArrayList<Expr>()
+        ctorArgTypes.forEachIndexed { index, type ->
+            //accessors.add()
+        }
+
+        //TODO: fold accessors and ctor onto rest
         var ret = Expr.Let(
             Expr.Let.Binding(
                 productCtx.ID().text,
-                productCtorType,
+                ctorType,
                 Expr.Fun.ProductCtor(
-                    productCtorArgTypes.map { at -> Expr.Fun.Param(Type.newId(), at) },
-                    productCtorType
+                    ctorArgTypes.map { at -> Expr.Fun.Param(Type.newId(), at) },
+                    ctorType
                 )
             ),
             rest,

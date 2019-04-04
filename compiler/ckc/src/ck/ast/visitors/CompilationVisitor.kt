@@ -4,7 +4,6 @@ import ck.ast.node.CkFile
 import ck.ast.node.Expr
 import ck.compiler.StackFrame
 import util.extensions.toDelimitedString
-import kotlin.math.exp
 
 class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<String>>() {
 
