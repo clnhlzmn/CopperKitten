@@ -7,6 +7,10 @@ class FindTailCalls: BaseASTVisitor<Unit>() {
 
     var tailPosition = false
 
+    override fun visit(e: Expr.Fun.ProductCtor) {
+        //nothing
+    }
+
     override fun visit(e: Expr.Let.Rec) {
         val tp = tailPosition
         tailPosition = false

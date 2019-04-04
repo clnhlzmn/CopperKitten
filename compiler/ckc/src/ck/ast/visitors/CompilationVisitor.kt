@@ -537,6 +537,72 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         return ret
     }
 
+    override fun visit(e: Expr.Fun.ProductCtor): List<String> {
+        val ret = ArrayList<String>()
+        if (debug) ret.add("debugpush \"$e\"")
+        val bodyLabel = nextLabel()
+        val contLabel = nextLabel()
+
+        //push size of 1 for function address
+        ret.add("push 1")
+        frame.push("<1>", false)
+        //set current layout
+        ret.add("layout ${frame.getLayoutString()}")
+        //alloc function array
+        ret.add("alloc []")
+        frame.pop()
+        frame.push("<Fun($e)>", true)
+        //[...|fun]
+
+        //store function address in fun[0]
+        ret.add("push $bodyLabel")
+        ret.add("rstore 0")
+        //[...|[addr]]
+
+        //leave function object on stack here
+
+        //jump over the function body
+        ret.add("jump $contLabel")
+
+        //here goes the body
+        ret.add("$bodyLabel:")
+
+        //create new frame
+        ret.add("enter")
+        val lastFrame = frame
+        frame = StackFrame()
+
+        //alloc object
+        ret.add("push ${e.params.size}")
+        frame.push("<${e.params.size}>", false)
+        ret.add("layout ${frame.getLayoutString()}")
+        ret.add("alloc [*]")
+        frame.pop()
+        frame.push("<[*]>", true)
+
+        //store args
+        e.params.forEachIndexed { index, _ ->
+            ret.add("aload $index")
+            ret.add("rstore $index")
+        }
+
+        //store object for return
+        ret.add("store")
+        frame.pop()
+
+        //leave frame
+        ret.add("leave")
+        frame = lastFrame
+
+        //return
+        ret.add("return")
+
+        //continue program from above
+        ret.add("$contLabel:")
+        if (debug) ret.add("debugpop")
+        return ret
+    }
+
     override fun visit(e: Expr.CFun): List<String> {
         val ret = ArrayList<String>()
         if (debug) ret.add("debugpush \"$e\"")

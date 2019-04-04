@@ -7,6 +7,10 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
 
     var currentFun: Expr.Fun? = null
 
+    override fun visit(e: Expr.Fun.ProductCtor) {
+        //nothing
+    }
+
     override fun visit(f: CkFile) {
         f.expr.accept(this)
     }

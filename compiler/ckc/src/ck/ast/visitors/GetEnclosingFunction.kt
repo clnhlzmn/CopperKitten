@@ -1,9 +1,14 @@
 package ck.ast.visitors
 
+import ck.ast.node.CkFile
 import ck.ast.node.Expr
 import java.security.spec.ECField
 
 class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
+
+    override fun visit(f: CkFile): Expr.Fun? {
+        return null
+    }
 
     override fun visit(e: Expr.Tuple): Expr.Fun? {
         return e.enclosingScope?.accept(this)

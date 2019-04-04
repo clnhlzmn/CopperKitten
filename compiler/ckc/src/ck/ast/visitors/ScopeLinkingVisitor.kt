@@ -7,6 +7,10 @@ import ck.ast.node.ASTNode
 //TODO: add enclosingLoop field to break expr and link it up here
 class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
 
+    override fun visit(e: Expr.Fun.ProductCtor) {
+        e.enclosingScope = currentScope
+    }
+
     //start with null scope (top level)
     var currentScope: ASTNode? = null
 
