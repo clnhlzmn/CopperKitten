@@ -203,7 +203,7 @@ sealed class Analyze {
                     e.t = analyze(e.body, bodyEnv, list)
                     e.t
                 }
-                is Expr.LetRec -> {
+                is Expr.Let.Rec -> {
                     var newEnv = env
                     var newList = list
                     e.bindings.forEach { binding ->
@@ -229,6 +229,7 @@ sealed class Analyze {
                     e.t = csqType
                     e.t
                 }
+                is Expr.Fun.ProductCtor -> e.t
             }
 
     }

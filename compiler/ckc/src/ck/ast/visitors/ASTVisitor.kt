@@ -17,15 +17,19 @@ interface ASTVisitor<T> {
     fun visit(e: Expr.Cond): T
     fun visit(e: Expr.Assign): T
     fun visit(e: Expr.Fun): T
+    fun visit(e: Expr.Fun.ProductCtor): T
     fun visit(e: Expr.CFun): T
     fun visit(e: Expr.Let): T
-    fun visit(e: Expr.LetRec): T
+    fun visit(e: Expr.Let.Rec): T
     fun visit(e: Expr.If): T
 }
 
 open class BaseASTVisitor<T> : ASTVisitor<T> {
+    override fun visit(e: Expr.Fun.ProductCtor): T {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
-    override fun visit(e: Expr.LetRec): T {
+    override fun visit(e: Expr.Let.Rec): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

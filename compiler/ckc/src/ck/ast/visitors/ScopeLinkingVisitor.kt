@@ -95,7 +95,7 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
         currentScope = e.enclosingScope
     }
 
-    override fun visit(e: Expr.LetRec) {
+    override fun visit(e: Expr.Let.Rec) {
         //first save current scope as enclosing scope for e
         e.enclosingScope = currentScope
         //then set the current scope to e

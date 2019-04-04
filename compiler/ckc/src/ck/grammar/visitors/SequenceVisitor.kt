@@ -14,9 +14,9 @@ class SequenceVisitor : ckBaseVisitor<Expr>() {
         else
             when (expr) {
                 is ckParser.LetRecExprContext ->
-                    Expr.LetRec(
+                    Expr.Let.Rec(
                         expr.binding().map { b ->
-                            Expr.Binding(
+                            Expr.Let.Binding(
                                 b.ID().text,
                                 if (b.type() == null) null else b.type().accept(TypeVisitor()),
                                 b.expr().accept(ExprVisitor())
@@ -28,7 +28,7 @@ class SequenceVisitor : ckBaseVisitor<Expr>() {
                 is ckParser.LetExprContext ->
                     //if expr is let then make sequence it's body
                     Expr.Let(
-                        Expr.Binding(
+                        Expr.Let.Binding(
                             expr.binding().ID().text,
                             if (expr.binding().type() == null) null else expr.binding().type().accept(TypeVisitor()),
                             ExprVisitor().visit(expr.binding().expr())

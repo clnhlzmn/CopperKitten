@@ -630,7 +630,7 @@ class CompilationVisitor(val debug: Boolean = false) : BaseASTVisitor<List<Strin
         return ret
     }
 
-    override fun visit(e: Expr.LetRec): List<String> {
+    override fun visit(e: Expr.Let.Rec): List<String> {
         val ret = ArrayList<String>()
         if (debug) ret.add("debugpush \"$e\"")
         //[...]

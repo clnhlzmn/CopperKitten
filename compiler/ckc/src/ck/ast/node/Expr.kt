@@ -299,6 +299,29 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             result = 31 * result + body.hashCode()
             return result
         }
+
+        class ProductCtor(val params: List<Param>, t: Type): Expr(t) {
+
+            override fun <T> accept(visitor: ASTVisitor<T>): T =
+                visitor.visit(this)
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as ProductCtor
+
+                if (params != other.params) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                return params.hashCode()
+            }
+
+        }
+
     }
 
     class CFun(val id: String, val sig: Type, t: Type) : Expr(t) {
@@ -328,12 +351,12 @@ sealed class Expr(var t: Type) : BaseASTNode() {
         }
     }
 
-    data class Binding(val id: String, val type: Type?, val value: Expr) {
-        override fun toString(): String =
-            "$id${if (type != null) ": $type" else ""} = $value"
-    }
-
     class Let(val binding: Binding, val body: Expr, t: Type) : Expr(t) {
+
+        data class Binding(val id: String, val type: Type?, val value: Expr) {
+            override fun toString(): String =
+                "$id${if (type != null) ": $type" else ""} = $value"
+        }
 
         override fun <T> accept(visitor: ASTVisitor<T>): T =
             visitor.visit(this)
@@ -359,34 +382,34 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             return result
         }
 
-    }
+        class Rec(val bindings: List<Binding>, val body: Expr, t: Type) : Expr(t) {
 
-    class LetRec(val bindings: List<Binding>, val body: Expr, t: Type) : Expr(t) {
+            override fun <T> accept(visitor: ASTVisitor<T>): T =
+                visitor.visit(this)
 
-        override fun <T> accept(visitor: ASTVisitor<T>): T =
-            visitor.visit(this)
+            override fun toString(): String {
+                val bindingsString = bindings.map { p -> "$p" }.toDelimitedString(" and ")
+                return "{let rec $bindingsString; $body}"
+            }
 
-        override fun toString(): String {
-            val bindingsString = bindings.map { p -> "$p" }.toDelimitedString(" and ")
-            return "{let rec $bindingsString; $body}"
-        }
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
 
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+                other as Rec
 
-            other as LetRec
+                if (bindings != other.bindings) return false
+                if (body != other.body) return false
 
-            if (bindings != other.bindings) return false
-            if (body != other.body) return false
+                return true
+            }
 
-            return true
-        }
+            override fun hashCode(): Int {
+                var result = bindings.hashCode()
+                result = 31 * result + body.hashCode()
+                return result
+            }
 
-        override fun hashCode(): Int {
-            var result = bindings.hashCode()
-            result = 31 * result + body.hashCode()
-            return result
         }
 
     }

@@ -36,7 +36,14 @@ class DeclVisitor(val rest: Expr): ckBaseVisitor<Expr>() {
         val productCtorType = Type.Op("Fun", productCtorArgTypes + type)
 
         var ret = Expr.Let(
-            Expr.Binding(productCtx.ID().text, productCtorType, Expr.Tuple() /*TODO: implement ctor function here*/),
+            Expr.Let.Binding(
+                productCtx.ID().text,
+                productCtorType,
+                Expr.Fun.ProductCtor(
+                    productCtorArgTypes.map { at -> Expr.Fun.Param(Type.newId(), at) },
+                    productCtorType
+                )
+            ),
             rest,
             rest.t
         )

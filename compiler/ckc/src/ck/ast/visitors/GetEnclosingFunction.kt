@@ -49,7 +49,7 @@ class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
         return e.enclosingScope?.accept(this)
     }
 
-    override fun visit(e: Expr.LetRec): Expr.Fun? {
+    override fun visit(e: Expr.Let.Rec): Expr.Fun? {
         return e.enclosingScope?.accept(this)
     }
 
