@@ -9,7 +9,7 @@ file
     ;
 
 decl
-    : 'type' (rec='rec')? TYPEID '=' '(' typeParams? ')' ':' sum
+    : 'type' (rec='rec')? TYPEID '=' ('(' typeParams? ')' ':')? sum
     ;
 
 sum
@@ -71,7 +71,7 @@ type
     : TYPEID                    #simpleType
     | '(' types? ')' ':' type   #funType
     | '(' types? ')'            #tupleType
-    | TYPEID '(' types ')' #ctorType
+    | TYPEID '(' types ')'      #ctorType
     ;
 
 typeParams

@@ -230,6 +230,7 @@ sealed class Analyze {
                     e.t
                 }
                 is Expr.Fun.ProductCtor -> e.t
+                is Expr.Fun.ProductAccessor -> e.t
             }
 
     }

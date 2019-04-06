@@ -322,6 +322,27 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         }
 
+        class ProductAccessor(val index: Int, t: Type): Expr(t) {
+
+            override fun <T> accept(visitor: ASTVisitor<T>): T =
+                visitor.visit(this)
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as ProductAccessor
+
+                if (index != other.index) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                return index
+            }
+        }
+
     }
 
     class CFun(val id: String, val sig: Type, t: Type) : Expr(t) {

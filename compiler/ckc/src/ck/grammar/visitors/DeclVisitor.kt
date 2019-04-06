@@ -6,7 +6,9 @@ import ckBaseVisitor
 import ckParser
 import java.lang.RuntimeException
 
-class DeclVisitor(val rest: Expr): ckBaseVisitor<Expr>() {
+class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
+
+    //visit a top level decl
     override fun visitDecl(ctx: ckParser.DeclContext?): Expr {
         if (ctx!!.rec != null) TODO("not implemented")
 
@@ -23,6 +25,7 @@ class DeclVisitor(val rest: Expr): ckBaseVisitor<Expr>() {
             throw RuntimeException("type parameters must be unique")
 
         //create type
+        //TODO: check that type name is unique in context, maybe not here
         val type = Type.Op(ctx.TYPEID().text, env.map { p -> p.second })
 
         //sums not implemented
@@ -31,18 +34,15 @@ class DeclVisitor(val rest: Expr): ckBaseVisitor<Expr>() {
         //parse context of product
         val productCtx = ctx.sum().product()[0]
 
-        //create product data ctor
+        //create product ctor
         val ctorArgTypes = if (productCtx.types() == null) ArrayList() else productCtx.types().accept(TypesVisitor(env))
         val ctorType = Type.Op("Fun", ctorArgTypes + type)
 
-        //TODO: create product field accessor functions
-        val accessors = ArrayList<Expr>()
-        ctorArgTypes.forEachIndexed { index, type ->
-            //accessors.add()
-        }
+        //a list of the new bindings that this decl creates
+        val newBindings = ArrayList<Expr.Let.Binding>()
 
-        //TODO: fold accessors and ctor onto rest
-        var ret = Expr.Let(
+        //add the ctor
+        newBindings.add(
             Expr.Let.Binding(
                 productCtx.ID().text,
                 ctorType,
@@ -50,12 +50,25 @@ class DeclVisitor(val rest: Expr): ckBaseVisitor<Expr>() {
                     ctorArgTypes.map { at -> Expr.Fun.Param(Type.newId(), at) },
                     ctorType
                 )
-            ),
-            rest,
-            rest.t
+            )
         )
 
+        //add the accessors
+        ctorArgTypes.forEachIndexed { index, argType ->
+            val accessorType = Type.Op("Fun", listOf(type, argType))
+            newBindings.add(
+                Expr.Let.Binding(
+                    "_${ctx.TYPEID().text}_$index",
+                    accessorType,
+                    Expr.Fun.ProductAccessor(
+                        index,
+                        accessorType
+                    )
+                )
+            )
+        }
+
         //return augmented expr
-        return ret
+        return newBindings.foldRight(rest) { binding, acc -> Expr.Let(binding, acc, acc.t) }
     }
 }

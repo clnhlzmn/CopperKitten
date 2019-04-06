@@ -13,13 +13,17 @@ sealed class Definition(val local: Boolean) {
 //scope to find the definition of a ck.ast.node.Expr.Ref
 class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
 
-    override fun visit(e: Expr.Fun.ProductCtor): Definition? {
-        return null
-    }
-
     var isLocal = true
 
     var id: String? = null
+
+    override fun visit(e: Expr.Fun.ProductAccessor): Definition? {
+        return null
+    }
+
+    override fun visit(e: Expr.Fun.ProductCtor): Definition? {
+        return null
+    }
 
     override fun visit(f: CkFile): Definition? {
         return null
