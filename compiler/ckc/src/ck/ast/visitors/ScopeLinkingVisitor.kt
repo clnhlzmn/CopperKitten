@@ -10,11 +10,15 @@ class ScopeLinkingVisitor : BaseASTVisitor<Unit>() {
     //start with null scope (top level)
     var currentScope: ASTNode? = null
 
-    override fun visit(e: Expr.Fun.ProductAccessor) {
+    override fun visit(e: Expr.Fun.DataPredicate) {
         e.enclosingScope = currentScope
     }
 
-    override fun visit(e: Expr.Fun.ProductCtor) {
+    override fun visit(e: Expr.Fun.DataAccessor) {
+        e.enclosingScope = currentScope
+    }
+
+    override fun visit(e: Expr.Fun.DataConstructor) {
         e.enclosingScope = currentScope
     }
 

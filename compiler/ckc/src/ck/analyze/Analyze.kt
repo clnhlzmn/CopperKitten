@@ -229,8 +229,9 @@ sealed class Analyze {
                     e.t = csqType
                     e.t
                 }
-                is Expr.Fun.ProductCtor -> e.t
-                is Expr.Fun.ProductAccessor -> e.t
+                is Expr.Fun.DataConstructor -> e.t
+                is Expr.Fun.DataAccessor -> e.t
+                is Expr.Fun.DataPredicate -> e.t
             }
 
     }

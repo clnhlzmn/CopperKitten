@@ -1,3 +1,7 @@
+
+
+type List = (A): nil() | cons(A, List(A))
+
 {
     //native read and write funs for chars
     let read = cfun native_read ():Int;
@@ -43,19 +47,6 @@
     let true = (a, b): a;
     let false = (a, b): b;
     
-    //church lists
-    let nil = pair(true, true);
-    let isNil = fst;
-    let cons = (h, t): pair(false, pair(h, t));
-    let head = (l): fst(snd(l));
-    let tail = (l): snd(snd(l));
-    //let rec len = (l): if (isNil(l)(1, 0)) 0 else len(tail(l));
-    //
-    //
-    //let myLen = len(nil)
-    
-    //let myList = cons(42, nil)
-    
     let rec readIntImpl = (acc): {
         let char = read();
         if (char == 10 || char == 13) 
@@ -84,6 +75,16 @@
         forever(f)
     };
     
-    forever((): write(97 + 5))
+    let myList = cons(1, cons(2, cons(3, nil())));
+    
+    let rec len = (l): 
+        if (_List_is_nil(l))
+            0
+        else
+            1 + len(_List_cons_1(l));
+    
+    writeInt(len(myList))
+    
+    //forever((): write(97 + 5))
     
 }

@@ -10,11 +10,10 @@ class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
 
     //visit a top level decl
     override fun visitDecl(ctx: ckParser.DeclContext?): Expr {
-        if (ctx!!.rec != null) TODO("not implemented")
 
         //add params to env
         val env = ArrayList<Pair<String, Type>>()
-        if (ctx.typeParams() != null) {
+        if (ctx!!.typeParams() != null) {
             for (paramNode in ctx.typeParams().TYPEID()) {
                 env.add(Pair(paramNode.text, Type.newVar()))
             }
@@ -28,44 +27,63 @@ class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
         //TODO: check that type name is unique in context, maybe not here
         val type = Type.Op(ctx.TYPEID().text, env.map { p -> p.second })
 
-        //sums not implemented
-        if (ctx.sum().product().size != 1) TODO("not implemented")
-
-        //parse context of product
-        val productCtx = ctx.sum().product()[0]
-
-        //create product ctor
-        val ctorArgTypes = if (productCtx.types() == null) ArrayList() else productCtx.types().accept(TypesVisitor(env))
-        val ctorType = Type.Op("Fun", ctorArgTypes + type)
+        //add type to env (for recursive types)
+        env.add(Pair(ctx.TYPEID().text, type))
 
         //a list of the new bindings that this decl creates
         val newBindings = ArrayList<Expr.Let.Binding>()
 
-        //add the ctor
-        newBindings.add(
-            Expr.Let.Binding(
-                productCtx.ID().text,
-                ctorType,
-                Expr.Fun.ProductCtor(
-                    ctorArgTypes.map { at -> Expr.Fun.Param(Type.newId(), at) },
-                    ctorType
-                )
-            )
-        )
+        //for each product in the sum
+        ctx.sum().product().forEachIndexed { index, productContext ->
 
-        //add the accessors
-        ctorArgTypes.forEachIndexed { index, argType ->
-            val accessorType = Type.Op("Fun", listOf(type, argType))
+            //create constructor argument types
+            val constructorArgTypes =
+                if (productContext.types() == null)
+                    ArrayList()
+                else
+                    productContext.types().accept(TypesVisitor(env))
+
+            //create constructor function type
+            val constructorType = Type.Op("Fun", constructorArgTypes + type)
+
+            //add the constructor fun
             newBindings.add(
                 Expr.Let.Binding(
-                    "_${ctx.TYPEID().text}_$index",
-                    accessorType,
-                    Expr.Fun.ProductAccessor(
+                    productContext.ID().text,
+                    constructorType,
+                    Expr.Fun.DataConstructor(
+                        constructorArgTypes.map { at -> Expr.Fun.Param(Type.newId(), at) },
                         index,
-                        accessorType
+                        constructorType
                     )
                 )
             )
+
+            //create predicate type
+            val predicateType = Type.Op("Fun", listOf(type, Type.Op("Int")))
+
+            //add predicate function
+            newBindings.add(
+                Expr.Let.Binding(
+                    "_${ctx.TYPEID().text}_is_${productContext.ID().text}",
+                    predicateType,
+                    Expr.Fun.DataPredicate(index, predicateType)
+                )
+            )
+
+            //for each argument to this constructor add an accessor fun
+            constructorArgTypes.forEachIndexed { accessorIndex, accessorRetType ->
+                //create accessor fun type
+                val accessorType = Type.Op("Fun", listOf(type, accessorRetType))
+                //add accessor
+                newBindings.add(
+                    Expr.Let.Binding(
+                        "_${ctx.TYPEID().text}_${productContext.ID().text}_$accessorIndex",
+                        accessorType,
+                        Expr.Fun.DataAccessor(accessorIndex, accessorType)
+                    )
+                )
+            }
         }
 
         //return augmented expr

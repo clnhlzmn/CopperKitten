@@ -7,11 +7,15 @@ class FindTailCalls: BaseASTVisitor<Unit>() {
 
     var tailPosition = false
 
-    override fun visit(e: Expr.Fun.ProductCtor) {
+    override fun visit(e: Expr.Fun.DataPredicate) {
         //nothing
     }
 
-    override fun visit(e: Expr.Fun.ProductAccessor) {
+    override fun visit(e: Expr.Fun.DataConstructor) {
+        //nothing
+    }
+
+    override fun visit(e: Expr.Fun.DataAccessor) {
         //nothing
     }
 

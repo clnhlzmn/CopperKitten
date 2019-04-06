@@ -7,11 +7,15 @@ class ComputeCapturesVisitor : BaseASTVisitor<Unit>() {
 
     var currentFun: Expr.Fun? = null
 
-    override fun visit(e: Expr.Fun.ProductAccessor) {
+    override fun visit(e: Expr.Fun.DataPredicate) {
         //nothing
     }
 
-    override fun visit(e: Expr.Fun.ProductCtor) {
+    override fun visit(e: Expr.Fun.DataAccessor) {
+        //nothing
+    }
+
+    override fun visit(e: Expr.Fun.DataConstructor) {
         //nothing
     }
 

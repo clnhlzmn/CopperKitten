@@ -17,11 +17,15 @@ class GetDefinitionVisitor : BaseASTVisitor<Definition?>() {
 
     var id: String? = null
 
-    override fun visit(e: Expr.Fun.ProductAccessor): Definition? {
+    override fun visit(e: Expr.Fun.DataPredicate): Definition? {
         return null
     }
 
-    override fun visit(e: Expr.Fun.ProductCtor): Definition? {
+    override fun visit(e: Expr.Fun.DataAccessor): Definition? {
+        return null
+    }
+
+    override fun visit(e: Expr.Fun.DataConstructor): Definition? {
         return null
     }
 

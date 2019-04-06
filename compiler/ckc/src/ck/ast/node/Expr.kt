@@ -300,7 +300,8 @@ sealed class Expr(var t: Type) : BaseASTNode() {
             return result
         }
 
-        class ProductCtor(val params: List<Param>, t: Type): Expr(t) {
+        //function that constructs an instance of an adt
+        class DataConstructor(val params: List<Param>, val index: Int, t: Type): Expr(t) {
 
             override fun <T> accept(visitor: ASTVisitor<T>): T =
                 visitor.visit(this)
@@ -309,7 +310,7 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                 if (this === other) return true
                 if (javaClass != other?.javaClass) return false
 
-                other as ProductCtor
+                other as DataConstructor
 
                 if (params != other.params) return false
 
@@ -322,7 +323,8 @@ sealed class Expr(var t: Type) : BaseASTNode() {
 
         }
 
-        class ProductAccessor(val index: Int, t: Type): Expr(t) {
+        //function that checks if data is a particular instance (given by index) of a sum type
+        class DataPredicate(val index: Int, t: Type): Expr(t) {
 
             override fun <T> accept(visitor: ASTVisitor<T>): T =
                 visitor.visit(this)
@@ -331,7 +333,30 @@ sealed class Expr(var t: Type) : BaseASTNode() {
                 if (this === other) return true
                 if (javaClass != other?.javaClass) return false
 
-                other as ProductAccessor
+                other as DataPredicate
+
+                if (index != other.index) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                return index
+            }
+
+        }
+
+        //function that retrieves the field at index from a adt instance
+        class DataAccessor(val index: Int, t: Type): Expr(t) {
+
+            override fun <T> accept(visitor: ASTVisitor<T>): T =
+                visitor.visit(this)
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as DataAccessor
 
                 if (index != other.index) return false
 

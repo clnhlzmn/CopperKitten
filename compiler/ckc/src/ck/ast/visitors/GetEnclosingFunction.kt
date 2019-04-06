@@ -5,7 +5,11 @@ import ck.ast.node.Expr
 
 class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
 
-    override fun visit(e: Expr.Fun.ProductCtor): Expr.Fun? {
+    override fun visit(e: Expr.Fun.DataPredicate): Expr.Fun? {
+        return null
+    }
+
+    override fun visit(e: Expr.Fun.DataConstructor): Expr.Fun? {
         return null
     }
 
@@ -13,7 +17,7 @@ class GetEnclosingFunction : BaseASTVisitor<Expr.Fun?>() {
         return null
     }
 
-    override fun visit(e: Expr.Fun.ProductAccessor): Expr.Fun? {
+    override fun visit(e: Expr.Fun.DataAccessor): Expr.Fun? {
         return null
     }
 
