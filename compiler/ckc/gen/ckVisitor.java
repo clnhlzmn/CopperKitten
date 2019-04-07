@@ -160,6 +160,13 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLetRecExpr(ckParser.LetRecExprContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code tupleExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTupleExpr(ckParser.TupleExprContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code relExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -238,6 +245,13 @@ public interface ckVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFunType(ckParser.FunTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code tupleType}
+	 * labeled alternative in {@link ckParser#type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTupleType(ckParser.TupleTypeContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ctorType}
 	 * labeled alternative in {@link ckParser#type}.

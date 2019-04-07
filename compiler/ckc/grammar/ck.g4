@@ -9,8 +9,7 @@ file
     ;
 
 decl
-//    : 'type' TYPEID '=' ('(' typeParams? ')' ':')? sum
-    : 'type' ID '=' ('(' typeParams? ')' ':')? sum
+    : 'type' ID '=' ('(' typeParams? ')')? sum
     ;
 
 sum
@@ -23,7 +22,7 @@ product
 
 expr
     : '{' sequence '}'                                                  #sequenceExpr
-//    | '(' exprs? ')'                                                    #tupleExpr
+    | '(' exprs? ')'                                                    #tupleExpr
     | NATURAL                                                           #naturalExpr
     | TEXT                                                              #textExpr
     | ID                                                                #refExpr
@@ -41,7 +40,7 @@ expr
     | lhs=expr '||' rhs=expr                                            #orExpr
     | <assoc=right> cond=expr '?' con=expr ':' alt=expr                 #condExpr
     | <assoc=right> target=expr '=' value=expr                          #assignExpr
-    | '(' params? ')' ':' type? expr                                    #funExpr
+    | '(' params? ')' (':' type)? expr                                  #funExpr
     | 'cfun' ID type                                                    #cFunExpr
     | 'let' binding                                                     #letExpr
     | 'let' 'rec' binding ('and' binding)*                              #letRecExpr
@@ -70,16 +69,13 @@ params
     ;
 
 type
-//    : TYPEID                    #simpleType
-    : ID                    #simpleType
-    | '(' types? ')' ':' type   #funType
-//    | '(' types? ')'            #tupleType
-//    | TYPEID '(' types ')'      #ctorType
-    | ID '(' types ')'      #ctorType
+    : ID                        #simpleType
+    | '(' types? ')' type       #funType
+    | '(' types? ')'            #tupleType
+    | ID '(' types ')'          #ctorType
     ;
 
 typeParams
-//    : TYPEID ( ',' TYPEID )*
     : ID ( ',' ID )*
     ;
 
@@ -96,15 +92,7 @@ TEXT
 fragment
 EscapeSequence
     : '\\' ('b'|'t'|'n'|'f'|'r'|'"'|'\\')
-    | OctalEscape
     | UnicodeEscape
-    ;
-
-fragment
-OctalEscape
-    : '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    | '\\' ('0'..'7') ('0'..'7')
-    | '\\' ('0'..'7')
     ;
 
 fragment
