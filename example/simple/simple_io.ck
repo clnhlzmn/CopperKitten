@@ -57,16 +57,20 @@ type List = (A): nil() | cons(A, List(A))
             left(-1)
     };
     
-    let rec writeInt = (i): {
-        if (i != 0) {
-            write(i % 10 + 48);
-            writeInt(i / 10)
-        }
+    let rec writeIntImpl = (i): {
+        if (i / 10)
+            writeIntImpl(i / 10);
+        write(i % 10 + 48)
     };
     
-    let readInt = (): {
-        readIntImpl(0)
-    };
+    let writeInt = (i):
+        if (i < 0) {
+            write(45);
+            writeIntImpl(-i)
+        } else
+            writeIntImpl(i);
+    
+    let readInt = (): readIntImpl(0);
     
     map(readInt(), (l): write(97+4), (r): writeInt(r));
     
