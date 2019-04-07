@@ -27,13 +27,25 @@ public class ckBaseListener implements ckListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDecl(ckParser.DeclContext ctx) { }
+	@Override public void enterTypeDecl(ckParser.TypeDeclContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDecl(ckParser.DeclContext ctx) { }
+	@Override public void exitTypeDecl(ckParser.TypeDeclContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterModuleDecl(ckParser.ModuleDeclContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitModuleDecl(ckParser.ModuleDeclContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

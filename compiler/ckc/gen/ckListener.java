@@ -17,15 +17,29 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitFile(ckParser.FileContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ckParser#decl}.
+	 * Enter a parse tree produced by the {@code typeDecl}
+	 * labeled alternative in {@link ckParser#decl}.
 	 * @param ctx the parse tree
 	 */
-	void enterDecl(ckParser.DeclContext ctx);
+	void enterTypeDecl(ckParser.TypeDeclContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ckParser#decl}.
+	 * Exit a parse tree produced by the {@code typeDecl}
+	 * labeled alternative in {@link ckParser#decl}.
 	 * @param ctx the parse tree
 	 */
-	void exitDecl(ckParser.DeclContext ctx);
+	void exitTypeDecl(ckParser.TypeDeclContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code moduleDecl}
+	 * labeled alternative in {@link ckParser#decl}.
+	 * @param ctx the parse tree
+	 */
+	void enterModuleDecl(ckParser.ModuleDeclContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code moduleDecl}
+	 * labeled alternative in {@link ckParser#decl}.
+	 * @param ctx the parse tree
+	 */
+	void exitModuleDecl(ckParser.ModuleDeclContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ckParser#sum}.
 	 * @param ctx the parse tree

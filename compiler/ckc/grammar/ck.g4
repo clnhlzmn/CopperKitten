@@ -9,7 +9,8 @@ file
     ;
 
 decl
-    : 'type' ID '=' ('(' typeParams? ')')? sum
+    : 'type' ID '=' ('(' typeParams? ')')? sum                          #typeDecl
+    | 'module' ID '=' ('(' typeParams? ')')? '{' decl* '}'              #moduleDecl
     ;
 
 sum

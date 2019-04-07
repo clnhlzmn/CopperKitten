@@ -9,7 +9,7 @@ import java.lang.RuntimeException
 class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
 
     //visit a top level decl
-    override fun visitDecl(ctx: ckParser.DeclContext?): Expr {
+    override fun visitTypeDecl(ctx: ckParser.TypeDeclContext?): Expr {
 
         //add params to env
         val env = ArrayList<Pair<String, Type>>()
