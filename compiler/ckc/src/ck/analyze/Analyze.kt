@@ -6,7 +6,14 @@ import ck.ast.node.Expr
 //adapted from "Basic Polymorphic ck.ast.Type Checking" by Luca Cardelli
 sealed class Analyze {
 
-    data class Env(val id: String, val type: Type, val tail: Env?)
+    data class Env(val id: String, val type: Type, val tail: Env?) {
+        override fun toString(): String {
+            return if (tail == null)
+                "$id: $type"
+            else
+                "$id: $type, " + tail.toString()
+        }
+    }
 
     data class CopyEnv(val old: Type, val new: Type, val tail: CopyEnv?)
 
@@ -123,13 +130,19 @@ sealed class Analyze {
             }
         }
 
-        /**Whether [type] is generic w.r.t. [list] of non-generic type variables*/
-        private fun isGeneric(type: Type, list: NonGenericTypes?): Boolean =
+        //in the paper cardelli called this function "OccursInTypeList" and it looks like it
+        //would apply to TypeList or NonGenericTypes
+        //mine only applies to NonGenericTypes
+        private fun occursInNonGenericTypes(typeVar: Type, list: NonGenericTypes?): Boolean =
             when {
-                list == null -> true
-                type == list.type -> false
-                else -> isGeneric(type, list.tail)
+                list == null -> false
+                occursInType(typeVar, list.type) -> true
+                else -> occursInNonGenericTypes(typeVar, list.tail)
             }
+
+        /**Whether [type] is generic w.r.t. [list] of non-generic type variables*/
+        private fun isGeneric(typeVar: Type, list: NonGenericTypes?): Boolean =
+            !occursInNonGenericTypes(typeVar, list)
 
         /**returns the type of [e] in [env] given [list] of [NonGenericTypes]*/
         fun analyze(e: Expr, env: Env?, list: NonGenericTypes?): Type =
@@ -173,22 +186,16 @@ sealed class Analyze {
                 is Expr.Cond -> TODO()
                 is Expr.Assign -> TODO()
                 is Expr.Fun -> {
-                    //create new types for params
-//                    val paramTypes: List<ck.ast.Type> = e.params.map { ck.ast.Type.newVar() }
-                    //params should already have new types here
-                    val paramTypes: List<Type> = e.params.map { p -> p.t }
                     //extend env with mapping from param names to types
                     val bodyEnv: Env? =
-                        e.params.zip(paramTypes).foldRight(env) { pair, acc ->
-                            Env(pair.first.id, pair.second, acc)
-                        }
+                        e.params.foldRight(env) { param, acc -> Env(param.id, param.t, acc) }
                     //add param types to non generics
                     val bodyList: NonGenericTypes? =
-                        paramTypes.foldRight(list) { type, acc -> NonGenericTypes(type, acc) }
+                        e.params.foldRight(list) { param, acc -> NonGenericTypes(param.t, acc) }
                     //analyze body
                     val bodyType: Type = analyze(e.body, bodyEnv, bodyList)
                     //return fun type
-                    e.t = Type.Op("Fun", paramTypes + bodyType)
+                    e.t = Type.Op("Fun", e.params.map { p -> p.t } + bodyType)
                     e.t
                 }
                 is Expr.CFun -> {
@@ -225,8 +232,8 @@ sealed class Analyze {
                     unifyType(condType, Type.Op("Int"))
                     val csqType = analyze(e.csq, env, list)
                     val altType = if (e.alt == null) Type.Op("Unit") else analyze(e.alt, env, list)
-                    unifyType(csqType, altType)
-                    e.t = csqType
+                    unifyType(e.t, csqType)
+                    unifyType(e.t, altType)
                     e.t
                 }
                 is Expr.Fun.DataConstructor -> e.t
