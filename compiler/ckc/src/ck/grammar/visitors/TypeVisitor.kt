@@ -8,16 +8,16 @@ import java.lang.RuntimeException
 class TypeVisitor(val env: List<Pair<String, Type>> = emptyList()) : ckBaseVisitor<Type>() {
 
     override fun visitCtorType(ctx: ckParser.CtorTypeContext?): Type {
-        return Type.Op(ctx!!.TYPEID().text, ctx.types().accept(TypesVisitor(env)))
+        return Type.Op(ctx!!.ID().text, ctx.types().accept(TypesVisitor(env)))
     }
 
     override fun visitSimpleType(ctx: ckParser.SimpleTypeContext?): Type {
-        val found = env.find { p -> p.first == ctx!!.TYPEID().text }
+        val found = env.find { p -> p.first == ctx!!.ID().text }
         return when {
             found != null -> found.second
-            ctx!!.TYPEID().text == "Int" -> Type.Op("Int", emptyList())
-            ctx.TYPEID().text == "Unit" -> Type.Op("Unit", emptyList())
-            else -> throw RuntimeException("unknown type ${ctx.TYPEID().text}")
+            ctx!!.ID().text == "Int" -> Type.Op("Int", emptyList())
+            ctx.ID().text == "Unit" -> Type.Op("Unit", emptyList())
+            else -> throw RuntimeException("unknown type ${ctx.ID().text}")
         }
     }
 

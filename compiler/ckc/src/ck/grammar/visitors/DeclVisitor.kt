@@ -14,7 +14,7 @@ class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
         //add params to env
         val env = ArrayList<Pair<String, Type>>()
         if (ctx!!.typeParams() != null) {
-            for (paramNode in ctx.typeParams().TYPEID()) {
+            for (paramNode in ctx.typeParams().ID()) {
                 env.add(Pair(paramNode.text, Type.newVar()))
             }
         }
@@ -25,10 +25,10 @@ class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
 
         //create type
         //TODO: check that type name is unique in context, maybe not here
-        val type = Type.Op(ctx.TYPEID().text, env.map { p -> p.second })
+        val type = Type.Op(ctx.ID().text, env.map { p -> p.second })
 
         //add type to env (for recursive types)
-        env.add(Pair(ctx.TYPEID().text, type))
+        env.add(Pair(ctx.ID().text, type))
 
         //a list of the new bindings that this decl creates
         val newBindings = ArrayList<Expr.Let.Binding>()
@@ -65,7 +65,7 @@ class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
             //add predicate function
             newBindings.add(
                 Expr.Let.Binding(
-                    "_${ctx.TYPEID().text}_is_${productContext.ID().text}",
+                    "_${ctx.ID().text}_is_${productContext.ID().text}",
                     predicateType,
                     Expr.Fun.DataPredicate(index, predicateType)
                 )
@@ -78,7 +78,7 @@ class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
                 //add accessor
                 newBindings.add(
                     Expr.Let.Binding(
-                        "_${ctx.TYPEID().text}_${productContext.ID().text}_$accessorIndex",
+                        "_${ctx.ID().text}_${productContext.ID().text}_$accessorIndex",
                         accessorType,
                         Expr.Fun.DataAccessor(accessorIndex, accessorType)
                     )

@@ -59,6 +59,18 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitApplyExpr(ckParser.ApplyExprContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code textExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterTextExpr(ckParser.TextExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code textExpr}
+	 * labeled alternative in {@link ckParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitTextExpr(ckParser.TextExprContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code funExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -251,18 +263,6 @@ public interface ckListener extends ParseTreeListener {
 	 */
 	void exitLetRecExpr(ckParser.LetRecExprContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code tupleExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterTupleExpr(ckParser.TupleExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code tupleExpr}
-	 * labeled alternative in {@link ckParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitTupleExpr(ckParser.TupleExprContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code relExpr}
 	 * labeled alternative in {@link ckParser#expr}.
 	 * @param ctx the parse tree
@@ -396,18 +396,6 @@ public interface ckListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunType(ckParser.FunTypeContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code tupleType}
-	 * labeled alternative in {@link ckParser#type}.
-	 * @param ctx the parse tree
-	 */
-	void enterTupleType(ckParser.TupleTypeContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code tupleType}
-	 * labeled alternative in {@link ckParser#type}.
-	 * @param ctx the parse tree
-	 */
-	void exitTupleType(ckParser.TupleTypeContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code ctorType}
 	 * labeled alternative in {@link ckParser#type}.

@@ -9,7 +9,8 @@ file
     ;
 
 decl
-    : 'type' TYPEID '=' ('(' typeParams? ')' ':')? sum
+//    : 'type' TYPEID '=' ('(' typeParams? ')' ':')? sum
+    : 'type' ID '=' ('(' typeParams? ')' ':')? sum
     ;
 
 sum
@@ -22,8 +23,9 @@ product
 
 expr
     : '{' sequence '}'                                                  #sequenceExpr
-    | '(' exprs? ')'                                                    #tupleExpr
+//    | '(' exprs? ')'                                                    #tupleExpr
     | NATURAL                                                           #naturalExpr
+    | TEXT                                                              #textExpr
     | ID                                                                #refExpr
     | expr '(' exprs? ')'                                               #applyExpr
     | <assoc=right> op=( '-' | '!' | '~' ) expr                         #unaryExpr
@@ -68,14 +70,17 @@ params
     ;
 
 type
-    : TYPEID                    #simpleType
+//    : TYPEID                    #simpleType
+    : ID                    #simpleType
     | '(' types? ')' ':' type   #funType
-    | '(' types? ')'            #tupleType
-    | TYPEID '(' types ')'      #ctorType
+//    | '(' types? ')'            #tupleType
+//    | TYPEID '(' types ')'      #ctorType
+    | ID '(' types ')'      #ctorType
     ;
 
 typeParams
-    : TYPEID ( ',' TYPEID )*
+//    : TYPEID ( ',' TYPEID )*
+    : ID ( ',' ID )*
     ;
 
 types
@@ -84,8 +89,38 @@ types
 
 NATURAL : ('0'..'9')+ ;
 
-ID : ('_'|'a'..'z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
-TYPEID : ('A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
+TEXT
+    :  '"' ( EscapeSequence | ~('\\'|'"') )* '"'
+    ;
+
+fragment
+EscapeSequence
+    : '\\' ('b'|'t'|'n'|'f'|'r'|'"'|'\\')
+    | OctalEscape
+    | UnicodeEscape
+    ;
+
+fragment
+OctalEscape
+    : '\\' ('0'..'3') ('0'..'7') ('0'..'7')
+    | '\\' ('0'..'7') ('0'..'7')
+    | '\\' ('0'..'7')
+    ;
+
+fragment
+HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
+
+fragment
+UnicodeEscape
+    : '\\' 'u' HexDigit HexDigit HexDigit HexDigit
+    ;
+
+ID
+    : ('_'|'a'..'z'|'A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')*
+    | '`' ~('`')+ '`'
+    ;
+
+//TYPEID : ('A'..'Z') ('_'|'0'..'9'|'a'..'z'|'A'..'Z')* ;
 
 WHITESPACE : (' '|'\t'|'\u000C'|'\n'|'\r') -> skip ;
 COMMENT : '//' ~('\n'|'\r')* '\r'? '\n' -> skip ;

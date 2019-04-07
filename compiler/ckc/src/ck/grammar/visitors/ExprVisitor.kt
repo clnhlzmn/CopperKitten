@@ -22,9 +22,9 @@ class ExprVisitor : ckBaseVisitor<Expr>() {
         throw RuntimeException("let rec without body")
     }
 
-    override fun visitTupleExpr(ctx: ckParser.TupleExprContext?): Expr {
-        return Expr.Tuple(if (ctx!!.exprs() == null) ArrayList() else ctx.exprs().accept(ExprsVisitor()))
-    }
+//    override fun visitTupleExpr(ctx: ckParser.TupleExprContext?): Expr {
+//        return Expr.Tuple(if (ctx!!.exprs() == null) ArrayList() else ctx.exprs().accept(ExprsVisitor()))
+//    }
 
     override fun visitRefExpr(ctx: ckParser.RefExprContext?): Expr =
         Expr.Ref(ctx!!.text, Type.newVar())
