@@ -93,6 +93,7 @@ TEXT
 fragment
 EscapeSequence
     : '\\' ('b'|'t'|'n'|'f'|'r'|'"'|'\\')
+    | HexEscape
     | UnicodeEscape
     ;
 
@@ -100,8 +101,12 @@ fragment
 HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
 fragment
+HexEscape : '\\' 'x' HexDigit HexDigit ;
+
+fragment
 UnicodeEscape
     : '\\' 'u' HexDigit HexDigit HexDigit HexDigit
+    | '\\' 'u' HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit
     ;
 
 ID
