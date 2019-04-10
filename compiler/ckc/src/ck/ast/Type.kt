@@ -72,7 +72,7 @@ sealed class Type {
                 instance!!.isPolyType()
 
         override fun toString(): String =
-            if (instance != null) "$instance"
+            if (instance != null) "($id = $instance)"
             else id
 
     }
