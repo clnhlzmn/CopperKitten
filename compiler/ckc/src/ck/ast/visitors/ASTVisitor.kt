@@ -1,11 +1,15 @@
 package ck.ast.visitors
 
 import ck.ast.node.CkFile
+import ck.ast.node.Decl
 import ck.ast.node.Expr
 
 interface ASTVisitor<T> {
 
     fun visit(f: CkFile): T
+
+    fun visit(m: Decl.Module): T
+    fun visit(m: Decl.Type): T
 
     fun visit(e: Expr.Tuple): T
     fun visit(e: Expr.Sequence): T
@@ -27,6 +31,14 @@ interface ASTVisitor<T> {
 }
 
 open class BaseASTVisitor<T> : ASTVisitor<T> {
+    override fun visit(m: Decl.Type): T {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun visit(m: Decl.Module): T {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun visit(e: Expr.Fun.DataPredicate): T {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

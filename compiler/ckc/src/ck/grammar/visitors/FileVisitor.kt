@@ -1,6 +1,7 @@
 package ck.grammar.visitors
 
 import ck.ast.node.CkFile
+import ck.ast.node.Decl
 import ck.ast.node.Expr
 import ckBaseVisitor
 import ckParser
@@ -14,6 +15,6 @@ class FileVisitor : ckBaseVisitor<CkFile>() {
                 ExprVisitor().visit(ctx.expr())
             else
                 Expr.Tuple()
-        return CkFile(ctx.decl().foldRight(expr) { declContext, acc -> declContext.accept(DeclVisitor(acc)) })
+        return CkFile(emptyList(), ctx.decl().foldRight(expr) { declContext, acc -> declContext.accept(DeclVisitor(acc)) })
     }
 }
