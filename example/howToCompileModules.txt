@@ -1,0 +1,13 @@
+
+
+module Foo = {
+    let a = 42
+}
+
+print(Foo.a)
+
+//becomes
+
+{ let `Foo.a` = 42;
+    print(`Foo.a`) }
+
