@@ -1,5 +1,6 @@
 
 
+//modules not currently implemented
 module Either = {
     
     type T = (A, B) left(A) | right(B)

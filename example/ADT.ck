@@ -1,8 +1,8 @@
 
-type List = (A): nil() | cons(A, List(A))
+type List = (A) nil() | cons(A, List(A))
 
-{   
-    let rec len = (l): 
+{
+    let rec len = (l)
         if (_List_is_nil(l))
             0
         else

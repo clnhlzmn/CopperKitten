@@ -1,4 +1,4 @@
 {
-    let id = (a): a;
+    let id = (a) a;
     id (42)
 }
