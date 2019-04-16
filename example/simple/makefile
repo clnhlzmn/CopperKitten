@@ -4,8 +4,9 @@ CKC = java -jar ../../compiler/out/artifacts/ckc_jar/ckc.jar
 CKA = java -jar ../../compiler/out/artifacts/cka_jar/cka.jar
 
 #ck assembler options
-STACKSIZE = 10000
-HEAPSIZE = 1000
+STACKSIZE = 1000
+HEAPSIZE = 10000
+#set WORDSIZE for target machine
 WORDSIZE = 8
 GC = copying
 #DEBUG = -d

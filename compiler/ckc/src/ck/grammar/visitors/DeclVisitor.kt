@@ -65,7 +65,7 @@ class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
             //add predicate function
             newBindings.add(
                 Expr.Let.Binding(
-                    "_${ctx.ID().text}_is_${productContext.ID().text}",
+                    "is_${productContext.ID().text}",
                     predicateType,
                     Expr.Fun.DataPredicate(index, predicateType)
                 )
@@ -78,7 +78,7 @@ class DeclVisitor(private val rest: Expr): ckBaseVisitor<Expr>() {
                 //add accessor
                 newBindings.add(
                     Expr.Let.Binding(
-                        "_${ctx.ID().text}_${productContext.ID().text}_$accessorIndex",
+                        "${productContext.ID().text}_$accessorIndex",
                         accessorType,
                         Expr.Fun.DataAccessor(accessorIndex, accessorType)
                     )

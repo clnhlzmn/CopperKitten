@@ -13,6 +13,10 @@ decl
     | 'module' ID '=' ('(' typeParams? ')')? '{' decl* '}'              #moduleDecl
     ;
 
+typeParams
+    : ID ( ',' ID )*
+    ;
+
 sum
     : product ( '|' product )*
     ;
@@ -74,10 +78,6 @@ type
     | '(' types? ')' type       #funType
     | '(' types? ')'            #tupleType
     | ID '(' types ')'          #ctorType
-    ;
-
-typeParams
-    : ID ( ',' ID )*
     ;
 
 types

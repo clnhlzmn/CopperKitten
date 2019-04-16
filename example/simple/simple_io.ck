@@ -8,20 +8,23 @@ type Either = (A, B) left(A) | right(B)
     //native read and write funs for chars
     let read = cfun native_read ()Int;
     let write = cfun native_write (Int)Unit;
-        
+    
+    //read a char
     let char = read();
     
+    //either: Either(()Int, Int)
     let either = 
         if (char < 97)
             left(()60)
         else
             right(62);
     
+    //map: (Either(A, B), (A) C, (B) C) C
     let map = (e, l, r)
-        if (_Either_is_left(e))
-            l(_Either_left_0(e))
+        if (is_left(e))
+            l(left_0(e))
         else
-            r(_Either_right_0(e));
+            r(right_0(e));
 
     map(either, (f) write(f()), (i) write(i));
     write(10);
@@ -66,10 +69,10 @@ type Either = (A, B) left(A) | right(B)
     let myList = cons(1, cons(2, cons(3, nil())));
     
     let rec len = (l) 
-        if (_List_is_nil(l))
+        if (is_nil(l))
             0
         else
-            1 + len(_List_cons_1(l));
+            1 + len(cons_1(l));
     
     writeInt(len(myList))
     
