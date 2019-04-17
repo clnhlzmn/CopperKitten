@@ -3,7 +3,7 @@ package ck.analyze
 import ck.ast.Type
 import ck.ast.node.Expr
 
-//adapted from "Basic Polymorphic ck.ast.Type Checking" by Luca Cardelli
+//adapted from "Basic Polymorphic Type Checking" by Luca Cardelli
 sealed class Analyze {
 
     data class Env(val id: String, val type: Type, val tail: Env?) {
